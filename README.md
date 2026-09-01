@@ -1,4 +1,4 @@
-# Parama-Simulator
+# Drug Simulator
 
 > **循证治理的多药药代动力学 / 药效动力学机制模拟器**  
 > **Evidence-Governed Mechanistic Simulator for Multi-Drug Pharmacokinetic and Pharmacodynamic Interactions**
@@ -7,9 +7,9 @@
 
 ## 1. 总体设计 / Overall Design
 
-Parama-Simulator 将药物联用问题拆分为一条可追踪、可复现的计算链：
+Drug Simulator 将药物联用问题拆分为一条可追踪、可复现的计算链：
 
-Parama-Simulator decomposes multi-drug interaction analysis into a traceable and reproducible computational pipeline:
+Drug Simulator decomposes multi-drug interaction analysis into a traceable and reproducible computational pipeline:
 
 ```mermaid
 flowchart LR
@@ -753,7 +753,7 @@ flowchart LR
 ## 20. 模块结构 / Module Map
 
 ```text
-Parama-Simulator/
+drug-simulator/
 ├── contracts/
 │   ├── physiology
 │   ├── regimen
@@ -925,9 +925,9 @@ critical physiology or route missing
 
 ## 23. 与 Research OS 的关系 / Relationship to Research OS
 
-Parama-Simulator 可作为 Research OS 下的第二个领域内核。
+Drug Simulator 可作为 Research OS 下的第二个领域内核。
 
-Parama-Simulator can serve as a second domain kernel under the Research OS architecture.
+Drug Simulator can serve as a second domain kernel under the Research OS architecture.
 
 ```mermaid
 flowchart TD
@@ -938,7 +938,7 @@ flowchart TD
     A --> F["Deterministic Governance"]
 
     A --> Q["Quant Kernel"]
-    A --> P["Parama Kernel"]
+    A --> P["Drug Simulation Kernel"]
 
     Q --> Q1["Markets / Factors / Portfolios"]
     P --> P1["Compounds / Exposure / Pathways"]
@@ -991,7 +991,7 @@ What critical information is missing?
 
 ## 25. 桌面版可视化规范 / Desktop Visualization Grammar
 
-Parama-Simulator 的桌面应用应使用一致的视觉语义，使用户能够在不重新学习图例的情况下跨页面理解药物、时间状态、模拟性质与不确定性。
+Drug Simulator 的桌面应用应使用一致的视觉语义，使用户能够在不重新学习图例的情况下跨页面理解药物、时间状态、模拟性质与不确定性。
 
 The desktop application should use a consistent visual grammar so users can interpret compound identity, temporal state, simulation status, and uncertainty across views without relearning the legend.
 
@@ -1339,7 +1339,7 @@ The repository provides a product thesis, system boundaries, PK/PD and interacti
 
 ## 28. 目标用户 / Intended Users
 
-Parama-Simulator 面向：
+Drug Simulator 面向：
 
 - 研究 PK/PD、给药时间轴和机制交互的工程或计算研究人员；
 - 需要证据可追溯、缺失信息可见的模拟原型团队；
@@ -1443,3 +1443,49 @@ report schema version
 5. 如何用单元、性质、回归或敏感性测试验证？
 
 详细 backlog、验收矩阵、数据准入规则与启动清单见 [`idea-structure.md`](./idea-structure.md)。
+
+---
+
+## 34. 医学与工程加固包 / Medical and Engineering Hardening Pack
+
+本归档新增了一组可直接约束实现的补充材料：
+
+- [`docs/medical-and-pharmacology-gap-analysis.md`](./docs/medical-and-pharmacology-gap-analysis.md)：审查适用人群、制剂、特殊场景、非线性/时变机制、临床结局边界和声明用语。
+- [`docs/software-architecture-and-module-contracts.md`](./docs/software-architecture-and-module-contracts.md)：定义纯科学内核、端口/适配器、不可变工件、模块状态和依赖禁区。
+- [`docs/verification-and-cross-validation-plan.md`](./docs/verification-and-cross-validation-plan.md)：定义解析 oracle、独立实现、变形测试、外部验证和 `NOT_RUN` 边界。
+- [`contracts/`](./contracts/)：提供模块结果、模型适用域和验证包的 JSON Schema 起点。
+- [`examples/synthetic/`](./examples/synthetic/)：只包含明确标记的合成契约示例，不代表真实药物或患者。
+
+这些材料将“模块解耦”和“交叉验证”从建议提升为发布约束。当前仍是设计基线；新增 schema 通过结构验收不等于药理、医学或临床验证。
+
+---
+
+## 35. 零数据外传 / Zero-Data-Egress Local Processing
+
+严格隐私模式采用两条完全分离的数据平面：联网获取区只能按照固定公共清单拉取公开资料，不能读取病例、方案或模拟结果；本地敏感区可以执行证据匹配、PK/PD、DDI、本地 AI 与报告，但全部组件默认禁网。
+
+- 设计与威胁模型：[`docs/local-private-data-architecture.md`](./docs/local-private-data-architecture.md)
+- 出站策略契约：[`contracts/network-egress-policy.schema.json`](./contracts/network-egress-policy.schema.json)
+- 合成严格模式示例：[`examples/synthetic/network-egress-policy.example.json`](./examples/synthetic/network-egress-policy.example.json)
+
+默认禁止把病例内容转写成外部检索词。资料不足时返回 `EVIDENCE_SNAPSHOT_INSUFFICIENT`，由人员更新不含病例语境的公共获取清单；系统不会静默降级到云端检索、外部 LLM、OCR、翻译或遥测服务。
+
+---
+
+## 36. 三层重叠验证森林 / Three-Layer Overlapping Validation Forest
+
+现有阶段被进一步拆成身份、单位、隐私、给药、时间、生理修正、方程构造、耦合组装、数值求解、暴露投影、稳态检测、靶点、状态响应、通路、端点、风险、归因、不确定性、比较、证据覆盖、治理和报告等单一责任模块。
+
+每个阶段结论及最终结论强制具有：
+
+```text
+L1 module scientific/numerical validation
+L2 adjacent and cross-stage validation
+L3 orthogonal independent validation
+```
+
+三层必须来自不同独立性域、连接不同证据 anchor，并通过 `OVERLAPS_WITH` 形成连通交互子图。所有阶段树必须接入同一个最终关系森林；循环自证、孤立结论、生产结果生成 expected value、同一 helper 包装成多个验证器均会失败关闭。
+
+- 细粒度模块与验证规则：[`docs/decomposed-modules-and-validation-forest.md`](./docs/decomposed-modules-and-validation-forest.md)
+- 森林契约：[`contracts/validation-forest.schema.json`](./contracts/validation-forest.schema.json)
+- 合成连通示例：[`examples/synthetic/validation-forest.example.json`](./examples/synthetic/validation-forest.example.json)

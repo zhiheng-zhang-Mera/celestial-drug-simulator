@@ -1,6 +1,6 @@
-# Parama-Simulator — idea-structure.md
+# Drug Simulator — idea-structure.md
 
-> **Working title:** Parama-Simulator  
+> **Working title:** Drug Simulator
 > **Project class:** Evidence-governed mechanistic pharmacology simulator  
 > **Primary use case:** For medically literate users who already know which compound(s) and regimen(s) they want to examine, but need a structured, auditable simulation of expected single-drug and multi-drug effects, interaction mechanisms, exposure changes, and interaction-specific adverse effects.  
 > **Explicit non-goal:** The system does **not** diagnose disease, recommend a drug, choose an “optimal stack,” prescribe treatment, or replace clinician judgment.
@@ -9,7 +9,7 @@
 
 ## 1. Product thesis
 
-Parama-Simulator answers one constrained question:
+Drug Simulator answers one constrained question:
 
 > **Given a physiological baseline and a fixed set of compounds, doses, administration routes, formulations, timing, and duration, what does the available pharmacological evidence imply about the expected exposure, mechanism-level activity, physiological effects, adverse effects, and drug-drug interactions?**
 
@@ -177,7 +177,7 @@ interaction_delta =
 Recommended repository layout:
 
 ```text
-Parama-Simulator/
+drug-simulator/
 ├── README.md
 ├── idea-structure.md
 ├── pyproject.toml
@@ -190,7 +190,7 @@ Parama-Simulator/
 │   ├── simulation_limits.yaml
 │   └── units.yaml
 │
-├── parama/
+├── drug_simulator/
 │   ├── __init__.py
 │   │
 │   ├── contracts/
@@ -1318,10 +1318,10 @@ Returns reproducible simulation snapshot.
 ## 22. CLI design
 
 ```bash
-parama simulate examples/two_drug_pk_interaction.yaml
-parama inspect-compound COMPOUND_ID
-parama inspect-evidence COMPOUND_ID
-parama replay RUN_ID
+drug-simulator simulate examples/two_drug_pk_interaction.yaml
+drug-simulator inspect-compound COMPOUND_ID
+drug-simulator inspect-evidence COMPOUND_ID
+drug-simulator replay RUN_ID
 ```
 
 ---
@@ -1561,7 +1561,7 @@ Later:
 
 ## 28. Relationship to Quant-Ultra / Research OS
 
-Parama-Simulator can be framed as a second domain kernel under a domain-independent research governance layer.
+Drug Simulator can be framed as a second domain kernel under a domain-independent research governance layer.
 
 ```text
 Research OS
@@ -1574,13 +1574,13 @@ Research OS
 ├── Quant Kernel
 │   └── markets / factors / portfolios
 │
-└── Parama Kernel
+└── Drug Simulation Kernel
     └── compounds / exposure / pathways
 ```
 
 Shared concepts:
 
-| Research OS concept | Quant domain | Parama domain |
+| Research OS concept | Quant domain | Drug simulation domain |
 |---|---|---|
 | state | market state | physiological state |
 | entity | asset/factor | compound/target |
@@ -1683,7 +1683,7 @@ Deliver:
 The MVP is ready when one command can:
 
 ```bash
-parama simulate examples/demo.yaml
+drug-simulator simulate examples/demo.yaml
 ```
 
 and generate a report that answers, for every supplied compound:
@@ -2133,11 +2133,11 @@ This requires a stable `compound_id` and graph node identity across all artifact
 The repository layout should explicitly include timeline and visualization-model layers:
 
 ```text
-Parama-Simulator/
+drug-simulator/
 ├── README.md
 ├── idea-structure.md
 │
-├── parama/
+├── drug_simulator/
 │   ├── contracts/
 │   ├── canonicalization/
 │   ├── knowledge/
@@ -2414,3 +2414,76 @@ Each record should state context, alternatives, evidence, decision, uncertainty,
 - [ ] Add clean-environment CI for contracts, math, reports, and deterministic replay.
 - [ ] Produce the first bounded report with explicit non-claims.
 - [ ] Review public documentation for medical-safety wording before the first tag.
+
+---
+
+## 47. Hardening Documents and Executable Contracts
+
+The following files are normative supplements for the next implementation phase:
+
+```text
+docs/medical-and-pharmacology-gap-analysis.md
+docs/software-architecture-and-module-contracts.md
+docs/verification-and-cross-validation-plan.md
+contracts/module-result.schema.json
+contracts/applicability-domain.schema.json
+contracts/validation-bundle.schema.json
+examples/synthetic/applicability-domain.example.json
+```
+
+The medical review adds first-class clinical context, formulation context, physiology trajectories, applicability domains, stateful response models, coupled DDI solving, and a strict separation between mechanistic hazard signals and clinical outcome risk.
+
+The software architecture makes scientific modules pure and replaceable behind versioned ports. Modules exchange immutable artifacts only; governance controls claim permissions without rewriting scientific values, and reporting never infers missing pharmacology.
+
+The verification plan requires triangulation through analytic oracles, independent implementations, and metamorphic properties. Engineering verification layers V0-V2 must not be presented as pharmacological, population, or clinical validation; unexecuted V3-V5 layers remain `NOT_RUN`.
+
+---
+
+## 48. Strict Local Privacy Architecture
+
+Strict local mode separates public evidence acquisition from sensitive computation:
+
+```text
+fixed public source manifest
+-> isolated acquisition zone with no sensitive-data access
+-> quarantined passive normalization
+-> signed evidence snapshot
+-> one-way local import
+-> network-denied scientific core, local AI, report, and UI
+```
+
+The acquisition zone never receives case-derived queries. The sensitive zone never receives network capability. Missing local evidence produces `EVIDENCE_SNAPSHOT_INSUFFICIENT`; it does not trigger an external search or cloud fallback.
+
+Normative supplements:
+
+```text
+docs/local-private-data-architecture.md
+contracts/network-egress-policy.schema.json
+examples/synthetic/network-egress-policy.example.json
+```
+
+Release evidence must include an offline end-to-end run, OS-level connection audit, canary non-disclosure test, remote-resource scan, dependency telemetry review, and deletion test. Passing these checks is bounded evidence for the tested build and deployment, not an absolute privacy or legal-compliance guarantee.
+
+---
+
+## 49. Decomposed Modules and One Connected Validation Forest
+
+The implementation baseline now separates canonicalization, privacy classification, regimen parsing, observed administration, event materialization, timeline boundaries, horizon policy, time-grid construction, physiology observations, physiology modifiers, formulation input, parent PK, metabolite PK, DDI coupling, numerical solving, exposure projection, steady-state detection, target binding, stateful response, pathway propagation, endpoint aggregation, hazard classification, attribution, uncertainty binding/propagation, compatibility, comparison, evidence coverage, governance, relationship assembly, and reporting.
+
+Every `STAGE_CONCLUSION` and `FINAL_CONCLUSION` requires three overlapping but independently anchored validators:
+
+```text
+L1 local scientific and numerical properties
+L2 adjacent-module and cross-stage invariants
+L3 independent implementation, external reference, or adjudication
+```
+
+The three validators must have distinct independence domains and anchors, and their overlap edges must form a connected subgraph. The directed support graph must remain acyclic. All stage trees must be aggregated into a final conclusion root, and the complete undirected view must contain exactly one connected component.
+
+Normative files:
+
+```text
+docs/decomposed-modules-and-validation-forest.md
+contracts/validation-forest.schema.json
+examples/synthetic/validation-forest.example.json
+```
