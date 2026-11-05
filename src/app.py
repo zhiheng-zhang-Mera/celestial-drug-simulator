@@ -7,10 +7,20 @@ from tkinter import ttk, filedialog
 def main():
     from src.simulation import load_catalog, simulate
     catalog = load_catalog()
-    root = tk.Tk()
-    root.title('Celestial Drug Simulator · 多药研究与证据')
-    root.geometry('1080x760')
-    root.minsize(800, 600)
+    from src.body_ui import AnatomyWorkspace, apply_theme
+    window = tk.Tk()
+    window.title('Celestial Drug Simulator · 人体作用与证据')
+    window.geometry('1440x940')
+    window.minsize(1160, 780)
+    apply_theme(window)
+    header = tk.Frame(window, bg='#0E141C', padx=24, pady=14)
+    header.pack(fill='x')
+    tk.Label(header, text='CELESTIAL / DRUG', bg='#0E141C', fg='#5BD8C7', font=('Microsoft YaHei UI',10,'bold')).pack(anchor='w')
+    tk.Label(header, text='人体作用与证据', bg='#0E141C', fg='#E8EFF5', font=('Microsoft YaHei UI',22,'bold')).pack(anchor='w')
+    tabs = ttk.Notebook(window); tabs.pack(fill='both', expand=True)
+    body_host = ttk.Frame(tabs); tabs.add(body_host, text='人体作用')
+    root = ttk.Frame(tabs); tabs.add(root, text='多药方案 / 暴露 / 报告')
+    body = None
     rows = []
     result = None
     context = {}
@@ -86,6 +96,8 @@ def main():
                            values=(item['kind'], item['route'], item['dose_mg'], item['half_life_h']))
         invalidate()
         status.set(f'已添加 {len(rows)} 种；编辑器修改需点“更新选中”。')
+        if body is not None:
+            body.drug = None; body.choice.set('未选择物质'); body.render()
 
     def read_editor():
         item = {key: (v.get().strip() if key == 'name' else
@@ -119,6 +131,8 @@ def main():
         kind.set(item['kind']); route.set(item['route']); source.set(item['source'])
         category.set(item.get('category', 'medicine'))
         if item['compound_id']: selection.set(item['compound_id'])
+        if body is not None:
+            body.drug = dict(item); body.choice.set('方案选中 / '+item['name']); body.render()
 
     def remove():
         for index in sorted((int(i) for i in listing.selection()), reverse=True): rows.pop(index)
@@ -177,6 +191,7 @@ def main():
         context = candidate
         invalidate()
         status.set('本次生理/基因基线已保存到内存；未应用代谢修正。导出报告会包含这些数据。')
+        if body is not None: body.render()
 
     def open_context():
         from src.context_dialog import edit_context
@@ -194,7 +209,13 @@ def main():
     for variable in list(variables.values()) + [kind, route, selection, source, category]:
         variable.trace_add('write', invalidate)
     show('添加任意名称的自定义药物；来源未审查时保留缺口。不会自动联网或将研究观察值套用到当前方案。')
-    root.mainloop()
+    def selected_item():
+        selected = listing.selection()
+        return dict(rows[int(selected[0])]) if selected else None
+    body = AnatomyWorkspace(body_host, catalog, selected_item, lambda: context,
+                            open_context, open_sources, lambda: tabs.select(root))
+    body.pack(fill='both', expand=True)
+    window.mainloop()
 
 
 if __name__ == '__main__':
