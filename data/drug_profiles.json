@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-11-05T00:00:00+00:00",
+  "review_timestamp_precision": "day",
+  "scope": "Partial curated ingredient library; public-label facts, not a complete pharmacopoeia or patient-specific model.",
+  "profiles": {
+    "estradiol": {
+      "name": "雌二醇 / estradiol",
+      "aliases": ["雌二醇", "estradiol", "17β-estradiol"],
+      "lookup_name": "ESTRADIOL",
+      "route": "oral",
+      "formulation": "micronized oral tablet",
+      "half_life_h": null,
+      "population": "所引口服片标签；未提供可采用的数值半衰期",
+      "parameter_note": "口服微粒化雌二醇片：所引标签未给出数值半衰期，保持未知。不得套用透皮、注射、舌下或雌二醇酯参数；不生成个人浓度曲线。",
+      "source_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bfc1beb9-1ade-446e-97dd-55b41c2fa851",
+      "source_section": "CLINICAL PHARMACOLOGY / Pharmacokinetics / Drug Interactions",
+      "facts": [{"fact": "estrogen_partial_cyp3a4_metabolism", "section": "CLINICAL PHARMACOLOGY / Pharmacokinetics / Drug Interactions", "summary": "标签指出雌激素代谢部分涉及 CYP3A4，酶抑制可能提高雌激素暴露。"}]
+    },
+    "bicalutamide": {
+      "name": "比卡鲁胺 / bicalutamide",
+      "aliases": ["比卡鲁胺", "bicalutamide"],
+      "lookup_name": "BICALUTAMIDE",
+      "route": "oral",
+      "formulation": "oral tablet",
+      "half_life_h": 139.2,
+      "population": "正常男性 n=30；标签表 3 的活性 R-对映体参数",
+      "parameter_note": "活性 R-bicalutamide：标签表 3 正常男性 n=30 的平均半衰期 5.8 天（139.2 小时），标准差 2.29 天。表中同时列有单次给药峰值参数；不能当作所有人、所有肝功能状态的固定值，也不能推出本组合的相互作用倍数。",
+      "source_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7a08d88b-051a-4c16-9560-12685c500c58",
+      "source_section": "12.3 Pharmacokinetics / Table 3 (normal males n=30)",
+      "facts": [{"fact": "r_bicalutamide_cyp3a4_inhibition", "section": "7. DRUG INTERACTIONS", "summary": "标签的体外研究显示活性 R-比卡鲁胺抑制 CYP3A4；这不是本组合的临床试验结论。"}]
+    },
+    "fluconazole": {
+      "name": "氟康唑 / fluconazole",
+      "aliases": ["氟康唑", "fluconazole"],
+      "lookup_name": "FLUCONAZOLE",
+      "route": "oral",
+      "formulation": "DIFLUCAN oral",
+      "half_life_h": 30,
+      "population": "空腹正常志愿者；口服给药",
+      "parameter_note": "沿用已引用 DIFLUCAN 标签事实：口服终末半衰期约 30 小时，所述范围 20–50 小时。范围不是置信区间，也不是个体参数。",
+      "source_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204",
+      "source_section": "CLINICAL PHARMACOLOGY / Pharmacokinetics and Metabolism",
+      "facts": []
+    },
+    "midazolam": {
+      "name": "咪达唑仑 / midazolam",
+      "aliases": ["咪达唑仑", "midazolam"],
+      "lookup_name": "MIDAZOLAM",
+      "route": "oral",
+      "formulation": "未建立独立剂型参数",
+      "half_life_h": null,
+      "population": "独立药品参数尚缺",
+      "parameter_note": "现有目录仅收录 DIFLUCAN 标签中的相互作用研究；未建立咪达唑仑的独立口服药代参数。",
+      "source_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204",
+      "source_section": "CLINICAL PHARMACOLOGY / Drug Interaction Studies / Midazolam",
+      "facts": [],
+      "standalone_seed": false
+    },
+    "tofacitinib": {
+      "name": "托法替布 / tofacitinib",
+      "aliases": ["托法替布", "tofacitinib"],
+      "lookup_name": "TOFACITINIB",
+      "route": "oral",
+      "formulation": "未建立独立剂型参数",
+      "half_life_h": null,
+      "population": "独立药品参数尚缺",
+      "parameter_note": "现有目录仅收录 DIFLUCAN 标签中的相互作用研究；未建立托法替布的独立口服药代参数。",
+      "source_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204",
+      "source_section": "CLINICAL PHARMACOLOGY / Drug Interaction Studies / Tofacitinib",
+      "facts": [],
+      "standalone_seed": false
+    }
+  }
+}

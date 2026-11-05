@@ -23,7 +23,9 @@ def apply_theme(root):
     style.configure('Treeview.Heading',background='#26333F',foreground=TEXT)
     style.configure('TNotebook',background=BG,borderwidth=0)
     style.configure('TNotebook.Tab',padding=(22,10),background=PANEL,foreground=MUTED)
-    style.map('TNotebook.Tab',background=[('selected','#16413E')],foreground=[('selected',ACCENT)])
+    style.map('TNotebook.Tab',background=[('selected','#16413E')],foreground=[('selected',ACCENT)],
+              padding=[('selected',(22,10)),('!selected',(22,10))],
+              expand=[('selected',(0,0,0,0)),('!selected',(0,0,0,0))])
     root.option_add('*TCombobox*Listbox.background','#1D2A38')
     root.option_add('*TCombobox*Listbox.foreground',TEXT)
 

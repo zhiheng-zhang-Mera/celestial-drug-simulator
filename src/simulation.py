@@ -3,6 +3,7 @@ from hashlib import sha256
 from itertools import combinations
 from pathlib import Path
 import json
+import math
 from src.exposure import Regimen, concentration
 from src.context import normalize_context
 
@@ -35,19 +36,33 @@ def simulate(items, context=None):
         if kind not in ('synthetic', 'custom', 'catalog'):
             raise ValueError('未知药物类型。')
         if kind == 'catalog':
-            if compound_id not in catalog['compounds']: raise ValueError('来源库无此药物 ID。')
+            if compound_id not in catalog['compounds']:
+                from src.drug_library import profile_for
+                profile=profile_for(compound_id, raw.get('route','oral'))
+                if profile is None: raise ValueError('来源库无此药物 ID。')
+                catalog['compounds'][compound_id]=profile
             if compound_id in identities: raise ValueError('同一来源药物不能重复添加；请更新原条目。')
             identities.add(compound_id)
         elif compound_id:
             raise ValueError('自定义与合成药物不能冒用来源库 ID。')
-        try:
-            regimen = Regimen(*(raw[key] for key in ('dose_mg', 'volume_l', 'half_life_h', 'interval_h', 'count')))
-        except (KeyError, TypeError) as exc:
-            raise ValueError('缺少或无效的数值参数。') from exc
-        horizon = (regimen.count - 1) * regimen.interval_h + 5 * regimen.half_life_h
-        if not 0 < horizon <= 8760: raise ValueError('此版本时间范围必须小于等于 8760 小时。')
+        evidence_mode=raw.get('model_mode')=='evidence'
+        regimen=None
+        if evidence_mode:
+            for key in ('dose_mg','interval_h','half_life_h','volume_l'):
+                value=raw.get(key)
+                if value is not None and (isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<=0):
+                    raise ValueError('填写的剂量、时间或参数必须为有限正数。')
+            if raw.get('count') is not None and (type(raw['count']) is not int or not 1<=raw['count']<=1000):
+                raise ValueError('次数必须为1到1000的整数。')
+        else:
+            try:
+                regimen = Regimen(*(raw[key] for key in ('dose_mg', 'volume_l', 'half_life_h', 'interval_h', 'count')))
+            except (KeyError, TypeError) as exc:
+                raise ValueError('缺少或无效的数值参数。') from exc
+            horizon = (regimen.count - 1) * regimen.interval_h + 5 * regimen.half_life_h
+            if not 0 < horizon <= 8760: raise ValueError('此版本时间范围必须小于等于 8760 小时。')
         route = raw.get('route')
-        if route not in ('iv_bolus', 'oral', 'infusion'): raise ValueError('未知给药途径。')
+        if route not in ('iv_bolus', 'oral', 'infusion','transdermal','sublingual','injection','other'): raise ValueError('未知给药途径。')
         gaps = []
         category = raw.get('category', 'medicine')
         if category not in ('medicine', 'supplement', 'botanical', 'food_beverage', 'other'):
@@ -55,20 +70,22 @@ def simulate(items, context=None):
         if category != 'medicine': gaps.append('COMPOSITION_NOT_RESOLVED')
         if kind != 'synthetic': gaps += ['PARAMETERS_NOT_REVIEWED', 'MODEL_DOMAIN_NOT_VALIDATED']
         if route != 'iv_bolus': gaps.append('UNSUPPORTED_ROUTE')
+        if evidence_mode:gaps.append('NO_VALIDATED_EXPOSURE_MODEL')
         entry = dict(raw, name=name, category=category, gaps=gaps,
                      status='SYNTHETIC_ONLY' if kind == 'synthetic' else 'PENDING_REVIEW')
         if kind == 'catalog': entry['source_profile'] = catalog['compounds'][compound_id]
         entries.append(entry)
         regimes.append(regimen)
-    times = sorted({max((r.count - 1) * r.interval_h + 5 * r.half_life_h for r in regimes) * i / 100
-                    for i in range(101)} | {i * r.interval_h for r in regimes for i in range(r.count)})
+    active_regimes=[r for r in regimes if r is not None]
+    times = sorted({max((r.count - 1) * r.interval_h + 5 * r.half_life_h for r in active_regimes) * i / 100
+                    for i in range(101)} | {i * r.interval_h for r in active_regimes for i in range(r.count)}) if active_regimes else []
     full_sample_count = len(times)
     if len(times) > 2048:
         times = [times[round(i * (len(times) - 1) / 2047)] for i in range(2048)]
     curves = [dict(name=entry['name'], interpretation=('SYNTHETIC_IV_BASELINE_NO_DDI' if entry['kind'] == 'synthetic'
                                                     else 'UNVERIFIED_USER_PARAMETER_WHAT_IF_NO_DDI'),
                    values=[concentration(regimen, time) for time in times])
-              for entry, regimen in zip(entries, regimes) if entry['kind'] in ('synthetic', 'custom') and entry['route'] == 'iv_bolus']
+              for entry, regimen in zip(entries, regimes) if regimen is not None and entry['kind'] in ('synthetic', 'custom') and entry['route'] == 'iv_bolus']
     pairs = []
     for a, b in combinations(entries, 2):
         evidence = []
