@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "retrieved_at": "2026-11-05T05:50:12.378420+00:00",
+  "diplotypes": {
+    "status": "FETCHED",
+    "url": "https://api.cpicpgx.org/v1/diplotype?genesymbol=eq.CYP2D6&diplotype=in.(*1/*1,*1/*4,*4/*4)&select=genesymbol,diplotype,function1,function2,totalactivityscore,generesult",
+    "data": [
+      {
+        "genesymbol": "CYP2D6",
+        "diplotype": "*1/*1",
+        "function1": "Normal function",
+        "function2": "Normal function",
+        "totalactivityscore": "2.0",
+        "generesult": "Normal Metabolizer"
+      },
+      {
+        "genesymbol": "CYP2D6",
+        "diplotype": "*1/*4",
+        "function1": "Normal function",
+        "function2": "No function",
+        "totalactivityscore": "1.0",
+        "generesult": "Intermediate Metabolizer"
+      },
+      {
+        "genesymbol": "CYP2D6",
+        "diplotype": "*4/*4",
+        "function1": "No function",
+        "function2": "No function",
+        "totalactivityscore": "0.0",
+        "generesult": "Poor Metabolizer"
+      }
+    ],
+    "data_sha256": "b987d8b4a64f52df2a0018d0502ea71eb5a641877b1c0a79332ac44b9097ed7e",
+    "response_sha256": "50f997ca699937a025ff84c817fe13a47295867c17773415a5ac6c66205aaeff",
+    "license_review": "PENDING"
+  },
+  "pair": {
+    "status": "FETCHED",
+    "url": "https://api.cpicpgx.org/v1/pair?genesymbol=eq.CYP2D6&drugid=eq.RxNorm:38400",
+    "data": [
+      {
+        "pairid": 110083,
+        "genesymbol": "CYP2D6",
+        "drugid": "RxNorm:38400",
+        "guidelineid": 104243,
+        "usedforrecommendation": true,
+        "version": 89,
+        "cpiclevel": "A",
+        "clinpgxlevel": "1A",
+        "pgxtesting": "Actionable PGx",
+        "citations": [
+          "30801677"
+        ],
+        "removed": false,
+        "removeddate": null,
+        "removedreason": null
+      }
+    ],
+    "data_sha256": "c5cf94809a6fadeedb2c670d85436e0e828e1c940612b040b6ad368f0669a120",
+    "response_sha256": "c0576f16119fc9e891f5d67d02e551a2b2d935ee9543d3b0ebb5672fb3f018cf",
+    "license_review": "PENDING"
+  },
+  "mayo": {
+    "status": "REFERENCE_REACHABLE",
+    "url": "https://www.mayoclinic.org/drugs-supplements/atomoxetine-oral-route/description/drg-20066904",
+    "response_sha256": "dc5b8169b25b39ac408dfdc95ad770c2d87180aace872403192aff6fdf03c792",
+    "content_import": "NOT_LICENSED",
+    "role": "educational reference only; not numeric model input"
+  }
+}

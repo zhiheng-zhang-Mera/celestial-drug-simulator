@@ -8,7 +8,7 @@ def main():
     from src.simulation import load_catalog, simulate
     catalog = load_catalog()
     root = tk.Tk()
-    root.title('Drug Simulator · 多药研究与证据')
+    root.title('Celestial Drug Simulator · 多药研究与证据')
     root.geometry('1080x760')
     root.minsize(800, 600)
     rows = []
@@ -134,7 +134,7 @@ def main():
                      result['sampling']['note'],
                      '验证森林 HOLD_FOR_REVIEW；独立科学验证未完成。', '']
             lines.extend([result['context']['note'], '生理/基因模型：' + ', '.join(result['context']['gaps']),
-                          'Mayo / CPIC：候选资料适配，尚未连接。'])
+                          '本方案尚未应用来源模型。Mayo / CPIC 实际来源与单药条件估计见“来源与基因机制”独立研究场景。'])
             for entry in result['entries']:
                 lines.append(f"{entry['name']} [{entry['category']}] — {entry['status']} — {', '.join(entry['gaps']) or '合成示例'}")
                 if entry.get('source_profile'):
@@ -182,10 +182,15 @@ def main():
         from src.context_dialog import edit_context
         edit_context(root, context, save_context)
 
+    def open_sources():
+        from src.pgx_dialog import open_pgx
+        open_pgx(root)
+
     for text, command in [('生理与基因', open_context), ('添加药物', save_row), ('更新选中', lambda: save_row(True)),
                           ('删除选中', remove), ('计算与证据校验', calculate), ('导出本机报告', export)]:
         ttk.Button(actions, text=text, command=command).pack(side='left', padx=3)
     listing.bind('<<TreeviewSelect>>', load_row)
+    ttk.Button(actions, text='来源与基因机制', command=open_sources).pack(side='left', padx=3)
     for variable in list(variables.values()) + [kind, route, selection, source, category]:
         variable.trace_add('write', invalidate)
     show('添加任意名称的自定义药物；来源未审查时保留缺口。不会自动联网或将研究观察值套用到当前方案。')
