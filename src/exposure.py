@@ -25,10 +25,15 @@ def concentration(regimen: Regimen, time_h: float) -> float:
     """Post-dose concentration in mg/L at an exact dose-event time."""
     if not math.isfinite(time_h) or time_h < 0:
         raise ValueError("时间必须为有限非负数。")
-    total = 0.0
-    for index in range(regimen.count):
-        elapsed = time_h - index * regimen.interval_h
-        if elapsed >= 0:
-            total += regimen.dose_mg / regimen.volume_l * math.exp(
-                -math.log(2) * (elapsed / regimen.half_life_h))
-    return total
+    # Finite geometric sum, O(1), including the newest administered bolus.
+    count = (regimen.count if time_h >= (regimen.count - 1) * regimen.interval_h
+             else min(regimen.count, int(time_h / regimen.interval_h) + 1))
+    while count > 0 and (count - 1) * regimen.interval_h > time_h:
+        count -= 1
+    while count < regimen.count and count * regimen.interval_h <= time_h:
+        count += 1
+    elapsed = time_h - (count - 1) * regimen.interval_h
+    decay = math.log(2) * (regimen.interval_h / regimen.half_life_h)
+    accumulation = count if decay == 0 else -math.expm1(-count * decay) / -math.expm1(-decay)
+    return (regimen.dose_mg / regimen.volume_l) * accumulation * math.exp(
+        -math.log(2) * (elapsed / regimen.half_life_h))

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "snapshot_id": "dailymed-candidates-2026-11-05",
+  "sources": [{
+    "id": "diflucan-label",
+    "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204",
+    "publisher": "DailyMed / NLM; Pfizer DIFLUCAN labeling",
+    "retrieved_on": "2026-11-05",
+    "source_type": "label",
+    "version": "setid=f694c617-3383-416c-91b6-b94fda371204; retrieval snapshot 2026-11-05",
+    "license": "Publicly readable label; redistribution rights review pending. Only extracted facts and citation stored.",
+    "review_status": "PENDING_REVIEW",
+    "extraction_method": "Agent extraction checked against displayed label; independent human review NOT_RUN"
+  }],
+  "compounds": {
+    "fluconazole": {
+      "name": "氟康唑 / fluconazole", "review_status": "PENDING_REVIEW",
+      "source_id": "diflucan-label",
+      "parameters": [{"parameter": "terminal_half_life", "value": 30, "range": [20, 50], "unit": "h",
+        "route": "oral", "population": "fasted normal volunteers", "formulation": "DIFLUCAN oral",
+        "source_location": "CLINICAL PHARMACOLOGY / Pharmacokinetics and Metabolism",
+        "dose_context": "general oral PK paragraph; not a fitted individual profile",
+        "uncertainty": "reported approximate value and observed range, not a confidence interval"}]
+    },
+    "midazolam": {"name": "咪达唑仑 / midazolam", "review_status": "PENDING_REVIEW",
+      "source_id": "diflucan-label", "parameters": [], "missing": ["standalone route-specific PK profile"]},
+    "tofacitinib": {"name": "托法替布 / tofacitinib", "review_status": "PENDING_REVIEW",
+      "source_id": "diflucan-label", "parameters": [], "missing": ["standalone route-specific PK profile"]}
+  },
+  "interactions": [{
+    "id": "fluconazole-midazolam-day1", "perpetrator": "fluconazole", "victim": "midazolam",
+    "source_id": "diflucan-label", "source_location": "CLINICAL PHARMACOLOGY / Drug Interaction Studies / Midazolam",
+    "review_status": "PENDING_REVIEW", "evidence_tier": "human DDI study summarized in label",
+    "population": "12 volunteers; randomized crossover",
+    "route": "oral", "context": "Day 1: fluconazole 400 mg and oral midazolam 7.5 mg; study continued fluconazole 200 mg daily on days 2–6",
+    "observed_auc_increase_percent": 259, "auc_ratio": 3.59,
+    "observed_cmax_increase_percent": 150, "cmax_ratio": 2.5,
+    "derivation": "ratio = 1 + reported percent increase / 100",
+    "uncertainty": "No numerical interval supplied for these day-1 endpoints in the cited paragraph",
+    "conflicts": [], "conflict_review": "NOT_RUN", "prediction_admitted": false
+  }, {
+    "id": "fluconazole-tofacitinib-day5", "perpetrator": "fluconazole", "victim": "tofacitinib",
+    "source_id": "diflucan-label", "source_location": "CLINICAL PHARMACOLOGY / Drug Interaction Studies / Tofacitinib",
+    "review_status": "PENDING_REVIEW", "evidence_tier": "human DDI study summarized in label",
+    "population": "healthy subjects", "route": "oral",
+    "context": "Fluconazole 400 mg day 1 then 200 mg daily days 2–7; tofacitinib 30 mg single dose day 5",
+    "observed_auc_increase_percent": 79, "auc_ratio": 1.79, "auc_ratio_90ci": [1.64, 1.96],
+    "observed_cmax_increase_percent": 27, "cmax_ratio": 1.27,
+    "derivation": "ratio = 1 + reported percent increase / 100",
+    "uncertainty": "AUC 90% confidence interval retained; no patient-level inference",
+    "conflicts": [], "conflict_review": "NOT_RUN", "prediction_admitted": false
+  }]
+}

@@ -1,5 +1,7 @@
 # Drug Simulator
 
+Implementation update (2026-11-05): the feature branch contains a local multi-drug research UI, custom parameter scenarios, source-linked candidate records and fail-closed pair reporting. See [running and limitations](docs/RUNNING.md). The design below remains the broader target; real combination prediction and independent scientific validation are not complete.
+
 > **循证治理的多药药代动力学 / 药效动力学机制模拟器**  
 > **Evidence-Governed Mechanistic Simulator for Multi-Drug Pharmacokinetic and Pharmacodynamic Interactions**
 
