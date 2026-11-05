@@ -74,8 +74,11 @@ class AnatomyWorkspace(ttk.Frame):
         self.hover=tk.StringVar(value='点击组织，查看关联证据')
         ttk.Label(center,textvariable=self.hover,foreground=ACCENT).pack(anchor='w',pady=(0,8))
         self.canvas=BodyCanvas(center,self.select_region,self.on_hover,width=350,height=540);self.canvas.pack(fill='both',expand=True)
+        zoom_controls=ttk.Frame(center,style='Card.TFrame');zoom_controls.pack(fill='x',pady=3)
+        for label,command in (('−',lambda:self.canvas.zoom_by(1/1.2)),('复位视角',self.canvas.reset_view),('+',lambda:self.canvas.zoom_by(1.2))):
+            ttk.Button(zoom_controls,text=label,command=command,width=9).pack(side='left',padx=2)
         ttk.Label(center,text='青·机制  蓝·代谢  浅蓝·排泄  金·关注',foreground=MUTED,font=('Microsoft YaHei UI',9)).pack(anchor='w',pady=(8,0))
-        ttk.Label(center,text='正背面为解剖投影 · 生殖分层不由性别推断',foreground=MUTED,font=('Microsoft YaHei UI',9)).pack(anchor='w')
+        ttk.Label(center,text='参数化解剖近似 · 非临床组织模型',foreground=MUTED,font=('Microsoft YaHei UI',9)).pack(anchor='w')
         right=ttk.Frame(self,style='Card.TFrame',padding=12,width=340);right.grid(row=2,column=2,sticky='nsew',padx=(8,0));right.pack_propagate(False)
         self.heading=tk.StringVar();ttk.Label(right,textvariable=self.heading,font=('Microsoft YaHei UI',17,'bold')).pack(anchor='w',pady=(0,12))
         reportframe=ttk.Frame(right);reportframe.pack(fill='both',expand=True)
