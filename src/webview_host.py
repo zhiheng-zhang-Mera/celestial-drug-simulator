@@ -6,6 +6,12 @@ import sys
 import threading
 
 
+def require_native_parent(actual, expected, error=0):
+    """Check the native postcondition; last-error alone does not mean failure."""
+    if actual != expected:
+        raise OSError(error, f'Native embedding failed: parent {actual}, expected {expected}')
+
+
 def main():
     # Match the existing Tk process' Windows DPI virtualization for native parenting.
     os.environ.setdefault('QT_QPA_PLATFORM', 'windows:dpiawareness=0')
@@ -84,8 +90,10 @@ def main():
     hwnd=int(view.winId())
     style=user32.GetWindowLongW(hwnd,-16)
     user32.SetWindowLongW(hwnd,-16,(style & ~0x80000000)|0x40000000)
-    ctypes.set_last_error(0);user32.SetParent(hwnd,parent)
-    if ctypes.get_last_error():raise ctypes.WinError(ctypes.get_last_error())
+    ctypes.set_last_error(0);previous=user32.SetParent(hwnd,parent)
+    attach_error=ctypes.get_last_error()
+    print(f'initial attach previous={previous}, error={attach_error}, actual={user32.GetParent(hwnd)}, expected={parent}, child={hwnd}',file=sys.stderr,flush=True)
+    require_native_parent(user32.GetParent(hwnd),parent,attach_error)
     def fit():
         rect=wintypes.RECT();user32.GetClientRect(parent,ctypes.byref(rect))
         w=max(1,rect.right);h=max(1,rect.bottom);scale=view.devicePixelRatioF()
@@ -97,7 +105,11 @@ def main():
         hwnd=int(view.winId())
         style=user32.GetWindowLongW(hwnd,-16)
         user32.SetWindowLongW(hwnd,-16,(style & ~0x80000000)|0x40000000)
-        user32.SetParent(hwnd,parent)
+        ctypes.set_last_error(0);user32.SetParent(hwnd,parent)
+        error=ctypes.get_last_error()
+        try:require_native_parent(user32.GetParent(hwnd),parent,error)
+        except OSError as exc:
+            emit('error',message=str(exc));view.close();app.quit();return
         fit()
         print(f'native parent={parent}, actual={user32.GetParent(hwnd)}, child={hwnd}, size={view.width()}x{view.height()}',file=sys.stderr,flush=True)
     QTimer.singleShot(300,attach)
