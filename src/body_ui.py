@@ -78,7 +78,8 @@ class AnatomyWorkspace(ttk.Frame):
         for label,command in (('−',lambda:self.canvas.zoom_by(1/1.2)),('复位视角',self.canvas.reset_view),('+',lambda:self.canvas.zoom_by(1.2))):
             ttk.Button(zoom_controls,text=label,command=command,width=9).pack(side='left',padx=2)
         ttk.Label(center,text='青·机制  蓝·代谢  浅蓝·排泄  金·关注',foreground=MUTED,font=('Microsoft YaHei UI',9)).pack(anchor='w',pady=(8,0))
-        ttk.Label(center,text='参数化解剖近似 · 非临床组织模型',foreground=MUTED,font=('Microsoft YaHei UI',9)).pack(anchor='w')
+        ttk.Label(center,text='BodyParts3D / DBCLS · CC BY-SA 2.1 JP',foreground=MUTED,font=('Microsoft YaHei UI',8)).pack(anchor='w')
+        ttk.Label(center,text='简化参考解剖 · 子宫为示意层',foreground=MUTED,font=('Microsoft YaHei UI',8)).pack(anchor='w')
         right=ttk.Frame(self,style='Card.TFrame',padding=12,width=340);right.grid(row=2,column=2,sticky='nsew',padx=(8,0));right.pack_propagate(False)
         self.heading=tk.StringVar();ttk.Label(right,textvariable=self.heading,font=('Microsoft YaHei UI',17,'bold')).pack(anchor='w',pady=(0,12))
         reportframe=ttk.Frame(right);reportframe.pack(fill='both',expand=True)
@@ -100,7 +101,9 @@ class AnatomyWorkspace(ttk.Frame):
         self.baseline.set('体重：'+str(p.get('weight_kg') or '未填写')+' kg  · 年龄：'+str(p.get('age_years') or '未填写')+'  · 基因：'+str(len(context.get('genes',[])))+' 项')
         data=region_details(self.drug,self.selected);self.heading.set(data['name'])
         substance=self.drug.get('name',self.drug.get('compound_id','')) if self.drug else '未选择物质'
-        lines=[substance,'',('文献关联 · 待人工审核' if data['evidence'] else 'INSUFFICIENT_EVIDENCE · 无已收录区域证据'),'']
+        geometry='几何：BodyParts3D / DBCLS，简化参考网格；模型形状不构成药效证据。'
+        if self.selected=='uterus':geometry='几何：原有参数化示意层；该男性参考图谱不提供子宫模型。'
+        lines=[substance,'',geometry,'',('文献关联 · 待人工审核' if data['evidence'] else 'INSUFFICIENT_EVIDENCE · 无已收录区域证据'),'']
         for evidence in data['evidence']:
             lines += [evidence['text'],'','来源章节：'+evidence['section'],evidence['url'],'核对：'+evidence['checked_on']+' / '+evidence['review_status'],'']
         if not data['evidence']:lines += ['此区域仍可浏览。资料缺失不等于没有作用，也不表示安全。','']

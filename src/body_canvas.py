@@ -2,6 +2,7 @@
 import math
 import tkinter as tk
 from src.anatomy_mesh import PARTS,SHELL,mesh,rotate,clamp_zoom
+from src.anatomy_atlas import load_atlas,skin_groups,convex_hull
 COLORS={'mechanism':'#5BD8C7','metabolism':'#8EAFFF','excretion':'#8ED6E2','label_concern':'#E7B45A'}
 
 class BodyCanvas(tk.Canvas):
@@ -10,8 +11,10 @@ class BodyCanvas(tk.Canvas):
   self.select=select;self.hover=hover;self.effects={};self.selected=None;self.members=[]
   self.view='正面';self.reproductive='隐藏';self.yaw=0.;self.pitch=0.;self.zoom=1.
   self._start=None;self._moved=False;self._pending=None
-  self.parts=[(k,*mesh(c,r,k,rows=10,cols=16)) for k,c,r in PARTS]
-  self.shell=[mesh(c,r,rows=8,cols=12) for c,r in SHELL]
+  atlas=load_atlas()
+  self.parts=[(k,v,f) for k,v,f in atlas if k!='shell']
+  self.drag_parts=[(k,v,f) for k,v,f in load_atlas(True) if k!='shell']
+  self.shell=skin_groups(next(v for k,v,f in atlas if k=='shell'))
   self.bind('<Configure>',lambda _:self.schedule())
   self.bind('<ButtonPress-1>',self.press);self.bind('<B1-Motion>',self.drag)
   self.bind('<ButtonRelease-1>',self.release);self.bind('<Motion>',self.motion)
@@ -41,7 +44,7 @@ class BodyCanvas(tk.Canvas):
   if self._start is not None and not self._moved:
    region=self.region_at(e.x,e.y)
    if region:self.select(region)
-  self._start=None
+  self._start=None;self._moved=False;self.schedule()
  def motion(self,e):
   if self._start is None:self.hover(self.region_at(e.x,e.y))
  def draw(self):
@@ -50,16 +53,12 @@ class BodyCanvas(tk.Canvas):
   def project(p):
    x,y,z=rotate(p,self.yaw,self.pitch);perspective=900/(900-z)
    return (w/2+x*scale*perspective,(h-24)/2+y*scale*perspective,z)
-  # Body envelope stays a faint wire mask; all organs carry depth and move together.
-  for vertices,faces in self.shell:
-   pts=[project(p) for p in vertices]
-   for i in range(1,8):
-    ring=[pts[i*12+j] for j in range(12)];ring.append(ring[0])
-    self.create_line([v for p in ring for v in p[:2]],fill='#263F4B',width=.6,smooth=True)
-   for j in (0,3,6,9):
-    self.create_line([v for i in range(9) for v in pts[i*12+j][:2]],fill='#263F4B',width=.6,smooth=True)
+  # Faint source-derived local envelopes avoid exposing simplification crease artifacts.
+  for vertices in self.shell:
+   hull=convex_hull([project(p) for p in vertices])
+   if len(hull)>=3:self.create_polygon([n for p in hull for n in p],fill='#38505C',stipple='gray25',outline='')
   surfaces=[]
-  for kind,vertices,faces in self.parts:
+  for kind,vertices,faces in (self.drag_parts if self._moved else self.parts):
    if kind in ('testes','uterus') and self.reproductive!={'testes':'睾丸分层','uterus':'子宫分层'}[kind]:continue
    pts=[project(p) for p in vertices]
    base=COLORS.get(self.effects.get(kind),'#78949F');rgb=[int(base[i:i+2],16) for i in (1,3,5)]
@@ -68,13 +67,18 @@ class BodyCanvas(tk.Canvas):
     q=[pts[i] for i in face]
     cross=(q[1][0]-q[0][0])*(q[2][1]-q[0][1])-(q[1][1]-q[0][1])*(q[2][0]-q[0][0])
     if cross>=0:continue
-    depth=sum(p[2] for p in q)/4
-    brightness=.58+.35*(depth+60)/120;brightness=max(.4,min(1,brightness))
+    depth=sum(p[2] for p in q)/len(q)
+    # Surface normal lighting makes real folds and muscle heads visible at every angle.
+    a,b,c=[vertices[i] for i in face[:3]]
+    u=[b[i]-a[i] for i in range(3)];v=[c[i]-a[i] for i in range(3)]
+    normal=(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])
+    nx,ny,nz=rotate(normal,self.yaw,self.pitch);length=math.sqrt(nx*nx+ny*ny+nz*nz) or 1
+    brightness=.5+.5*abs((-.3*nx-.4*ny+.86*nz)/length)
     color='#'+''.join(f'{int(c*brightness):02x}' for c in rgb)
     surfaces.append((depth,kind,[v for p in q for v in p[:2]],color))
   for _,kind,points,color in sorted(surfaces,key=lambda v:v[0]):
    active=kind in self.effects;selected=kind==self.selected;linked=kind in self.members
-   self.create_polygon(points,fill=color,stipple='gray75' if active else 'gray25',
+   self.create_polygon(points,fill=color,stipple='gray75' if active else 'gray50',
       outline='#91AAB6' if selected else '#657F8B' if linked else '',
       width=.65 if selected else .35,tags=('region:'+kind,))
   self.create_text(w/2,h-12,text=f'拖动旋转 · 滚轮缩放 {self.zoom:.0%}',fill='#A9BAC8',font=('Microsoft YaHei UI',9))
