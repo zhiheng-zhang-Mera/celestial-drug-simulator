@@ -13,8 +13,9 @@ def main():
     root.minsize(800, 600)
     rows = []
     result = None
+    context = {}
     ttk.Label(root, text='多药模拟器 · 方案与证据', font=('', 18)).pack(pady=8)
-    ttk.Label(root, text='1–32 种药物 · 本机离线计算 · 合成模型 / 自定义参数 / 待审真实来源').pack()
+    ttk.Label(root, text='1–32 种物质 · 药品 / 补充剂 / 其他 · 本机离线研究').pack()
     editor = ttk.Frame(root, padding=10)
     editor.pack(fill='x')
     variables = {}
@@ -29,6 +30,7 @@ def main():
     route = tk.StringVar(value='iv_bolus')
     selection = tk.StringVar(value='fluconazole')
     source = tk.StringVar()
+    category = tk.StringVar(value='medicine')
     options = ttk.Frame(root, padding=(10, 0))
     options.pack(fill='x')
     for label, variable, values in [('类型', kind, ('synthetic', 'custom', 'catalog')),
@@ -38,6 +40,12 @@ def main():
         ttk.Combobox(options, textvariable=variable, values=values, state='readonly', width=14).pack(side='left')
     ttk.Label(options, text='自定义来源/备注').pack(side='left', padx=4)
     ttk.Entry(options, textvariable=source, width=24).pack(side='left', fill='x', expand=True)
+    classification = ttk.Frame(root, padding=(10, 4))
+    classification.pack(fill='x')
+    ttk.Label(classification, text='物质类别').pack(side='left')
+    ttk.Combobox(classification, textvariable=category, state='readonly',
+                 values=('medicine', 'supplement', 'botanical', 'food_beverage', 'other')).pack(side='left', padx=6)
+    ttk.Label(classification, text='复方/补充剂成分未解析时，质量不能代表有效成分剂量。').pack(side='left')
     status = tk.StringVar(value='输入药物，点击添加；catalog 不自动填写或批准 PK 参数。')
     ttk.Label(root, textvariable=status, wraplength=1000).pack(padx=10, pady=6)
     actions = ttk.Frame(root)
@@ -82,7 +90,7 @@ def main():
     def read_editor():
         item = {key: (v.get().strip() if key == 'name' else
                       int(v.get()) if key == 'count' else float(v.get())) for key, v in variables.items()}
-        item.update(kind=kind.get(), route=route.get(),
+        item.update(kind=kind.get(), route=route.get(), category=category.get(),
                     compound_id=selection.get() if kind.get() == 'catalog' else '', source=source.get().strip())
         simulate([item])  # identical validation at the public service boundary
         return item
@@ -109,6 +117,7 @@ def main():
         item = rows[int(selected[0])]
         for key, variable in variables.items(): variable.set(str(item[key]))
         kind.set(item['kind']); route.set(item['route']); source.set(item['source'])
+        category.set(item.get('category', 'medicine'))
         if item['compound_id']: selection.set(item['compound_id'])
 
     def remove():
@@ -119,13 +128,15 @@ def main():
         nonlocal result
         invalidate()
         try:
-            result = simulate(rows)
+            result = simulate(rows, context)
             lines = [result['overall'], result['explanation'],
                      '自定义曲线仅使用输入参数作假设计算，不能证明该药物的实际暴露。',
                      result['sampling']['note'],
                      '验证森林 HOLD_FOR_REVIEW；独立科学验证未完成。', '']
+            lines.extend([result['context']['note'], '生理/基因模型：' + ', '.join(result['context']['gaps']),
+                          'Mayo / CPIC：候选资料适配，尚未连接。'])
             for entry in result['entries']:
-                lines.append(f"{entry['name']} — {entry['status']} — {', '.join(entry['gaps']) or '合成示例'}")
+                lines.append(f"{entry['name']} [{entry['category']}] — {entry['status']} — {', '.join(entry['gaps']) or '合成示例'}")
                 if entry.get('source_profile'):
                     lines.append(json.dumps(entry['source_profile'], ensure_ascii=False, indent=2))
             for pair in result['pairs']:
@@ -161,11 +172,21 @@ def main():
                 status.set('报告已保存到本机：' + path)
             except OSError as exc: status.set('保存失败：' + str(exc))
 
-    for text, command in [('添加药物', save_row), ('更新选中', lambda: save_row(True)),
+    def save_context(candidate):
+        nonlocal context
+        context = candidate
+        invalidate()
+        status.set('本次生理/基因基线已保存到内存；未应用代谢修正。导出报告会包含这些数据。')
+
+    def open_context():
+        from src.context_dialog import edit_context
+        edit_context(root, context, save_context)
+
+    for text, command in [('生理与基因', open_context), ('添加药物', save_row), ('更新选中', lambda: save_row(True)),
                           ('删除选中', remove), ('计算与证据校验', calculate), ('导出本机报告', export)]:
         ttk.Button(actions, text=text, command=command).pack(side='left', padx=3)
     listing.bind('<<TreeviewSelect>>', load_row)
-    for variable in list(variables.values()) + [kind, route, selection, source]:
+    for variable in list(variables.values()) + [kind, route, selection, source, category]:
         variable.trace_add('write', invalidate)
     show('添加任意名称的自定义药物；来源未审查时保留缺口。不会自动联网或将研究观察值套用到当前方案。')
     root.mainloop()

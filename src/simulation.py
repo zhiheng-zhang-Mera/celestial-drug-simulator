@@ -4,6 +4,7 @@ from itertools import combinations
 from pathlib import Path
 import json
 from src.exposure import Regimen, concentration
+from src.context import normalize_context
 
 CATALOG = Path(__file__).resolve().parent.parent / 'data' / 'catalog.json'
 
@@ -17,7 +18,8 @@ def digest(value):
                              separators=(',', ':'), allow_nan=False).encode()).hexdigest()
 
 
-def simulate(items):
+def simulate(items, context=None):
+    normalized_context = normalize_context(context)
     if not isinstance(items, list) or not 1 <= len(items) <= 32:
         raise ValueError('方案必须包含 1 到 32 种药物。')
     catalog = load_catalog()
@@ -47,9 +49,13 @@ def simulate(items):
         route = raw.get('route')
         if route not in ('iv_bolus', 'oral', 'infusion'): raise ValueError('未知给药途径。')
         gaps = []
+        category = raw.get('category', 'medicine')
+        if category not in ('medicine', 'supplement', 'botanical', 'food_beverage', 'other'):
+            raise ValueError('未知物质类别。')
+        if category != 'medicine': gaps.append('COMPOSITION_NOT_RESOLVED')
         if kind != 'synthetic': gaps += ['PARAMETERS_NOT_REVIEWED', 'MODEL_DOMAIN_NOT_VALIDATED']
         if route != 'iv_bolus': gaps.append('UNSUPPORTED_ROUTE')
-        entry = dict(raw, name=name, gaps=gaps,
+        entry = dict(raw, name=name, category=category, gaps=gaps,
                      status='SYNTHETIC_ONLY' if kind == 'synthetic' else 'PENDING_REVIEW')
         if kind == 'catalog': entry['source_profile'] = catalog['compounds'][compound_id]
         entries.append(entry)
@@ -76,7 +82,8 @@ def simulate(items):
                                      prediction_admitted=False))
         pairs.append(dict(drugs=[a['name'], b['name']], status='HOLD_FOR_REVIEW' if evidence else 'INSUFFICIENT_EVIDENCE',
                           evidence=evidence, predicted_effect=None))
-    return dict(schema_version='1.0', simulator_version='0.2', input_sha256=digest(items),
+    return dict(schema_version='1.1', simulator_version='0.3',
+                input_sha256=digest({'items': items, 'context': normalized_context}), context=normalized_context,
                 snapshot_sha256=digest(catalog), snapshot_id=catalog['snapshot_id'],
                 overall='INSUFFICIENT_EVIDENCE',
                 explanation='研究观察值不是当前方案预测。多药交互不能由两药倍率相乘；未知不等于无相互作用。',

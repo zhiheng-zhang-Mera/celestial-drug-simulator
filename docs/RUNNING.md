@@ -21,3 +21,9 @@ For local developer verification, existing `CELESTIAL_FINANCE_OFFLINE=1` now als
 ## Validation
 
 `python -m unittest discover -s tests` covers numerical oracle comparison, 32 entries/496 pairs, source gaps, custom identity isolation, invalid input and route refusal. These are engineering tests, not clinical validation. See Mission CEL-DRUG-20261105 for recorded GUI observations and pending independent verification.
+
+## Physiology and generalized substances (0.3)
+
+Use 生理与基因 for optional height (cm), weight (kg), body fat (%), age, physiological sex and measurement provenance. Gene records require gene, result and source. Blank remains unknown; no phenotype is inferred. Inputs remain in memory until a local report is exported; exports include these fields, so inspect before sharing.
+
+The five categories are medicine, supplement, botanical, food_beverage and other. Category does not establish identity or resolve ingredients. Unresolved composition is flagged. These inputs change the report fingerprint and invalidate previous output, but do not change exposure: no personal metabolic modifiers are validated. Mayo and CPIC are declared candidate sources, not connected services. See CONTEXT_EXTENSION.md for the remaining calibrated-model, authorized-source and mixture requirements.
