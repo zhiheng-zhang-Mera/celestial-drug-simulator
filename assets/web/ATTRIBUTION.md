@@ -1,0 +1,9 @@
+# Embedded anatomy reference
+
+User-supplied `assets/reference/doubao_html_20261105_155000.html` is preserved byte-for-byte (SHA256 b3a4aabd2a43cb255c745d9934115b2933041c6bdc432d93a4eb2ebcd409a03f). The user explicitly requested its rendering embedded in the desktop anatomy region. It contains an AI-generated-content notice; no additional third-party license is asserted for that supplied design.
+
+`tools/build_reference_ui.py` derives `index.html` and `scene.mjs`. It keeps the original cylinder/sphere/tube scene, X-Ray background, lights, transparency controls and auto-rotation. Changes: offline modern imports, correct aspect/target, full vertical orbit, compact sidebar, Python evidence integration, visible-layer picking on click instead of pointerdown, source/system-color separation. Original organ coordinates are schematic (including low thoracic organ placement), not a medical anatomical atlas. Additional muscles/testes/uterus are explicitly schematic. Previous BodyParts3D reference remains available through Simplified View, under its separate license.
+
+Vendor source: https://github.com/mrdoob/three.js/tree/r164 (MIT, full license in vendor/THREE-LICENSE.txt). `build/three.module.min.js` SHA2566c2bfdf07626404916f34aef8cf57992926d849526bc6eb4556da96a3ba4e78c. `examples/jsm/controls/OrbitControls.js` has only import rewritten from `three` to local `./three.module.min.js` (plus UTF8/newline conversion); adapted SHA25661b1f6c8a13552b8ec666b5723bea1951bd110f3ed3767a37d041304389992b2. The supplied HTML's non-existent r164 legacy global script paths are not used. No runtime CDN, npm, server or download.
+
+Host uses already-installed PySide6/Qt WebEngine6.12, loaded dynamically in a child process. Qt itself is not vendored or installed by this change; its existing license terms remain applicable. `qrc:///qtwebchannel/qwebchannel.js` is supplied by that runtime.

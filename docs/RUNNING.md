@@ -20,6 +20,8 @@ For local developer verification, existing `CELESTIAL_FINANCE_OFFLINE=1` now als
 
 ## Validation
 
+DEV-09 default anatomy rendering embeds the user-provided HTML using local Three.js and the already-installed Windows PySide6/WebEngine6.12 runtime. No CDN/network or package install occurs on launch. Missing graphics/runtime exposes a status message and explicit Simplified View fallback. See [HTML embedding and dependency contract](HTML_EMBEDDING.md). Existing Tk workflows remain available.
+
 `python -m unittest discover -s tests` covers numerical oracle comparison, 32 entries/496 pairs, source gaps, custom identity isolation, invalid input and route refusal. These are engineering tests, not clinical validation. See Mission CEL-DRUG-20261105 for recorded GUI observations and pending independent verification.
 
 ## Physiology and generalized substances (0.3)

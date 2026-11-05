@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>透明人体解剖交互式仪表盘</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: radial-gradient(ellipse at center, #0b2a5a 0%, #051530 70%, #020817 100%);
+    color: #dff4ff;
+    font-family: "Microsoft YaHei", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    height: 100vh;
+  }
+
+  /* 侧边仪表盘 */
+  .dashboard {
+    background: linear-gradient(180deg, rgba(10, 28, 56, 0.85), rgba(5, 16, 36, 0.85));
+    backdrop-filter: blur(14px);
+    border-right: 1px solid rgba(110, 200, 255, 0.25);
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #7fd8ff;
+    text-shadow: 0 0 12px rgba(127, 216, 255, 0.6);
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: #88aacc;
+    margin-bottom: 22px;
+  }
+
+  .group {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(120, 200, 255, 0.12);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .group h3 {
+    font-size: 14px;
+    color: #9fd6ff;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .group h3::before {
+    content: "";
+    width: 4px;
+    height: 14px;
+    background: #4cc9ff;
+    border-radius: 2px;
+    box-shadow: 0 0 8px #4cc9ff;
+  }
+
+  .sys-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.2s;
+  }
+  .sys-item:hover {
+    background: rgba(120, 200, 255, 0.08);
+    border-color: rgba(120, 200, 255, 0.25);
+  }
+  .sys-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+  }
+  .color-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .depth-badge {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: rgba(120, 200, 255, 0.12);
+    color: #b9e6ff;
+    border: 1px solid rgba(120, 200, 255, 0.2);
+  }
+
+  input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #2590eb;
+    cursor: pointer;
+  }
+
+  .slider-wrap {
+    margin: 14px 0;
+  }
+  .slider-wrap label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #b9dcff;
+    margin-bottom: 6px;
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: #4cc9ff;
+  }
+
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .btn {
+    padding: 10px;
+    border: 1px solid rgba(120, 200, 255, 0.25);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(80, 160, 255, 0.18), rgba(40, 100, 200, 0.18));
+    color: #d6f0ff;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+  .btn:hover {
+    background: linear-gradient(180deg, rgba(80, 160, 255, 0.32), rgba(40, 100, 200, 0.32));
+    box-shadow: 0 0 14px rgba(80, 160, 255, 0.35);
+  }
+
+  .info-card {
+    margin-top: 16px;
+    padding: 16px;
+    background: rgba(14, 34, 64, 0.6);
+    border-radius: 14px;
+    border: 1px solid rgba(120, 200, 255, 0.18);
+    min-height: 120px;
+  }
+  .info-card h4 {
+    color: #7fd8ff;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+  .info-card p {
+    font-size: 12px;
+    line-height: 1.7;
+    color: #a9c7e8;
+  }
+  .tag-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(120, 200, 255, 0.12);
+    border: 1px solid rgba(120, 200, 255, 0.2);
+    color: #b9e6ff;
+  }
+
+  /* 3D画布 */
+  #canvas-wrap {
+    position: relative;
+  }
+  #three-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    padding: 10px 18px;
+    background: rgba(10, 28, 56, 0.55);
+    border: 1px solid rgba(120, 200, 255, 0.25);
+    border-radius: 22px;
+    font-size: 12px;
+    color: #b9dcff;
+    backdrop-filter: blur(10px);
+    pointer-events: none;
+  }
+  .loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #7fd8ff;
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="dashboard">
+    <div class="title">透明人体解剖仪表盘</div>
+    <div class="subtitle">X-Ray 风格 · 多层解剖系统独立显隐</div>
+
+    <div class="group">
+      <h3>系统分层开关</h3>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#9fd6ff"></span>
+          <label for="sys-skin">人体外壳</label>
+        </div>
+        <span class="depth-badge">外层</span>
+        <input type="checkbox" id="sys-skin" checked />
+      </div>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#e9f6ff"></span>
+          <label for="sys-ske">骨骼系统</label>
+        </div>
+        <span class="depth-badge">内层</span>
+        <input type="checkbox" id="sys-ske" checked />
+      </div>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#ff5566"></span>
+          <label for="sys-cir">循环系统</label>
+        </div>
+        <span class="depth-badge">中层</span>
+        <input type="checkbox" id="sys-cir" checked />
+      </div>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#55ddff"></span>
+          <label for="sys-res">呼吸系统</label>
+        </div>
+        <span class="depth-badge">中层</span>
+        <input type="checkbox" id="sys-res" checked />
+      </div>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#ffbb55"></span>
+          <label for="sys-dig">消化系统</label>
+        </div>
+        <span class="depth-badge">深层</span>
+        <input type="checkbox" id="sys-dig" checked />
+      </div>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#bb77ff"></span>
+          <label for="sys-ner">神经系统</label>
+        </div>
+        <span class="depth-badge">深层</span>
+        <input type="checkbox" id="sys-ner" />
+      </div>
+
+      <div class="sys-item">
+        <div class="sys-item-left">
+          <span class="color-dot" style="color:#66ddaa"></span>
+          <label for="sys-uri">泌尿系统</label>
+        </div>
+        <span class="depth-badge">深层</span>
+        <input type="checkbox" id="sys-uri" checked />
+      </div>
+    </div>
+
+    <div class="group">
+      <h3>可视化调节</h3>
+
+      <div class="slider-wrap">
+        <label>人体外壳透明度 <span id="skin-val">0.20</span></label>
+        <input type="range" id="skin-opacity" min="0" max="0.9" step="0.05" value="0.20" />
+      </div>
+
+      <div class="slider-wrap">
+        <label>器官层透明度 <span id="organ-val">0.85</span></label>
+        <input type="range" id="organ-opacity" min="0.2" max="1" step="0.05" value="0.85" />
+      </div>
+
+      <div class="slider-wrap">
+        <label>发光强度 <span id="glow-val">1.2</span></label>
+        <input type="range" id="glow" min="0" max="2.5" step="0.1" value="1.2" />
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="resetCam">重置视角</button>
+        <button class="btn" id="autoRotate">自动旋转</button>
+      </div>
+    </div>
+
+    <div class="info-card" id="info">
+      <h4>器官信息</h4>
+      <p>点击人体器官查看分层位置与生理指标。建议先关闭无关系统，单独观察骨骼、循环或消化系统，辨识更清晰。</p>
+      <div class="tag-row">
+        <span class="tag">拖拽横向旋转</span>
+        <span class="tag">滚轮缩放</span>
+        <span class="tag">系统分层显隐</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="canvas-wrap">
+    <div class="loading" id="loading">加载人体模型中...</div>
+    <canvas id="three-canvas"></canvas>
+    <div class="hint">横向拖拽旋转人体 · 滚轮缩放 · 点击器官查看详情</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/examples/js/controls/OrbitControls.js"></script>
+<script>
+  // ========== 基础场景 ==========
+  const scene = new THREE.Scene();
+  scene.background = null;
+
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 1.6, 4.2);
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById("three-canvas"),
+    antialias: true,
+    alpha: true
+  });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(document.getElementById("canvas-wrap").clientWidth, document.getElementById("canvas-wrap").clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.1;
+
+  // 蓝色 X-Ray 背景层
+  const bgCanvas = document.createElement("canvas");
+  const bgCtx = bgCanvas.getContext("2d");
+  function drawBg() {
+    const w = renderer.domElement.width;
+    const h = renderer.domElement.height;
+    bgCanvas.width = w;
+    bgCanvas.height = h;
+    const grad = bgCtx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.7);
+    grad.addColorStop(0, "#154b8c");
+    grad.addColorStop(0.55, "#0b2a5a");
+    grad.addColorStop(1, "#031024");
+    bgCtx.fillStyle = grad;
+    bgCtx.fillRect(0, 0, w, h);
+
+    // 扫描线
+    bgCtx.strokeStyle = "rgba(120, 200, 255, 0.05)";
+    bgCtx.lineWidth = 1;
+    for (let y = 0; y < h; y += 18) {
+      bgCtx.beginPath();
+      bgCtx.moveTo(0, y);
+      bgCtx.lineTo(w, y);
+      bgCtx.stroke();
+    }
+    // 中心光晕
+    const glow = bgCtx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.min(w, h) * 0.4);
+    glow.addColorStop(0, "rgba(120, 200, 255, 0.25)");
+    glow.addColorStop(1, "rgba(120, 200, 255, 0)");
+    bgCtx.fillStyle = glow;
+    bgCtx.fillRect(0, 0, w, h);
+
+    renderer.domElement.style.backgroundImage = `url(${bgCanvas.toDataURL()})`;
+    renderer.domElement.style.backgroundSize = "cover";
+  }
+  drawBg();
+
+  // ========== 控制器：仅横向旋转 ==========
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minPolarAngle = Math.PI / 2 - 0.45;
+  controls.maxPolarAngle = Math.PI / 2 + 0.45;
+  controls.minDistance = 2.2;
+  controls.maxDistance = 7;
+  controls.autoRotate = false;
+  controls.autoRotateSpeed = 1.2;
+
+  // ========== 灯光 ==========
+  scene.add(new THREE.AmbientLight(0x88bbff, 0.55));
+  const keyLight = new THREE.DirectionalLight(0xaad8ff, 0.9);
+  keyLight.position.set(3, 4, 3);
+  scene.add(keyLight);
+  const rimLight = new THREE.DirectionalLight(0x5599ff, 0.5);
+  rimLight.position.set(-3, 2, -3);
+  scene.add(rimLight);
+
+  // ========== 系统分组与深度分层 ==========
+  // 层级原则：外壳最外；骨骼最内；器官按前后层级错开
+  const LAYER = {
+    SKIN: 0,
+    ORGAN_FRONT: 0.02,
+    ORGAN_MIDDLE: 0,
+    ORGAN_BACK: -0.02,
+    SKELETON: -0.04
+  };
+
+  const bodyShell = new THREE.Group();
+  const sysSke = new THREE.Group();
+  const sysCir = new THREE.Group();
+  const sysRes = new THREE.Group();
+  const sysDig = new THREE.Group();
+  const sysNer = new THREE.Group();
+  const sysUri = new THREE.Group();
+
+  scene.add(bodyShell);
+  scene.add(sysSke);
+  scene.add(sysCir);
+  scene.add(sysRes);
+  scene.add(sysDig);
+  scene.add(sysNer);
+  scene.add(sysUri);
+
+  // 材质
+  const skinMat = new THREE.MeshPhongMaterial({
+    color: 0x88b8dd,
+    transparent: true,
+    opacity: 0.20,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  });
+
+  const organCommon = {
+    transparent: true,
+    opacity: 0.85,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  };
+
+  const matSke = new THREE.MeshPhongMaterial({ color: 0xe9f6ff, emissive: 0x7faad6, emissiveIntensity: 0.4, ...organCommon });
+  const matCir = new THREE.MeshPhongMaterial({ color: 0xff5566, emissive: 0xff2233, emissiveIntensity: 1.2, ...organCommon });
+  const matRes = new THREE.MeshPhongMaterial({ color: 0x55ddff, emissive: 0x2299dd, emissiveIntensity: 1.2, ...organCommon });
+  const matDig = new THREE.MeshPhongMaterial({ color: 0xffbb55, emissive: 0xdd9922, emissiveIntensity: 1.1, ...organCommon });
+  const matNer = new THREE.MeshPhongMaterial({ color: 0xbb77ff, emissive: 0x8833dd, emissiveIntensity: 1.3, ...organCommon });
+  const matUri = new THREE.MeshPhongMaterial({ color: 0x66ddaa, emissive: 0x22bb88, emissiveIntensity: 1.1, ...organCommon });
+
+  // ========== 透明人体外壳 ==========
+  const bodyGeo = new THREE.CylinderGeometry(0.55, 0.4, 1.8, 24, 4, true);
+  const bodyMesh = new THREE.Mesh(bodyGeo, skinMat);
+  bodyMesh.position.y = 1.0;
+  bodyShell.add(bodyMesh);
+
+  // 头部轮廓
+  const headGeo = new THREE.SphereGeometry(0.24, 20, 20);
+  const head = new THREE.Mesh(headGeo, skinMat);
+  head.position.set(0, 2.1, 0);
+  bodyShell.add(head);
+
+  // 手臂轮廓
+  const armGeo = new THREE.CylinderGeometry(0.06, 0.04, 1.4, 12);
+  const armL = new THREE.Mesh(armGeo, skinMat);
+  armL.position.set(-0.72, 1.15, 0);
+  armL.rotation.z = 0.35;
+  bodyShell.add(armL);
+  const armR = new THREE.Mesh(armGeo, skinMat);
+  armR.position.set(0.72, 1.15, 0);
+  armR.rotation.z = -0.35;
+  bodyShell.add(armR);
+
+  // ========== 骨骼系统（最内层） ==========
+  function addBone(group, geometry, x, y, z, mat) {
+    const m = new THREE.Mesh(geometry, mat);
+    m.position.set(x, y, z + LAYER.SKELETON);
+    group.add(m);
+    return m;
+  }
+
+  addBone(sysSke, new THREE.CylinderGeometry(0.04, 0.04, 1.6, 12), 0, 1.0, 0, matSke);       // 躯干中轴
+  addBone(sysSke, new THREE.CylinderGeometry(0.03, 0.03, 0.6, 12), 0, 1.85, 0, matSke);     // 颈
+  addBone(sysSke, new THREE.SphereGeometry(0.18, 16, 16), 0, 2.15, 0, matSke);                // 颅骨
+  addBone(sysSke, new THREE.CylinderGeometry(0.025, 0.02, 1.3, 10), -0.55, 1.2, 0, matSke); // 左臂
+  addBone(sysSke, new THREE.CylinderGeometry(0.025, 0.02, 1.3, 10), 0.55, 1.2, 0, matSke);  // 右臂
+  addBone(sysSke, new THREE.CylinderGeometry(0.035, 0.03, 0.8, 12), -0.18, 0.3, 0, matSke);  // 左股骨
+  addBone(sysSke, new THREE.CylinderGeometry(0.035, 0.03, 0.8, 12), 0.18, 0.3, 0, matSke);   // 右股骨
+
+  // ========== 循环系统（中层靠前） ==========
+  const heart = new THREE.Mesh(new THREE.SphereGeometry(0.18, 20, 20), matCir);
+  heart.position.set(0, 0.45, 0.4 + LAYER.ORGAN_FRONT);
+  sysCir.add(heart);
+
+  // 主动脉弓
+  const archCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.15, 0.6, 0.4 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0, 0.82, 0.42 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0.18, 0.6, 0.4 + LAYER.ORGAN_FRONT)
+  ]);
+  const arch = new THREE.Mesh(new THREE.TubeGeometry(archCurve, 32, 0.022, 12, false), matCir);
+  sysCir.add(arch);
+
+  // 躯干血管网格
+  function makeVeinLines(points, mat) {
+    const g = new THREE.BufferGeometry().setFromPoints(points);
+    const line = new THREE.Line(g, new THREE.LineBasicMaterial({ color: mat.color, transparent: true, opacity: 0.75 }));
+    return line;
+  }
+
+  const veinL = makeVeinLines([
+    new THREE.Vector3(-0.22, 1.3, 0.35 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(-0.18, 0.9, 0.38 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(-0.14, 0.5, 0.4 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(-0.1, 0.1, 0.42 + LAYER.ORGAN_FRONT)
+  ], matCir);
+  const veinR = makeVeinLines([
+    new THREE.Vector3(0.22, 1.3, 0.35 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0.18, 0.9, 0.38 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0.14, 0.5, 0.4 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0.1, 0.1, 0.42 + LAYER.ORGAN_FRONT)
+  ], matCir);
+  sysCir.add(veinL, veinR);
+
+  // 手臂血管
+  const armVeinL = makeVeinLines([
+    new THREE.Vector3(-0.45, 1.5, 0.32 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(-0.62, 1.15, 0.3 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(-0.74, 0.8, 0.28 + LAYER.ORGAN_FRONT)
+  ], matCir);
+  const armVeinR = makeVeinLines([
+    new THREE.Vector3(0.45, 1.5, 0.32 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0.62, 1.15, 0.3 + LAYER.ORGAN_FRONT),
+    new THREE.Vector3(0.74, 0.8, 0.28 + LAYER.ORGAN_FRONT)
+  ], matCir);
+  sysCir.add(armVeinL, armVeinR);
+
+  // ========== 呼吸系统（中层） ==========
+  const lungL = new THREE.Mesh(new THREE.SphereGeometry(0.23, 20, 20), matRes);
+  lungL.scale.set(0.85, 1.15, 0.9);
+  lungL.position.set(-0.3, 0.5, 0.3 + LAYER.ORGAN_MIDDLE);
+  sysRes.add(lungL);
+
+  const lungR = new THREE.Mesh(new THREE.SphereGeometry(0.23, 20, 20), matRes);
+  lungR.scale.set(0.85, 1.15, 0.9);
+  lungR.position.set(0.3, 0.5, 0.3 + LAYER.ORGAN_MIDDLE);
+  sysRes.add(lungR);
+
+  const trachea = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.35, 12), matRes);
+  trachea.position.set(0, 0.85, 0.35 + LAYER.ORGAN_MIDDLE);
+  sysRes.add(trachea);
+
+  // ========== 消化系统（深层靠后） ==========
+  const liver = new THREE.Mesh(new THREE.SphereGeometry(0.21, 20, 20), matDig);
+  liver.scale.set(1.2, 0.85, 0.9);
+  liver.position.set(0.28, 0.12, 0.2 + LAYER.ORGAN_BACK);
+  sysDig.add(liver);
+
+  const stomach = new THREE.Mesh(new THREE.SphereGeometry(0.16, 20, 20), matDig);
+  stomach.position.set(-0.18, 0.08, 0.22 + LAYER.ORGAN_BACK);
+  sysDig.add(stomach);
+
+  const intestine = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.04, 12, 40), matDig);
+  intestine.position.set(0, -0.08, 0.18 + LAYER.ORGAN_BACK);
+  intestine.rotation.x = Math.PI / 2;
+  sysDig.add(intestine);
+
+  // ========== 神经系统（深层） ==========
+  const brain = new THREE.Mesh(new THREE.SphereGeometry(0.22, 20, 20), matNer);
+  brain.position.set(0, 2.12, 0.15 + LAYER.ORGAN_BACK);
+  sysNer.add(brain);
+
+  const nerve = makeVeinLines([
+    new THREE.Vector3(0, 1.95, 0.18 + LAYER.ORGAN_BACK),
+    new THREE.Vector3(0, 1.4, 0.2 + LAYER.ORGAN_BACK),
+    new THREE.Vector3(0, 0.8, 0.22 + LAYER.ORGAN_BACK),
+    new THREE.Vector3(0, 0.2, 0.24 + LAYER.ORGAN_BACK)
+  ], matNer);
+  sysNer.add(nerve);
+
+  // ========== 泌尿系统（深层） ==========
+  const kidneyL = new THREE.Mesh(new THREE.SphereGeometry(0.13, 18, 18), matUri);
+  kidneyL.position.set(-0.28, -0.1, 0.18 + LAYER.ORGAN_BACK);
+  sysUri.add(kidneyL);
+
+  const kidneyR = new THREE.Mesh(new THREE.SphereGeometry(0.13, 18, 18), matUri);
+  kidneyR.position.set(0.28, -0.1, 0.18 + LAYER.ORGAN_BACK);
+  sysUri.add(kidneyR);
+
+  const bladder = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 16), matUri);
+  bladder.position.set(0, -0.38, 0.16 + LAYER.ORGAN_BACK);
+  sysUri.add(bladder);
+
+  // ========== 器官信息映射 ==========
+  const organMap = {
+    heart:    { name: "心脏", system: "循环系统", layer: "中层靠前", desc: "血液循环动力器官，监测心率、血压、心输出量。" },
+    lungL:    { name: "左肺", system: "呼吸系统", layer: "中层", desc: "气体交换器官，关注血氧饱和度、通气效率。" },
+    lungR:    { name: "右肺", system: "呼吸系统", layer: "中层", desc: "气体交换器官，关注血氧饱和度、通气效率。" },
+    liver:    { name: "肝脏", system: "消化系统", layer: "深层靠后", desc: "代谢与解毒器官，关注转氨酶、胆红素等指标。" },
+    stomach:  { name: "胃", system: "消化系统", layer: "深层靠后", desc: "消化器官，关注胃酸水平与胃动力。" },
+    intestine:{ name: "肠道", system: "消化系统", layer: "深层靠后", desc: "营养吸收与排泄通道，关注蠕动与通畅状态。" },
+    brain:    { name: "大脑", system: "神经系统", layer: "深层", desc: "神经中枢，关注脑电活动与血氧供应。" },
+    kidneyL:  { name: "左肾", system: "泌尿系统", layer: "深层", desc: "泌尿器官，关注肌酐、尿酸与滤过功能。" },
+    kidneyR:  { name: "右肾", system: "泌尿系统", layer: "深层", desc: "泌尿器官，关注肌酐、尿酸与滤过功能。" },
+    bladder:  { name: "膀胱", system: "泌尿系统", layer: "深层", desc: "储尿器官，关注容量与排尿功能。" }
+  };
+
+  // 点击拾取
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const infoEl = document.getElementById("info");
+  const clickable = [heart, lungL, lungR, liver, stomach, intestine, brain, kidneyL, kidneyR, bladder];
+
+  renderer.domElement.addEventListener("pointerdown", (e) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+
+    const hits = raycaster.intersectObjects(clickable, false);
+    if (hits.length > 0) {
+      const obj = hits[0].object;
+      const data = organMap[obj.name] || { name: "未命名器官", system: "-", layer: "-", desc: "暂无详细信息。" };
+      infoEl.innerHTML = `
+        <h4>${data.name}</h4>
+        <p><strong>系统：</strong>${data.system}</p>
+        <p><strong>分层位置：</strong>${data.layer}</p>
+        <p>${data.desc}</p>
+        <div class="tag-row">
+          <span class="tag">${data.system}</span>
+          <span class="tag">${data.layer}</span>
+        </div>
+      `;
+    }
+  });
+
+  // ========== UI 绑定 ==========
+  const organMats = [matSke, matCir, matRes, matDig, matNer, matUri];
+
+  document.getElementById("sys-skin").onchange = e => bodyShell.visible = e.target.checked;
+  document.getElementById("sys-ske").onchange = e => sysSke.visible = e.target.checked;
+  document.getElementById("sys-cir").onchange = e => sysCir.visible = e.target.checked;
+  document.getElementById("sys-res").onchange = e => sysRes.visible = e.target.checked;
+  document.getElementById("sys-dig").onchange = e => sysDig.visible = e.target.checked;
+  document.getElementById("sys-ner").onchange = e => sysNer.visible = e.target.checked;
+  document.getElementById("sys-uri").onchange = e => sysUri.visible = e.target.checked;
+
+  document.getElementById("skin-opacity").oninput = e => {
+    const v = parseFloat(e.target.value);
+    skinMat.opacity = v;
+    document.getElementById("skin-val").innerText = v.toFixed(2);
+  };
+
+  document.getElementById("organ-opacity").oninput = e => {
+    const v = parseFloat(e.target.value);
+    organMats.forEach(m => m.opacity = v);
+    document.getElementById("organ-val").innerText = v.toFixed(2);
+  };
+
+  document.getElementById("glow").oninput = e => {
+    const v = parseFloat(e.target.value);
+    organMats.forEach(m => m.emissiveIntensity = v);
+    document.getElementById("glow-val").innerText = v.toFixed(1);
+  };
+
+  document.getElementById("resetCam").onclick = () => {
+    camera.position.set(0, 1.6, 4.2);
+    controls.target.set(0, 1.0, 0);
+    controls.update();
+  };
+
+  document.getElementById("autoRotate").onclick = (e) => {
+    controls.autoRotate = !controls.autoRotate;
+    e.target.innerText = controls.autoRotate ? "停止旋转" : "自动旋转";
+  };
+
+  // ========== 自适应 ==========
+  window.addEventListener("resize", () => {
+    const wrap = document.getElementById("canvas-wrap");
+    camera.aspect = wrap.clientWidth / wrap.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+    drawBg();
+  });
+
+  // ========== 渲染循环 ==========
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  document.getElementById("loading").style.display = "none";
+</script>
+</body>
+</html>
+<!-- （注：内容由AI生成） -->
