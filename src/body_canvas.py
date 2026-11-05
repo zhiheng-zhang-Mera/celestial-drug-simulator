@@ -30,8 +30,8 @@ class BodyCanvas(tk.Canvas):
     def draw(self):
         self.delete('all')
         width,height=self.winfo_width(),self.winfo_height()
-        scale=min(max(width-30,1)/300,max(height-38,1)/520)
-        ox=(width-294*scale)/2; oy=12
+        scale=min(max(width-16,1)/240,max(height-28,1)/490)
+        ox=width/2-147*scale; oy=4-18*scale
         def coords(points): return [v*scale+(ox if i%2==0 else oy) for i,v in enumerate(points)]
         self.create_polygon(coords(OUTLINE),smooth=True,splinesteps=20,fill='#182B36',outline='#647E8A',width=1.3,stipple='gray25')
         # Torso midline, clavicles, ribs and pelvic contour provide depth without skin colors.

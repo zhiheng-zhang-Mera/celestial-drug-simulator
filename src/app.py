@@ -13,10 +13,10 @@ def main():
     window.geometry('1440x940')
     window.minsize(1160, 780)
     apply_theme(window)
-    header = tk.Frame(window, bg='#0E141C', padx=24, pady=14)
+    header = tk.Frame(window, bg='#0E141C', padx=16, pady=6)
     header.pack(fill='x')
-    tk.Label(header, text='CELESTIAL / DRUG', bg='#0E141C', fg='#5BD8C7', font=('Microsoft YaHei UI',10,'bold')).pack(anchor='w')
-    tk.Label(header, text='人体作用与证据', bg='#0E141C', fg='#E8EFF5', font=('Microsoft YaHei UI',22,'bold')).pack(anchor='w')
+    tk.Label(header, text='CELESTIAL / DRUG', bg='#0E141C', fg='#5BD8C7', font=('Microsoft YaHei UI',10,'bold')).pack(side='left',padx=(0,18))
+    tk.Label(header, text='人体作用与证据', bg='#0E141C', fg='#E8EFF5', font=('Microsoft YaHei UI',16,'bold')).pack(side='left')
     tabs = ttk.Notebook(window); tabs.pack(fill='both', expand=True)
     body_host = ttk.Frame(tabs); tabs.add(body_host, text='人体作用')
     root = ttk.Frame(tabs); tabs.add(root, text='多药方案 / 暴露 / 报告')
@@ -24,18 +24,24 @@ def main():
     rows = []
     result = None
     context = {}
-    ttk.Label(root, text='多药模拟器 · 方案与证据', font=('', 18)).pack(pady=8)
+    ttk.Label(root, text='方案输入', font=('Microsoft YaHei UI',13,'bold')).pack(anchor='w',padx=12,pady=(8,0))
     ttk.Label(root, text='1–32 种物质 · 药品 / 补充剂 / 其他 · 本机离线研究').pack()
-    editor = ttk.Frame(root, padding=10)
+    editor = ttk.Frame(root, padding=(10,6))
     editor.pack(fill='x')
     variables = {}
     specs = [('name', '名称', '合成 A'), ('dose_mg', '剂量 mg', '100'),
              ('volume_l', '容积 L', '10'), ('half_life_h', '半衰期 h', '4'),
              ('interval_h', '间隔 h', '8'), ('count', '次数', '3')]
-    for col, (key, label, default) in enumerate(specs):
-        ttk.Label(editor, text=label).grid(row=0, column=col, sticky='w')
-        variables[key] = tk.StringVar(value=default)
-        ttk.Entry(editor, textvariable=variables[key], width=15).grid(row=1, column=col, padx=3)
+    groups={}
+    for col,title in enumerate(('物质名称','给药方案','模型参数 · 假设输入')):
+        groups[title]=ttk.LabelFrame(editor,text=title,padding=8)
+        groups[title].grid(row=0,column=col,sticky='nsew',padx=(0,8))
+    positions={'name':('物质名称',0),'dose_mg':('给药方案',0),'interval_h':('给药方案',1),'count':('给药方案',2),'volume_l':('模型参数 · 假设输入',0),'half_life_h':('模型参数 · 假设输入',1)}
+    for key,label,default in specs:
+        group,col=positions[key];parent=groups[group]
+        ttk.Label(parent,text=label).grid(row=0,column=col,sticky='w')
+        variables[key]=tk.StringVar(value=default)
+        ttk.Entry(parent,textvariable=variables[key],width=15).grid(row=1,column=col,padx=(0,6))
     kind = tk.StringVar(value='synthetic')
     route = tk.StringVar(value='iv_bolus')
     selection = tk.StringVar(value='fluconazole')

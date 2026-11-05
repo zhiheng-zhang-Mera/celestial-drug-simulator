@@ -17,3 +17,9 @@ Implemented the approved three-column layout in the external Tk desktop module w
 The anatomy is an original 2D schematic projection, not a realistic tissue mesh or tissue dynamics model. Initial source-linked coverage is five atomoxetine regions only; other identities and unlisted regions show insufficient evidence. System membership does not propagate effects. Brightness is not dose, intensity, damage or an individualized prediction. Sources remain pending human scientific review.
 
 Validation: 32 unit tests pass; independent code review found no important actionable issues. Developer actual-window checks covered atomoxetine liver/brain, stomach absence, testes/uterus, triceps/back, urinary-to-kidney navigation, deselection clearing and legacy synthetic calculation. DEV-05 recording is local-only and does not establish formal remote acceptance. Figma fresh context was blocked by Starter quota; prior inspected design and committed layout contract used.
+
+## DEV-06 compact layout
+
+Owner requested input consolidation and reduced body whitespace. Drug choice/regimen actions and physiology/PGx controls now share a compact top toolbar. The region directory is190px and body column390px, with remaining width assigned to evidence. The body uses tighter fitted bounds, preserves aspect ratio and existing hit regions. Header is a single row. Regimen numeric inputs are grouped into substance name, dose/interval/count, and model volume/half-life; values and handlers unchanged.
+
+32tests pass. Native window528572: catalog atomoxetine selection, liver hit/evidence and synthetic add/calculate checked. Local60s recording DEV-06; no new clinical/data behavior. Independent body_review read-only Tk inspection at1160x780 found no overflow in either tab and complete435px-high drawing within bounds; no actionable findings. This is bounded layout review, not formal full runtime acceptance.
