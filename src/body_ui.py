@@ -78,7 +78,7 @@ class AnatomyWorkspace(ttk.Frame):
         right=ttk.Frame(self,style='Card.TFrame',padding=16,width=340);right.grid(row=1,column=2,sticky='nsew',padx=(16,0));right.pack_propagate(False)
         self.heading=tk.StringVar();ttk.Label(right,textvariable=self.heading,font=('Microsoft YaHei UI',17,'bold')).pack(anchor='w',pady=(0,12))
         reportframe=ttk.Frame(right);reportframe.pack(fill='both',expand=True)
-        self.detail=tk.Text(reportframe,bg=PANEL,fg=TEXT,wrap='word',relief='flat',font=('Microsoft YaHei UI',11),padx=4,pady=8,state='disabled',width=32)
+        self.detail=tk.Text(reportframe,bg=PANEL,fg=TEXT,wrap='word',relief='flat',font=('Microsoft YaHei UI',11),padx=4,pady=8,state='disabled',width=32,height=1)
         scroll=ttk.Scrollbar(reportframe,command=self.detail.yview);self.detail.configure(yscrollcommand=scroll.set)
         scroll.pack(side='right',fill='y');self.detail.pack(fill='both',expand=True)
         self.related=ttk.Frame(right,style='Card.TFrame');self.related.pack(fill='x',pady=10)
