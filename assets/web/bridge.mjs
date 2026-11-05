@@ -88,8 +88,12 @@ export function initAnatomyBridge(ctx) {
     const geometry=document.createElement('p');geometry.textContent='HTML 原稿及补充示意几何；非真实组织或生理指标测量。';
     document.getElementById('info').append(heading,info,geometry);applyColors();
   };
-  for(const id of ['color-mode','organ-opacity','glow'])document.getElementById(id).addEventListener('input',()=>{
-    if(id!=='color-mode')document.getElementById(id==='glow'?'glow-val':'organ-val').textContent=(+document.getElementById(id).value).toFixed(id==='glow'?1:2);
+  document.getElementById('color-mode').onclick=e=>{
+    const button=e.currentTarget;button.value=button.value==='source'?'system':'source';
+    button.textContent=button.value==='system'?'切换药物证据蒙版':'切换原稿系统配色';applyColors();
+  };
+  for(const id of ['organ-opacity','glow'])document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById(id==='glow'?'glow-val':'organ-val').textContent=(+document.getElementById(id).value).toFixed(id==='glow'?1:2);
     applyColors();
   });
   document.getElementById('reproductive').onchange=reproductive;reproductive();applyColors();

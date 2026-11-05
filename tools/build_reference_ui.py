@@ -40,10 +40,10 @@ page = page.replace('</style>', '''
   #viewport-status {position:absolute;right:12px;top:12px;font-size:11px;color:#b9dcff;pointer-events:none;}
 </style>''')
 page = page.replace('<div class="group">', '''<div class="group">
-      <h3>器官 / 肌群 / 系统</h3>
-      <select id="region-select" aria-label="区域目录"></select>
-      <select id="color-mode" aria-label="颜色模式"><option value="source">药物证据 · 默认透明蒙版</option><option value="system">原稿系统配色 · 非药物影响</option></select>
-      <select id="reproductive" aria-label="生殖器官分层"><option value="none">隐藏生殖分层</option><option value="testes">睾丸示意层</option><option value="uterus">子宫示意层</option></select>
+      <h3>显示模式</h3>
+      <select id="region-select" aria-label="区域目录" hidden></select>
+      <button class="btn" style="width:100%" id="color-mode" value="source">切换原稿系统配色</button>
+      <select id="reproductive" size="3" aria-label="生殖器官分层"><option value="none" selected>隐藏生殖分层</option><option value="testes">睾丸示意层</option><option value="uterus">子宫示意层</option></select>
       <div id="source-legend">亮色仅表示文献关联，不是个人反应。</div>
     </div>
     <div class="group">''',1)
