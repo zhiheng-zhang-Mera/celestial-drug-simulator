@@ -28,7 +28,6 @@ ttk.Label(root, textvariable=status, wraplength=880).pack(pady=8)
 table = ttk.Treeview(root, columns=("time", "a", "b"), show="headings", height=18)
 for column, label in zip(("time", "a", "b"), ("时间 h", "合成 A 浓度 mg/L", "合成 B 浓度 mg/L")):
     table.heading(column, text=label)
-table.pack(fill="both", expand=True, padx=16, pady=12)
 
 def calculate():
     table.delete(*table.get_children())
@@ -53,4 +52,5 @@ def calculate():
         status.set("输入被拒绝：" + str(error))
 
 ttk.Button(root, text="计算合成暴露时间轴", command=calculate).pack(pady=8)
+table.pack(fill="both", expand=True, padx=16, pady=12)
 root.mainloop()
