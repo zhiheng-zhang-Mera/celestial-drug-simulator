@@ -73,7 +73,7 @@ class AnatomyWorkspace(tk.Frame):
         self.choice = tk.StringVar(value='未选择物质')
         self._query = tk.StringVar(value='未选择物质')
         self.combo = ttk.Combobox(bar, textvariable=self._query, values=self._labels,
-                                  style='Paper.TCombobox', width=30)
+                                  style='Paper.TCombobox', width=26)
         self.combo.pack(side='left', padx=(0, 8))
         self.combo.bind('<KeyRelease>', self._filter_substances)
         self.combo.bind('<<ComboboxSelected>>', self._choose_substance)
@@ -92,13 +92,6 @@ class AnatomyWorkspace(tk.Frame):
         for label, command in (('编辑多药方案', open_regimen), ('生理 / 基因', open_context),
                                ('来源 / 条件估计', open_pgx)):
             ui.FlatButton(bar, label, kind='quiet', command=command).pack(side='left', padx=(0, 6))
-        legend = tk.Frame(bar, bg=PAPER['surface'])
-        legend.pack(side='right')
-        tk.Label(legend, text='●', font=(ui.FONT, 7), fg=PAPER['accent'],
-                 bg=PAPER['surface']).pack(side='left')
-        ui.text(legend, '亮色 = 文献关联，非个人反应', size=9,
-                fg=PAPER['ink3']).pack(side='left', padx=(4, 0))
-
         status_row = tk.Frame(toolbar, bg=PAPER['surface'], padx=24)
         status_row.pack(fill='x', pady=(0, 10))
         self.pharm_status = tk.StringVar(value='本地药典就绪 · 可输入中文 / 英文名检索')
@@ -171,7 +164,7 @@ class AnatomyWorkspace(tk.Frame):
         self.mayo_button.configure(state='normal')
         if error is not None:
             self.pharm_status.set(
-                f"Mayo 更新失败（{error.code}）：{error} 本地药典仍可用，可点「打开 Mayo 搜索」人工核对。")
+                f"Mayo 更新失败（{error.code}）：{error} 可点「打开 Mayo 搜索」人工核对。")
             return
         self._pharma_entries = pharmacopoeia.load_entries()
         self._combo_entries = {entry['display']: entry for entry in self._pharma_entries}
