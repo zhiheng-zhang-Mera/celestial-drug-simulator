@@ -1,5 +1,13 @@
 """Celestial Drug Simulator desktop workspace with a clinical reading shell."""
+import os
 import tkinter as tk
+
+DEFAULT_TITLE = 'Celestial Drug Simulator · 人体作用与证据'
+
+
+def window_title():
+    """Production title, with a development-only override for parallel UI checks."""
+    return os.environ.get('CELESTIAL_DRUG_TITLE') or DEFAULT_TITLE
 
 
 def build(window):
@@ -10,7 +18,7 @@ def build(window):
     from src.navigation import SegmentedNav
     from src.simulation import load_catalog
 
-    window.title('Celestial Drug Simulator · 人体作用与证据')
+    window.title(window_title())
     window.geometry('1440x900')
     window.minsize(1024, 720)
     apply_theme(window)
