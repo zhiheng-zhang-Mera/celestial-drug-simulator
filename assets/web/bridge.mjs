@@ -15,20 +15,21 @@ export function initAnatomyBridge(ctx) {
   groups.mus=new THREE.Group();groups.rep=new THREE.Group();scene.add(groups.mus,groups.rep);
   function schematic(region,x,y,z,sx,sy,sz){
     const mesh=new THREE.Mesh(new THREE.SphereGeometry(1,24,18),new THREE.MeshPhongMaterial({
-      color:0xb6d6e9,transparent:true,opacity:.65,depthWrite:false,side:THREE.DoubleSide}));
+      color:0xC7A79C,transparent:true,opacity:.55,depthWrite:false,side:THREE.DoubleSide}));
     mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);groups[regionGroups[region]].add(mesh);addNamed(mesh,region);
   }
   for(const side of [-1,1]){
-    schematic('biceps',side*.64,1.28,.09,.07,.26,.06);
-    schematic('triceps',side*.64,1.28,-.09,.075,.28,.065);
-    schematic('quadriceps',side*.18,-.03,.08,.09,.3,.07);
-    schematic('testes',side*.055,-.47,.13,.045,.065,.045);
+    schematic('biceps',side*.55,1.33,.07,.065,.19,.055);
+    schematic('triceps',side*.55,1.33,-.08,.07,.21,.06);
+    schematic('quadriceps',side*.18,-.26,.03,.09,.25,.075);
+    schematic('testes',side*.055,-.06,.10,.045,.06,.045);
   }
-  schematic('uterus',0,-.32,.13,.09,.07,.045);
-  for(const side of [-1,1])schematic('uterus',side*.09,-.28,.13,.07,.018,.018);
+  schematic('uterus',0,-.01,.10,.09,.065,.045);
+  for(const side of [-1,1])schematic('uterus',side*.09,.02,.10,.065,.016,.016);
   const layerRow=document.createElement('div');layerRow.className='sys-item';
-  layerRow.innerHTML='<label for="sys-mus">肌肉群 · 补充示意</label><input id="sys-mus" type="checkbox" checked>';
-  document.getElementById('sys-uri').closest('.group').append(layerRow);
+  layerRow.innerHTML='<label for="sys-mus">肌肉群</label><input id="sys-mus" type="checkbox" checked>';
+  const uri=document.getElementById('sys-uri');
+  (uri.closest('.layers')||uri.closest('.group')).append(layerRow);
   document.getElementById('sys-mus').onchange=e=>groups.mus.visible=e.target.checked;
   // Each mesh gets its own material: highlighting one organ never colors a whole system.
   const renderables=[];
@@ -47,12 +48,12 @@ export function initAnatomyBridge(ctx) {
       const selected=region===state.selected||state.members?.includes(region);
       const mat=object.material;mat.color.setHex(style.color);
       mat.opacity=opacity*(style.effect||system?1:.45);
-      if(mat.emissive){mat.emissive.setHex(selected&&!style.effect?0xd3edff:style.color);
-        mat.emissiveIntensity=glow*(style.effect?1:system?.7:selected?.35:.08);}
+      if(mat.emissive){mat.emissive.setHex(selected&&!style.effect?0xBFD8D2:style.color);
+        mat.emissiveIntensity=glow*(style.effect?.55:system?.12:selected?.25:.05);}
     }
     document.getElementById('source-legend').textContent=system?
-      '系统配色用于辨识结构，不表示药物影响。药物关联仍依右侧证据。':
-      '青·机制 / 蓝·代谢 / 浅蓝·排泄 / 金·关注；亮色为文献关联，非个人反应。';
+      '系统配色仅辨识结构，不代表药物影响。':
+      '青·机制 / 蓝·代谢 / 浅蓝·排泄 / 金·关注；亮色为文献关联。';
   }
   function reproductive(){
     const chosen=document.getElementById('reproductive').value;
@@ -76,8 +77,8 @@ export function initAnatomyBridge(ctx) {
     select.value=state.selected;
     if(lastSelection!==state.selected){
       reveal(state.selected);state.members?.forEach(reveal);
-      if(state.selected==='triceps')camera.position.set(0,1.6,-4.2);
-      if(state.selected==='biceps')camera.position.set(0,1.6,4.2);
+      if(state.selected==='triceps')camera.position.set(0,1.15,-4.9);
+      if(state.selected==='biceps')camera.position.set(0,1.15,4.9);
       lastSelection=state.selected;
     }
     for(const region of Object.keys(state.effects))reveal(region);
