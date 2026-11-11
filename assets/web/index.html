@@ -2,30 +2,39 @@
 <html lang="zh-CN">
 <head>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' qrc: data:; script-src 'self' qrc: 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'">
-
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>解剖舞台 · 人体分层视图</title>
+<title>解剖舞台 · 人体模型</title>
 <style>
   :root {
     --ink: #0C0D0F;
-    --panel: #121316;
+    --panel: #101114;
     --surface: #16171A;
+    --surface-2: #1C1D21;
     --line: rgba(255, 255, 255, 0.07);
     --line-strong: rgba(255, 255, 255, 0.14);
     --text: #F3F1EB;
     --text-2: #B9B5AC;
     --text-3: #8A867E;
     --accent: #74E3C8;
+    --skin: #D8C2A6;
+    --warn: #E8BE73;
+    --loss: #F08C7F;
+    --radius: 6px;
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+    --font: "Segoe UI Variable Display", "Segoe UI", "Microsoft YaHei UI", "PingFang SC", system-ui, sans-serif;
+    --mono: "Cascadia Mono", Consolas, "Liberation Mono", monospace;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     background: var(--ink);
     color: var(--text-2);
-    font-family: "Microsoft YaHei UI", "Segoe UI", system-ui, sans-serif;
+    font-family: var(--font);
     font-size: 12px;
     line-height: 1.5;
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   #app {
@@ -34,318 +43,363 @@
     height: 100vh;
   }
 
-  .dashboard {
+  /* ---------------------------------------------------------------- panel */
+  .panel {
     background: var(--ink);
     border-right: 1px solid var(--line);
     overflow-y: auto;
+    overflow-x: hidden;
     scrollbar-width: thin;
-    scrollbar-color: #2A2C30 var(--ink);
+    scrollbar-color: #2A2C30 transparent;
+    padding-bottom: 14px;
   }
-  .dashboard::-webkit-scrollbar { width: 8px; }
-  .dashboard::-webkit-scrollbar-thumb { background: #2A2C30; border-radius: 4px; }
+  .panel::-webkit-scrollbar { width: 7px; }
+  .panel::-webkit-scrollbar-thumb { background: #2A2C30; border-radius: 4px; }
 
-  .dash-head { padding: 12px 16px 10px; }
+  .panel-head { padding: 11px 15px 9px; }
   .eyebrow {
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--text-3);
   }
-  .dash-head .sub { font-size: 11px; color: var(--text-2); margin-top: 3px; }
-  .sex-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 8px;
+  .panel-sub {
+    font-size: 11px;
+    color: var(--text-2);
+    margin-top: 3px;
   }
-  .sex-row label { font-size: 10px; color: var(--text-3); flex: none; }
-  .sex-row select { flex: 1; width: auto; margin: 0; }
-
-  .group {
-    padding: 10px 16px 12px;
+  .panel-sub em { font-style: normal; color: var(--text-3); }
+  .selection-line {
+    margin-top: 7px;
+    padding-top: 7px;
     border-top: 1px solid var(--line);
-  }
-  .group h3 {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .selection-line span#selection-name { display: block; }
+  .selection-line span#selection-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 9.5px;
+    font-weight: 400;
     color: var(--text-3);
-    margin-bottom: 9px;
+    letter-spacing: 0;
   }
-  details.group > summary {
-    list-style: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--text-3);
-    padding: 2px 0;
-  }
-  details.group > summary::-webkit-details-marker { display: none; }
-  details.group > summary::after { content: "▾"; color: var(--text-3); }
-  details.group[open] > summary::after { content: "▴"; }
-  details.group[open] > summary { margin-bottom: 9px; }
-
-  .layers {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px 6px;
-  }
-  .sys-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-    padding: 3px 6px;
-    margin: 0;
-    border-radius: 5px;
-  }
-  .sys-item:hover { background: rgba(255, 255, 255, 0.035); }
-  .sys-item-left {
+  .legend-mini {
     display: flex;
     align-items: center;
     gap: 6px;
+    margin-top: 5px;
+    font-size: 9.5px;
+    color: var(--text-3);
+    line-height: 1.3;
+  }
+  .legend-mini .sw { width: 6px; height: 6px; }
+
+  .block { border-top: 1px solid var(--line); padding: 8px 15px 10px; }
+  .block-head {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 23px;
+    cursor: pointer;
     font-size: 11px;
     color: var(--text-2);
-    min-width: 0;
+    border-radius: 4px;
   }
-  .color-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
-  .depth-badge { font-size: 10px; color: var(--text-3); }
+  .row:hover { color: var(--text); }
+  .row-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sw {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--c, var(--text-3));
+    flex: none;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07);
+  }
+  .sw-none { background: transparent; border: 1px dashed var(--line-strong); }
+  .note { font-size: 9.5px; color: var(--text-3); white-space: nowrap; }
+  .is-note { cursor: default; color: var(--text-3); }
+  .is-note:hover { color: var(--text-3); }
 
   input[type="checkbox"] {
-    width: 14px;
+    width: 13px; height: 13px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex: none;
+  }
+
+  .slider {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-2);
+    margin: 6px 0 3px;
+  }
+  .slider .val { color: var(--text-3); font-variant-numeric: tabular-nums; }
+  input[type="range"] {
+    width: 100%;
     height: 14px;
     accent-color: var(--accent);
     cursor: pointer;
   }
 
-  .slider-wrap { margin: 9px 0; }
-  .slider-wrap label {
+  .layers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 6px;
+  }
+  .layers .row { min-height: 23px; gap: 5px; }
+  .layers .row-label { font-size: 10.5px; }
+  .layers .sw { width: 6px; height: 6px; }
+  .layers input[type="checkbox"] { width: 12px; height: 12px; }
+
+  .view-bar {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    z-index: 4;
     display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--text-2);
-    margin-bottom: 5px;
-  }
-  .slider-wrap label span { color: var(--text-3); font-variant-numeric: tabular-nums; }
-  input[type="range"] { width: 100%; accent-color: var(--accent); }
-
-  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 11px; }
-  .btn {
-    padding: 7px 10px;
-    border: 1px solid var(--line-strong);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 3px;
+    background: rgba(12, 13, 15, 0.78);
+    border: 1px solid var(--line);
     border-radius: 6px;
-    background: transparent;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 11px;
-    font-family: inherit;
-    transition: background 120ms ease, border-color 120ms ease;
   }
-  .btn:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.22); }
-  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .vbtn {
+    min-height: 24px;
+    padding: 3px 8px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-2);
+    font-family: inherit;
+    font-size: 10px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .vbtn:hover { background: rgba(255, 255, 255, 0.06); color: var(--text); }
+  .vbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .vbtn[aria-pressed="true"] { color: var(--accent); }
 
+  .field-label { display: block; font-size: 10px; color: var(--text-3); margin: 9px 0 4px; }
   select {
     width: 100%;
     background: #101113;
     color: var(--text);
     border: 1px solid var(--line-strong);
-    border-radius: 6px;
-    padding: 6px 8px;
-    margin: 5px 0;
+    border-radius: var(--radius);
+    padding: 5px 7px;
     font-size: 11px;
     font-family: inherit;
   }
-  select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .mini-label { display: block; font-size: 10px; color: var(--text-3); margin-top: 9px; }
+  select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-  #source-legend {
-    font-size: 10px;
-    color: var(--text-3);
-    margin-top: 8px;
-    line-height: 1.55;
-  }
-
-  .info { border-top: 1px solid var(--line); padding: 12px 16px 14px; }
-  #info h4 { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  #info p { font-size: 10.5px; line-height: 1.65; color: var(--text-3); margin-top: 3px; }
-  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  /* --------------------------------------------------------------- info */
   .tag {
+    font-size: 9.5px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+  .tag-real { color: var(--accent); border-color: rgba(116, 227, 200, 0.28); }
+  .tag-schematic { color: var(--warn); border-color: rgba(232, 190, 115, 0.3); }
+
+  .micro { font-size: 9.5px; color: var(--text-3); line-height: 1.5; margin-top: 7px; }
+
+  /* ------------------------------------------------------------- stage */
+  #canvas-wrap { position: relative; min-width: 0; min-height: 0; background: var(--ink); overflow: hidden; }
+  #three-canvas { width: 100%; height: 100%; display: block; outline: none; }
+  #three-canvas.can-pick { cursor: pointer; }
+  #three-canvas.is-dragging { cursor: grabbing; }
+
+  #viewport-status {
+    position: absolute;
+    top: 11px;
+    right: 13px;
     font-size: 10px;
     color: var(--text-3);
-    border-bottom: 1px solid var(--line-strong);
-    padding-bottom: 1px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    pointer-events: none;
+    white-space: nowrap;
   }
-
-  #canvas-wrap { position: relative; min-width: 0; min-height: 0; background: var(--ink); }
-  #three-canvas { width: 100%; height: 100%; display: block; }
 
   .hint {
     position: absolute;
     left: 50%;
-    bottom: 16px;
+    bottom: 13px;
     transform: translateX(-50%);
-    max-width: 88%;
+    max-width: 92%;
     text-align: center;
-    padding: 7px 14px;
-    background: rgba(12, 13, 15, 0.72);
+    padding: 5px 13px;
+    background: rgba(12, 13, 15, 0.74);
     border: 1px solid var(--line);
     border-radius: 999px;
     font-size: 10px;
     color: var(--text-3);
     pointer-events: none;
-  }
-  .loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--text-3);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-  }
-  #viewport-status {
-    position: absolute;
-    right: 14px;
-    top: 12px;
-    font-size: 10px;
-    color: var(--text-3);
-    font-variant-numeric: tabular-nums;
-    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* 矮窗口下隐藏与右侧证据面板重复的区域说明，避免图层控制被挤进滚动区。 */
-  @media (max-height: 560px) {
-    #info { display: none; }
+  .tooltip {
+    position: absolute;
+    left: 0; top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 220px;
+    padding: 5px 9px;
+    background: rgba(22, 23, 26, 0.96);
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 11px;
+    pointer-events: none;
+    white-space: nowrap;
+    transform: translate(12px, 12px);
+  }
+  .tooltip[hidden] { display: none; }
+  .tooltip .tag { font-size: 9px; }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    background: var(--ink);
+    text-align: center;
+    padding: 24px;
+  }
+  .overlay[hidden] { display: none; }
+  .load-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+  }
+  #loading-text { font-size: 12px; color: var(--text-2); }
+  .load-track {
+    width: 168px;
+    height: 2px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  #loading-bar { width: 0%; height: 100%; background: var(--accent); transition: width 160ms var(--ease); }
+  .load-detail { font-size: 9.5px; color: var(--text-3); letter-spacing: 0.02em; }
+  .overlay.is-error .load-track { display: none; }
+  .overlay.is-error #loading-text { color: var(--loss); max-width: 460px; line-height: 1.65; }
+  .overlay.is-error .load-detail { max-width: 460px; line-height: 1.6; }
+
+  @media (max-height: 540px) {
+    .hint { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
   }
 </style>
 </head>
 <body>
 <div id="app">
-  <aside class="dashboard">
-    <section class="group">
-      <h3>显示模式</h3>
-      <select id="region-select" aria-label="区域目录" hidden></select>
-      <button class="btn" style="width:100%" id="color-mode" value="source">切换原稿系统配色</button>
-      <div class="sex-row">
-        <label for="reproductive">生殖分层</label>
-        <select id="reproductive" aria-label="生殖器官分层">
-          <option value="none" selected>隐藏</option>
-          <option value="testes">睾丸示意层</option>
-          <option value="uterus">子宫示意层</option>
-        </select>
+  <aside class="panel" aria-label="人体模型控制">
+    <header class="panel-head">
+      <div class="eyebrow">人体模型</div>
+      <div class="panel-sub">BodyParts3D · 真实网格</div>
+      <div class="selection-line">
+        <span id="selection-name">大脑</span>
+        <span id="selection-meta">正在等待区域状态…</span>
       </div>
-      <p id="source-legend">亮色仅表示文献关联，不是个人反应。</p>
+      <div class="legend-mini">
+        <span class="sw" style="--c:#74E3C8"></span><span id="legend-evidence">亮色 = 文献关联</span>
+      </div>
+      <div class="legend-mini">
+        <span class="sw" style="--c:#C08A9A"></span><span>子宫为示意层 · 骨骼未含</span>
+      </div>
+    </header>
+
+    <section class="block">
+      <div class="block-head">透明度</div>
+      <label class="slider" for="skin-opacity"><span>体表</span><span class="val" id="skin-val">30%</span></label>
+      <input type="range" id="skin-opacity" min="0.05" max="0.35" step="0.01" value="0.30" aria-label="体表透明度" />
+      <label class="slider" for="organ-opacity"><span>器官</span><span class="val" id="organ-val">82%</span></label>
+      <input type="range" id="organ-opacity" min="0.40" max="1.00" step="0.01" value="0.82" aria-label="器官透明度" />
+      <label class="slider" for="glow"><span>证据光</span><span class="val" id="glow-val">1.0</span></label>
+      <input type="range" id="glow" min="0" max="2" step="0.1" value="1" aria-label="证据高亮强度" />
     </section>
 
-    <section class="group">
-      <h3>系统分层</h3>
+    <section class="block">
+      <div class="block-head">图层</div>
       <div class="layers">
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#9FB3BD"></span>
-            <label for="sys-skin">外壳</label>
-          </div>
-          <input type="checkbox" id="sys-skin" checked />
-        </div>
-
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#D9D3C5"></span>
-            <label for="sys-ske">骨骼</label>
-          </div>
-          <input type="checkbox" id="sys-ske" checked />
-        </div>
-
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#C98A80"></span>
-            <label for="sys-cir">循环</label>
-          </div>
-          <input type="checkbox" id="sys-cir" checked />
-        </div>
-
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#86A9BA"></span>
-            <label for="sys-res">呼吸</label>
-          </div>
-          <input type="checkbox" id="sys-res" checked />
-        </div>
-
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#C2A678"></span>
-            <label for="sys-dig">消化</label>
-          </div>
-          <input type="checkbox" id="sys-dig" checked />
-        </div>
-
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#A79BC4"></span>
-            <label for="sys-ner">神经</label>
-          </div>
-          <input type="checkbox" id="sys-ner" checked />
-        </div>
-
-        <div class="sys-item">
-          <div class="sys-item-left">
-            <span class="color-dot" style="background:#82AE99"></span>
-            <label for="sys-uri">泌尿</label>
-          </div>
-          <input type="checkbox" id="sys-uri" checked />
-        </div>
+        <label class="row"><span class="sw" style="--c:#D8C2A6"></span><span class="row-label">体表</span><input type="checkbox" id="layer-shell" checked /></label>
+        <label class="row"><span class="sw" style="--c:#B3746C"></span><span class="row-label">循环</span><input type="checkbox" id="layer-cir" checked /></label>
+        <label class="row"><span class="sw" style="--c:#C29A94"></span><span class="row-label">呼吸</span><input type="checkbox" id="layer-res" checked /></label>
+        <label class="row"><span class="sw" style="--c:#A9725C"></span><span class="row-label">消化</span><input type="checkbox" id="layer-dig" checked /></label>
+        <label class="row"><span class="sw" style="--c:#C0A29A"></span><span class="row-label">神经</span><input type="checkbox" id="layer-ner" checked /></label>
+        <label class="row"><span class="sw" style="--c:#9C6A60"></span><span class="row-label">泌尿</span><input type="checkbox" id="layer-uri" checked /></label>
+        <label class="row"><span class="sw" style="--c:#A65F55"></span><span class="row-label">肌肉群</span><input type="checkbox" id="layer-mus" checked /></label>
+        <label class="row"><span class="sw" style="--c:#C08A9A"></span><span class="row-label">生殖层</span><input type="checkbox" id="layer-rep" checked /></label>
       </div>
+      <div class="row is-note"><span class="sw sw-none"></span><span class="row-label">骨骼</span><span class="note">来源数据未含</span></div>
+      <label class="field-label" for="reproductive">生殖分层</label>
+      <select id="reproductive" aria-label="生殖器官分层">
+        <option value="none" selected>隐藏</option>
+        <option value="testes">睾丸 · 真实网格</option>
+        <option value="uterus">子宫 · 示意层</option>
+        <option value="both">全部（含示意层）</option>
+      </select>
+      <select id="region-select" aria-label="区域目录" hidden></select>
     </section>
 
-    <details class="group">
-      <summary>视图</summary>
-
-      <div class="slider-wrap">
-        <label>人体外壳透明度 <span id="skin-val">0.16</span></label>
-        <input type="range" id="skin-opacity" min="0" max="0.9" step="0.05" value="0.16" />
-      </div>
-
-      <div class="slider-wrap">
-        <label>器官层透明度 <span id="organ-val">0.85</span></label>
-        <input type="range" id="organ-opacity" min="0.2" max="1" step="0.05" value="0.85" />
-      </div>
-
-      <div class="slider-wrap">
-        <label>证据蒙版强度 <span id="glow-val">1.2</span></label>
-        <input type="range" id="glow" min="0" max="2.5" step="0.1" value="1.2" />
-      </div>
-
-      <div class="btn-row">
-        <button class="btn" id="resetCam">重置视角</button>
-        <button class="btn" id="autoRotate">自动旋转</button>
-      </div>
-    </details>
-
-    <section class="group info" id="info">
-      <h4>器官信息</h4>
-      <p>HTML 原稿示意几何；点击器官联动右侧证据。显示不构成生理指标测量。</p>
-      <div class="tag-row">
-        <span class="tag">拖拽旋转</span>
-        <span class="tag">滚轮缩放</span>
-        <span class="tag">分层显隐</span>
-      </div>
+    <section class="block footnote">
+      <p class="micro">BodyParts3D 单例成年男性参考；形状不代表个体解剖或临床证据。</p>
     </section>
   </aside>
 
   <div id="canvas-wrap">
-    <div class="loading" id="loading">加载人体模型中…</div>
-    <canvas id="three-canvas"></canvas>
-    <div id="viewport-status">正在准备渲染</div>
+    <canvas id="three-canvas" tabindex="0" aria-label="可旋转的三维人体模型"></canvas>
+    <div class="view-bar" role="group" aria-label="视角控制">
+      <button class="vbtn" id="view-front" data-view="front" title="正面（F）">正面</button>
+      <button class="vbtn" id="view-back" data-view="back" title="背面（B）">背面</button>
+      <button class="vbtn" id="resetCam" title="重置视角（R）">重置</button>
+      <button class="vbtn" id="autoRotate" aria-pressed="false" title="自动旋转（空格）">旋转</button>
+      <button class="vbtn" id="color-mode" data-mode="system" aria-pressed="true" title="系统配色 / 证据中性色">系统配色</button>
+    </div>
+    <div id="viewport-status">初始化渲染</div>
     <div class="hint">拖拽旋转 · 右键平移 · 滚轮缩放 · 点击器官查看证据</div>
+    <div class="tooltip" id="tooltip" hidden><span id="tooltip-name"></span><span class="tag" id="tooltip-tag"></span></div>
+
+    <div class="overlay" id="loading">
+      <div class="load-eyebrow">人体模型</div>
+      <div id="loading-text">正在加载本地网格…</div>
+      <div class="load-track"><div id="loading-bar"></div></div>
+      <div class="load-detail" id="loading-detail">BodyParts3D · CC BY-SA 2.1 Japan</div>
+    </div>
   </div>
 </div>
 
 <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 <script type="module" src="./scene.mjs"></script>
-</body></html>
+</body>
+</html>
