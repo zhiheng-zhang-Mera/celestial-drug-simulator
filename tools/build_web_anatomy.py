@@ -200,6 +200,8 @@ def build_document(source_bytes, skin_path):
         'region': SKIN_REGION,
         'source': skin_source,
         'sourceSha256': skin_sha,
+        'sourceIds': ['FMA7163'],
+        'sourceName': 'skin',
         'decimation': skin_stats,
         'positions': _convert_points(skin_points, cx, cy, z0),
         'indices': _indices_from_faces(skin_faces, orient_faces(skin_faces)),
@@ -210,6 +212,10 @@ def build_document(source_bytes, skin_path):
         faces = [tuple(int(i) - 1 for i in face) for face in part['faces']]
         parts.append({
             'region': part['region'],
+            # Upstream identity of this mesh part. The viewer uses these ids to
+            # label individual muscle heads; no geometry is inferred from them.
+            'sourceIds': list(part.get('source_ids', [])),
+            'sourceName': (part.get('names') or [''])[0],
             'positions': _convert_points(part['vertices'], cx, cy, z0),
             'indices': _indices_from_faces(faces, orient_faces(faces)),
         })

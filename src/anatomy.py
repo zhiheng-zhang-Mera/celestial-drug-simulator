@@ -9,17 +9,36 @@ REGIONS = {
     'bladder': ('膀胱', 'organ', ['urinary']),
     'testes': ('睾丸', 'organ', ['reproductive']),
     'uterus': ('子宫', 'organ', ['reproductive']),
+    'shell': ('体表', 'organ', ['integumentary']),
     'biceps': ('肱二头肌群', 'muscle', ['muscular']),
     'triceps': ('肱三头肌群', 'muscle', ['muscular']),
     'quadriceps': ('股四头肌群', 'muscle', ['muscular']),
+    # Physiological systems: navigation only. Members are structural/functional
+    # groupings; no evidence is invented for a system.
+    'integumentary': ('皮肤 / 体表系统', 'system', ['shell']),
     'nervous': ('神经系统', 'system', ['brain']),
-    'metabolic': ('代谢相关器官', 'system', ['liver']),
-    'urinary': ('泌尿系统', 'system', ['kidneys', 'bladder']),
-    'digestive': ('消化系统', 'system', ['stomach', 'liver']),
     'cardiovascular': ('心血管系统', 'system', ['heart']),
     'respiratory': ('呼吸系统', 'system', ['lungs']),
+    'digestive': ('消化系统', 'system', ['stomach', 'liver']),
+    'urinary': ('泌尿系统', 'system', ['kidneys', 'bladder']),
     'reproductive': ('生殖器官分层', 'system', ['testes', 'uterus']),
     'muscular': ('肌肉系统', 'system', ['biceps', 'triceps', 'quadriceps']),
+    'metabolic': ('代谢相关器官', 'system', ['liver']),
+}
+
+# Display layer that owns each region. Layers are presentation only; they do
+# not change evidence semantics.
+SYSTEM_LAYERS = {
+    'integumentary': 'shell', 'nervous': 'ner', 'cardiovascular': 'cir',
+    'respiratory': 'res', 'digestive': 'dig', 'urinary': 'uri',
+    'reproductive': 'rep', 'muscular': 'mus', 'metabolic': 'dig',
+}
+REGION_SYSTEMS = {
+    'shell': 'integumentary', 'brain': 'nervous', 'heart': 'cardiovascular',
+    'lungs': 'respiratory', 'liver': 'digestive', 'stomach': 'digestive',
+    'kidneys': 'urinary', 'bladder': 'urinary', 'testes': 'reproductive',
+    'uterus': 'reproductive', 'biceps': 'muscular', 'triceps': 'muscular',
+    'quadriceps': 'muscular',
 }
 MAYO = 'https://www.mayoclinic.org/drugs-supplements/atomoxetine-oral-route/description/drg-20066904'
 LABEL = 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=309de576-c318-404a-bc15-660c2b1876fb'

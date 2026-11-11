@@ -161,6 +161,193 @@
   .layers .sw { width: 6px; height: 6px; }
   .layers input[type="checkbox"] { width: 12px; height: 12px; flex: none; }
 
+  /* ------------------------------------------------ systems / region tree */
+  .block-hint {
+    margin-left: 5px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--text-3);
+    opacity: 0.8;
+  }
+  #system-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0 4px;
+    min-width: 0;
+  }
+  .sys-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 22px;
+    min-width: 0;
+  }
+  .sys-row input[type="checkbox"] { width: 11px; height: 11px; flex: none; }
+  .sys-btn {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 3px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 10.5px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .sys-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--text); }
+  .sys-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .sys-btn[aria-current="true"] { color: var(--text); }
+  .member-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .member-count {
+    flex: none;
+    font-size: 9px;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .sys-btn .member-count { display: none; }
+  .member-list {
+    grid-column: 1 / -1;
+    margin: 1px 0 5px 10px;
+    padding-left: 8px;
+    border-left: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    min-height: 19px;
+    padding: 1px 4px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-3);
+    font: inherit;
+    font-size: 10.5px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .member-row:hover { background: rgba(255, 255, 255, 0.05); color: var(--text); }
+  .member-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .member-row[aria-current="true"] { color: var(--accent); }
+  .member-row .sw { width: 5px; height: 5px; }
+  .member-row .tag { margin-left: auto; font-size: 8px; padding: 0 4px; }
+  .member-group .member-label { color: var(--text-2); }
+  .member-group[aria-current="true"] .member-label { color: var(--accent); }
+  .head-list {
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    margin-left: 4px;
+    border-left: 1px dotted var(--line-strong);
+  }
+  .head-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    min-height: 18px;
+    padding: 1px 3px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-3);
+    font: inherit;
+    font-size: 9.5px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .head-row:hover { background: rgba(255, 255, 255, 0.05); color: var(--text); }
+  .head-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .head-id {
+    margin-left: auto;
+    color: var(--text-3);
+    opacity: 0.65;
+    font-family: var(--mono);
+    font-size: 8px;
+  }
+  .disclosure-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 22px;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-3);
+    font: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+  .disclosure-btn:hover { color: var(--text-2); }
+  .disclosure-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .disclosure-btn .chev { font-size: 11px; transition: transform 120ms var(--ease); }
+  .disclosure-btn[aria-expanded="true"] .chev { transform: rotate(90deg); }
+  #display-body[hidden] { display: none; }
+  .panel-notes {
+    border-top: 1px solid var(--line);
+    padding: 5px 15px 8px;
+    font-size: 8.5px;
+    line-height: 1.45;
+    color: var(--text-3);
+  }
+  .member-label.short { display: inline; }
+  .member-label.full { display: none; }
+
+  /* Very short stages (1024×720 and 1200×800 WebEngine viewports) use a
+     two-column system index so every system, the selected members, the
+     display disclosure and both provenance notes fit without scrolling. */
+  @media (max-height: 330px) {
+    .panel-head { padding: 4px 12px 3px; }
+    .selection-line { margin-top: 2px; padding-top: 2px; }
+    .selection-line span#selection-meta { font-size: 8.5px; }
+    .legend-mini { display: none; }
+    .block { padding: 3px 12px 4px; }
+    .block-head { font-size: 9px; margin-bottom: 2px; }
+    .block-hint { display: none; }
+    #system-list {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0 3px;
+    }
+    .sys-row { min-height: 17px; gap: 3px; }
+    .sys-row input[type="checkbox"] { width: 9px; height: 9px; }
+    .sys-btn { font-size: 9.5px; gap: 4px; padding: 0 2px; }
+    .sys-btn .member-count { display: none; }
+    .member-list {
+      grid-column: 1 / -1;
+      margin: 1px 0 2px 4px;
+      padding-left: 6px;
+    }
+    .member-row { min-height: 16px; font-size: 9.5px; }
+    .member-label.full { display: none; }
+    .member-label.short { display: inline; }
+    .head-list { padding-left: 6px; }
+    .head-row { min-height: 15px; font-size: 9px; }
+    .display-block { padding-top: 2px; padding-bottom: 3px; }
+    .disclosure-btn { min-height: 16px; font-size: 9px; }
+    .panel-notes { padding: 2px 12px 3px; font-size: 7.5px; line-height: 1.3; }
+  }
+
   .view-bar {
     position: absolute;
     top: 50%;
@@ -341,51 +528,49 @@
 <div id="app">
   <aside class="panel" aria-label="人体模型控制">
     <header class="panel-head">
-      <div class="eyebrow">人体模型 · BodyParts3D</div>
+      <div class="eyebrow">人体模型 · 生理系统</div>
       <div class="selection-line">
         <span id="selection-name">大脑</span>
         <span id="selection-meta">正在等待区域状态…</span>
       </div>
       <div class="legend-mini">
-        <span class="sw" style="--c:#74E3C8"></span><span id="legend-evidence">亮色=文献关联</span>
-        <span class="sep">·</span>
-        <span class="sw" style="--c:#C08A9A"></span><span>子宫示意 · 无骨骼层</span>
+        <span class="sw" style="--c:#74E3C8"></span><span id="legend-evidence">亮色 = 选中 / 文献关联</span>
+        <span class="sep">·</span><span>中性灰 = 默认</span>
       </div>
     </header>
 
-    <section class="block">
-      <div class="block-head">透明度</div>
-      <label class="slider" for="skin-opacity"><span>体表</span><span class="val" id="skin-val">30%</span></label>
-      <input type="range" id="skin-opacity" min="0.05" max="0.35" step="0.01" value="0.30" aria-label="体表透明度" />
-      <label class="slider" for="organ-opacity"><span>器官</span><span class="val" id="organ-val">82%</span></label>
-      <input type="range" id="organ-opacity" min="0.40" max="1.00" step="0.01" value="0.82" aria-label="器官透明度" />
-      <label class="slider" for="glow"><span>证据光</span><span class="val" id="glow-val">1.0</span></label>
-      <input type="range" id="glow" min="0" max="2" step="0.1" value="1" aria-label="证据高亮强度" />
+    <section class="block systems-block">
+      <div class="block-head">生理系统<span class="block-hint">点击选中 · 勾选显隐</span></div>
+      <div id="system-list" role="group" aria-label="生理系统目录"></div>
     </section>
 
-    <section class="block">
-      <div class="block-head">图层</div>
-      <div class="layers">
-        <label class="row"><span class="sw" style="--c:#D8C2A6"></span><span class="row-label">体表</span><input type="checkbox" id="layer-shell" checked /></label>
-        <label class="row"><span class="sw" style="--c:#B3746C"></span><span class="row-label">循环</span><input type="checkbox" id="layer-cir" checked /></label>
-        <label class="row"><span class="sw" style="--c:#C29A94"></span><span class="row-label">呼吸</span><input type="checkbox" id="layer-res" checked /></label>
-        <label class="row"><span class="sw" style="--c:#A9725C"></span><span class="row-label">消化</span><input type="checkbox" id="layer-dig" checked /></label>
-        <label class="row"><span class="sw" style="--c:#C0A29A"></span><span class="row-label">神经</span><input type="checkbox" id="layer-ner" checked /></label>
-        <label class="row"><span class="sw" style="--c:#9C6A60"></span><span class="row-label">泌尿</span><input type="checkbox" id="layer-uri" checked /></label>
-        <label class="row"><span class="sw" style="--c:#A65F55"></span><span class="row-label">肌肉群</span><input type="checkbox" id="layer-mus" checked /></label>
-        <label class="row"><span class="sw" style="--c:#C08A9A"></span><span class="row-label">生殖层</span><input type="checkbox" id="layer-rep" checked /></label>
+    <section class="block display-block">
+      <button class="disclosure-btn" id="display-toggle" type="button"
+              aria-expanded="false" aria-controls="display-body">
+        <span>显示参数</span><span class="chev">›</span>
+      </button>
+      <div id="display-body" hidden>
+        <label class="slider" for="skin-opacity"><span>体表</span><span class="val" id="skin-val">30%</span></label>
+        <input type="range" id="skin-opacity" min="0.05" max="0.35" step="0.01" value="0.30" aria-label="体表透明度" />
+        <label class="slider" for="organ-opacity"><span>器官</span><span class="val" id="organ-val">82%</span></label>
+        <input type="range" id="organ-opacity" min="0.40" max="1.00" step="0.01" value="0.82" aria-label="器官透明度" />
+        <label class="slider" for="glow"><span>证据光</span><span class="val" id="glow-val">1.0</span></label>
+        <input type="range" id="glow" min="0" max="2" step="0.1" value="1" aria-label="证据高亮强度" />
+        <label class="repro-row" for="reproductive">
+          <span class="row-label">生殖分层</span>
+          <select id="reproductive" aria-label="生殖器官分层">
+            <option value="none" selected>隐藏</option>
+            <option value="testes">睾丸 · 真实网格</option>
+            <option value="uterus">子宫 · 示意层</option>
+            <option value="both">全部（含示意层）</option>
+          </select>
+        </label>
       </div>
-      <label class="repro-row" for="reproductive">
-        <span class="row-label">生殖分层</span>
-        <select id="reproductive" aria-label="生殖器官分层">
-          <option value="none" selected>隐藏</option>
-          <option value="testes">睾丸 · 真实网格</option>
-          <option value="uterus">子宫 · 示意层</option>
-          <option value="both">全部（含示意层）</option>
-        </select>
-      </label>
-      <select id="region-select" aria-label="区域目录" hidden></select>
     </section>
+
+    <div class="panel-notes">
+      骨骼：来源数据未含 · 子宫：示意层
+    </div>
   </aside>
 
   <div id="canvas-wrap">
@@ -395,7 +580,7 @@
       <button class="vbtn" id="view-back" data-view="back" title="背面（B）">背面</button>
       <button class="vbtn" id="resetCam" title="重置视角（R）">重置</button>
       <button class="vbtn" id="autoRotate" aria-pressed="false" title="自动旋转（空格）">旋转</button>
-      <button class="vbtn" id="color-mode" data-mode="system" aria-pressed="true" title="系统配色 / 证据中性色">系统配色</button>
+      <button class="vbtn" id="color-mode" data-mode="neutral" aria-pressed="false" title="系统配色（默认关闭：中性灰）">系统配色</button>
     </div>
     <div id="viewport-status">初始化渲染</div>
     <div class="hint">拖拽旋转 · 右键平移 · 滚轮缩放 · 点击器官查看证据</div>

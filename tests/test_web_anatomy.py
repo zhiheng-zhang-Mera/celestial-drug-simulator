@@ -8,7 +8,17 @@ class WebAnatomyContractTests(unittest.TestCase):
         state = make_state({'kind': 'catalog', 'compound_id': 'atomoxetine', 'name': '<script>x</script>'}, 'liver')
         self.assertEqual(set(state['effects']), {'brain', 'heart', 'liver', 'kidneys', 'bladder'})
         self.assertEqual(state['selected'], 'liver')
-        self.assertEqual(len(state['regions']), 20)
+        self.assertEqual(len(state['regions']), 22)
+        self.assertEqual(len(state['systems']), 9)
+        self.assertEqual([item['id'] for item in state['systems']],
+                         ['integumentary', 'nervous', 'cardiovascular', 'respiratory',
+                          'digestive', 'urinary', 'reproductive', 'muscular', 'metabolic'])
+        self.assertEqual({item['id'] for item in state['regions']},
+                         set(anatomy.REGIONS))
+        skin = next(item for item in state['regions'] if item['id'] == 'shell')
+        self.assertEqual((skin['name'], skin['system']), ('体表', 'integumentary'))
+        self.assertEqual(next(item for item in state['systems']
+                              if item['id'] == 'integumentary')['layer'], 'shell')
         self.assertEqual(make_state(None, 'liver')['effects'], {})
         self.assertEqual(make_state({'kind': 'custom', 'name': 'atomoxetine'}, 'liver')['effects'], {})
 

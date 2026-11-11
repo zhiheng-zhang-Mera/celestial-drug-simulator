@@ -29,6 +29,10 @@ the original Celestial adapter, converted from millimetres to metres and from th
 winding repair is applied to triangles that disagree with their manifold neighbours. No vertices are
 invented. The bundle is a display simplification, not a measurement.
 
+Each generated part now carries its upstream `sourceIds` and `sourceName`. The page uses those pinned
+FMA ids to label the 18 available muscle heads individually (4 biceps, 6 triceps, 8 quadriceps, both
+sides). No muscle group, bone or organ outside this bundle is drawn or implied.
+
 ### Why the shell is re-derived from FMA7163.stl
 
 The organ bundle's `shell` region is a uniform-grid reduction of the BodyParts3D FMA7163 skin mesh to

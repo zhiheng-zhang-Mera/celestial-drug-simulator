@@ -20,11 +20,26 @@ let booted = false;
 
 const REGION_NAMES = {
   brain: '大脑', heart: '心脏', lungs: '肺', liver: '肝脏', stomach: '胃',
-  kidneys: '双肾', bladder: '膀胱', testes: '睾丸', uterus: '子宫',
+  kidneys: '双肾', bladder: '膀胱', testes: '睾丸', uterus: '子宫', shell: '体表',
   biceps: '肱二头肌群', triceps: '肱三头肌群', quadriceps: '股四头肌群',
-  nervous: '神经系统', metabolic: '代谢相关器官', urinary: '泌尿系统',
+  integumentary: '皮肤 / 体表系统', nervous: '神经系统',
+  metabolic: '代谢相关器官', urinary: '泌尿系统',
   digestive: '消化系统', cardiovascular: '心血管系统', respiratory: '呼吸系统',
   reproductive: '生殖器官分层', muscular: '肌肉系统',
+};
+
+// Every available BodyParts3D muscle head is a distinct source mesh. These
+// labels only name the pinned source parts (FMA ids); they are not new anatomy.
+const HEAD_LABELS = {
+  FMA37684: '右 · 短头', FMA37685: '左 · 短头',
+  FMA37686: '右 · 长头', FMA37687: '左 · 长头',
+  FMA37695: '右 · 内侧头', FMA37696: '左 · 内侧头',
+  FMA37697: '右 · 外侧头', FMA37698: '左 · 外侧头',
+  FMA37699: '右 · 长头', FMA37700: '左 · 长头',
+  FMA38928: '右 · 股直肌', FMA38929: '左 · 股直肌',
+  FMA38930: '右 · 股外侧肌', FMA38931: '左 · 股外侧肌',
+  FMA38932: '右 · 股内侧肌', FMA38933: '左 · 股内侧肌',
+  FMA38934: '右 · 股中间肌', FMA38935: '左 · 股中间肌',
 };
 
 // Muted tissue colours. These are interface conventions, not measurements.
@@ -34,11 +49,19 @@ const TISSUE = {
   biceps: 0xBB7A6E, triceps: 0xB47166, quadriceps: 0xB8786C, uterus: 0xC99AA8,
 };
 const SYSTEM_OF = {
-  brain: 'ner', heart: 'cir', lungs: 'res', liver: 'dig', stomach: 'dig',
+  shell: 'shell', brain: 'ner', heart: 'cir', lungs: 'res', liver: 'dig', stomach: 'dig',
   kidneys: 'uri', bladder: 'uri', biceps: 'mus', triceps: 'mus',
   quadriceps: 'mus', testes: 'rep', uterus: 'rep',
 };
 const MUSCLE_REGIONS = new Set(['biceps', 'triceps', 'quadriceps']);
+// Default presentation is deliberately colourless: neutral grey shapes on the
+// ink stage. Colour is reserved for an explicit selection (accent) or a
+// source-backed evidence hit (visualStyle category). Tissue colours below are
+// only used when the explicit 系统配色 switch is turned on.
+const NEUTRAL_ORGAN = 0x9EA0A3;
+const NEUTRAL_MUSCLE = 0x85888C;
+const SKIN_NEUTRAL = 0xC8C3B9;
+const SKIN_SYSTEM = 0xE0C6A8;
 
 function setProgress(text, percent, detail) {
   els.loadingText.textContent = text;
@@ -139,8 +162,10 @@ async function boot() {
   // non-manifold smooth-normal seams.
   const skinMaterial = new THREE.ShaderMaterial({
     uniforms: {
-      uSkin: {value: new THREE.Color(0xFFE1BA)},
-      uRim: {value: new THREE.Color(0xFFE9CB)},
+      uSkin: {value: new THREE.Color(SKIN_NEUTRAL)},
+      uRim: {value: new THREE.Color(0xE3DED4)},
+      uAccent: {value: 0.0},
+      uAccentColor: {value: new THREE.Color(0x74E3C8)},
       uOpacity: {value: 0.30},
     },
     vertexShader: `
@@ -154,6 +179,8 @@ async function boot() {
     fragmentShader: `
       uniform vec3 uSkin;
       uniform vec3 uRim;
+      uniform vec3 uAccentColor;
+      uniform float uAccent;
       uniform float uOpacity;
       varying vec3 vViewPosition;
       void main() {
@@ -168,7 +195,9 @@ async function boot() {
         float facing = abs(dot(normal, viewDir));
         float shade = 0.62 + 0.28 * abs(dot(normal, keyDir)) + 0.12 * abs(dot(normal, fillDir));
         float rim = pow(1.0 - facing, 3.0);
-        vec3 color = uSkin * shade + uRim * rim * 0.45;
+        vec3 base = uSkin * shade + uRim * rim * 0.45;
+        vec3 accent = uAccentColor * (0.72 + 0.28 * shade) + uRim * rim * 0.18;
+        vec3 color = mix(base, accent, uAccent);
         gl_FragColor = vec4(pow(max(color, vec3(0.0)), vec3(1.0 / 2.2)), uOpacity);
       }
     `,
@@ -193,8 +222,13 @@ async function boot() {
     selected: 'brain',
     members: [],
     regions: [],
+    // The Python model always has a selected region (default 大脑). That
+    // default is a directory cursor, not a user choice, so no accent is painted
+    // until the reader actually selects something. Evidence colour is always
+    // shown because it is source-backed, never a default decoration.
+    selectionActive: false,
   };
-  let systemColors = true;
+  let systemColors = false;
   let organOpacity = 0.82;
   let glow = 1.0;
   let reproChoice = 'none';
@@ -242,7 +276,7 @@ async function boot() {
       const group = new THREE.Group();
       group.name = region;
       model.regions.set(region, {
-        region, group, parts: [], baseColor: TISSUE[region] || 0xB9AFA4,
+        region, group, parts: [], heads: [], baseColor: TISSUE[region] || 0xB9AFA4,
         system: SYSTEM_OF[region] || 'rep', schematic: false, material: null,
       });
     }
@@ -270,6 +304,16 @@ async function boot() {
     mesh.name = `${region}-part`;
     mesh.userData.region = region;
     mesh.renderOrder = 2;
+    const sourceIds = Array.isArray(part.sourceIds) ? part.sourceIds : [];
+    const headLabel = sourceIds.map(id => HEAD_LABELS[id]).find(Boolean) || null;
+    if (MUSCLE_REGIONS.has(region)) {
+      mesh.userData.headLabel = headLabel;
+      info.heads.push({
+        label: headLabel || part.sourceName || `${REGION_NAMES[region] || region} 来源网格`,
+        sourceId: sourceIds[0] || '',
+        mesh,
+      });
+    }
     info.group.add(mesh);
     info.parts.push(mesh);
     model.picker.push(mesh);
@@ -294,11 +338,11 @@ async function boot() {
     const group = new THREE.Group();
     group.name = 'uterus';
     const material = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(TISSUE.uterus), roughness: 0.68, metalness: 0,
+      color: new THREE.Color(NEUTRAL_ORGAN), roughness: 0.68, metalness: 0,
       transparent: true, opacity: 0.42, side: THREE.DoubleSide, depthWrite: false,
     });
     const wireMaterial = new THREE.MeshBasicMaterial({
-      color: 0xE3AEBC, wireframe: true, transparent: true, opacity: 0.22,
+      color: 0xB9B5AC, wireframe: true, transparent: true, opacity: 0.24,
       depthWrite: false,
     });
     const meshes = [];
@@ -333,7 +377,7 @@ async function boot() {
     }
     model.sysGroups.rep.add(group);
     const info = {
-      region: 'uterus', group, parts: meshes, baseColor: TISSUE.uterus,
+      region: 'uterus', group, parts: meshes, heads: [], baseColor: NEUTRAL_ORGAN,
       system: 'rep', schematic: true, material,
     };
     model.regions.set('uterus', info);
@@ -359,9 +403,12 @@ async function boot() {
     if (!hit) return null;
     const info = model.regions.get(hit.object.userData.region);
     if (!info) return null;
+    const head = hit.object.userData.headLabel || null;
     return {
       region: info.region,
-      name: REGION_NAMES[info.region] || info.region,
+      name: head ? `${REGION_NAMES[info.region] || info.region} · ${head}`
+        : (REGION_NAMES[info.region] || info.region),
+      head,
       schematic: info.schematic,
     };
   }
@@ -418,49 +465,62 @@ async function boot() {
   controls.update();
 
   // ---------------------------------------------------------- state painting
-  const scratchColor = new THREE.Color();
   const accentColor = new THREE.Color(0x74E3C8);
-  const focusColor = new THREE.Color(0xBFE8DF);
+
+  function updateSkinAppearance() {
+    const active = stageState.selectionActive && (stageState.selected === 'shell' ||
+      (Array.isArray(stageState.members) && stageState.members.includes('shell')));
+    skinMaterial.uniforms.uAccent.value = active ? 1 : 0;
+    skinMaterial.uniforms.uSkin.value.setHex(systemColors ? SKIN_SYSTEM : SKIN_NEUTRAL);
+  }
 
   function applyHighlight() {
+    const active = stageState.selectionActive;
     for (const info of model.regions.values()) {
       if (info.region === 'shell' || !info.material) continue;
       const style = requireStyle(info.region);
-      const isSelected = info.region === stageState.selected;
-      const isMember = Array.isArray(stageState.members) && stageState.members.includes(info.region);
+      const isSelected = active && info.region === stageState.selected;
+      const isMember = active && Array.isArray(stageState.members) &&
+        stageState.members.includes(info.region);
       const material = info.material;
-      material.color.setHex(info.baseColor);
-      if (!systemColors && !style.effect) {
-        material.color.setHex(MUSCLE_REGIONS.has(info.region) ? 0x8B9AA1 : 0x9FB8CC);
+      // Default: neutral grey. Colour appears only for an explicit selection
+      // (accent), a source-backed evidence category, or the 系统配色 switch.
+      material.color.setHex(MUSCLE_REGIONS.has(info.region) ? NEUTRAL_MUSCLE : NEUTRAL_ORGAN);
+      if (systemColors) material.color.setHex(info.baseColor);
+      if (style.effect) material.color.setHex(style.color);
+      if (style.effect && (isSelected || isMember)) {
+        material.color.lerp(accentColor, 0.18);
+      } else if (isSelected) {
+        material.color.lerp(accentColor, 0.62);
+      } else if (isMember) {
+        material.color.lerp(accentColor, 0.42);
       }
-      if (style.effect) {
-        scratchColor.setHex(style.color);
-        material.color.lerp(scratchColor, 0.32);
-      }
-      if (isSelected || isMember) material.color.lerp(focusColor, 0.14);
       material.emissive.setHex(0x000000);
       material.emissiveIntensity = 0;
       // A faint self-tint keeps organs readable behind translucent skin even
       // when the room lighting is dim; evidence/selection replaces it.
-      material.emissive.copy(material.color).multiplyScalar(0.06);
+      material.emissive.copy(material.color).multiplyScalar(0.05);
       material.emissiveIntensity = 1;
       if (style.effect) {
         material.emissive.setHex(style.color);
-        material.emissiveIntensity = 0.18 * glow;
-      }
-      if (isMember && !style.effect) {
-        material.emissive.setHex(0x9FD8CE);
-        material.emissiveIntensity = 0.07 * glow;
-      }
-      if (isSelected) {
+        material.emissiveIntensity = 0.22 * glow;
+      } else if (isSelected) {
         material.emissive.setHex(0x74E3C8);
-        material.emissiveIntensity = Math.max(material.emissiveIntensity, 0.10 * glow);
+        material.emissiveIntensity = 0.22 * glow;
+      } else if (isMember) {
+        material.emissive.setHex(0x74E3C8);
+        material.emissiveIntensity = 0.11 * glow;
       }
-      material.opacity = MUSCLE_REGIONS.has(info.region)
-        ? Math.min(0.9, organOpacity * 0.52)
-        : organOpacity;
+      if (info.schematic) {
+        material.opacity = 0.42;
+      } else if (MUSCLE_REGIONS.has(info.region)) {
+        material.opacity = Math.min(0.92, organOpacity * 0.72);
+      } else {
+        material.opacity = organOpacity;
+      }
       material.needsUpdate = true;
     }
+    updateSkinAppearance();
     updateOutlineMaterial();
   }
 
@@ -483,6 +543,7 @@ async function boot() {
 
   function buildOutline() {
     clearOutline();
+    if (!stageState.selectionActive) return;
     const focus = new Set();
     if (model.regions.has(stageState.selected)) focus.add(stageState.selected);
     for (const member of stageState.members || []) {
@@ -492,6 +553,7 @@ async function boot() {
     outlineGroup = new THREE.Group();
     outlineGroup.name = 'selection-outline';
     for (const region of focus) {
+      if (region === 'shell') continue;
       const info = model.regions.get(region);
       if (!info || info.schematic) continue;
       for (const mesh of info.parts) {
@@ -564,6 +626,14 @@ async function boot() {
     get reproChoice() { return reproChoice; },
     regionName(region) { return REGION_NAMES[region] || region; },
     isSchematic(region) { return !!(model.regions.get(region) || {}).schematic; },
+    headsFor(region) {
+      const info = model.regions.get(region);
+      return info && Array.isArray(info.heads) ? info.heads.map(head => ({
+        label: head.label, sourceId: head.sourceId,
+      })) : [];
+    },
+    markSelectionActive() { stageState.selectionActive = true; },
+    get selectionActive() { return stageState.selectionActive; },
     pick,
     setLayer(key, visible) {
       if (!(key in layerState)) return;
@@ -601,6 +671,9 @@ async function boot() {
       stageState.selected = state.selected || previous;
       stageState.members = state.members || [];
       stageState.regions = state.regions || stageState.regions;
+      // A changed region means the reader (or a region-directory click) chose
+      // it; the initial Python default equals `previous` and stays colourless.
+      if (stageState.selected !== previous) stageState.selectionActive = true;
       // Reveal the layer for the selected region / related structures.
       const reveal = new Set([stageState.selected, ...stageState.members,
         ...Object.keys(stageState.effects)]);
@@ -634,8 +707,10 @@ async function boot() {
   renderer.render(scene, camera);
   const firstFrame = Math.round(performance.now() - started);
   const shellPart = anatomy.parts.find(part => part.region === 'shell') || {positions: []};
+  const headCount = [...model.regions.values()]
+    .reduce((count, info) => count + info.heads.length, 0);
   console.log(`[anatomy] first frame ${firstFrame}ms · parts=${anatomy.parts.length} · ` +
-    `shellVerts=${shellPart.positions.length / 3} · height=${height}m · ` +
+    `heads=${headCount} · shellVerts=${shellPart.positions.length / 3} · height=${height}m · ` +
     `source=${anatomy.sourceCommit}`);
   els.loadingBar.style.width = '100%';
   els.loading.hidden = true;

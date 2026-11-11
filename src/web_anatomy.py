@@ -1,6 +1,7 @@
 """Small, data-only contract between the authoritative Python model and HTML."""
 import json
-from src.anatomy import REGIONS, highlighted_regions, region_details
+from src.anatomy import (REGIONS, REGION_SYSTEMS, SYSTEM_LAYERS,
+                         highlighted_regions, region_details)
 
 
 def fallback_view(selected):
@@ -13,7 +14,13 @@ def make_state(drug, selected):
     return {
         'selected': selected,
         'name': detail['name'],
-        'regions': [{'id': key, 'name': value[0]} for key, value in REGIONS.items()],
+        'regions': [{'id': key, 'name': value[0], 'kind': value[1],
+                     'system': key if value[1] == 'system'
+                     else REGION_SYSTEMS.get(key, '')}
+                    for key, value in REGIONS.items()],
+        'systems': [{'id': key, 'name': value[0], 'members': list(value[2]),
+                     'layer': SYSTEM_LAYERS.get(key, '')}
+                    for key, value in REGIONS.items() if value[1] == 'system'],
         'effects': {key: region_details(drug, key)['evidence'][0]['category']
                     for key in highlighted_regions(drug)},
         'members': detail['members'] if detail['kind'] == 'system' else [],
