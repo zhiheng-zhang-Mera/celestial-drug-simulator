@@ -14,7 +14,6 @@ from src import ui_theme as ui
 
 PAPER = ui.PAPER
 INK = ui.INK
-SUPPLEMENT_REGIONS = ('uterus', 'testes', 'biceps', 'triceps', 'quadriceps')
 SUPPORTED_SUBSTANCES = (('atomoxetine', '阿托莫西汀 / atomoxetine'),)
 SOURCE_NAMES = {'mayoclinic.org': 'Mayo Clinic', 'dailymed.nlm.nih.gov': 'DailyMed / NLM',
                 'api.fda.gov': 'openFDA', 'cpicpgx.org': 'CPIC'}
@@ -225,10 +224,11 @@ class AnatomyWorkspace(tk.Frame):
 
     def _geometry_text(self):
         if self.canvas.fallback:
-            return '几何：BodyParts3D / DBCLS 简化参考网格；子宫为原有示意层。'
-        if self.selected in SUPPLEMENT_REGIONS:
-            return '几何：补充示意层，用于保留既有区域入口；不是实际组织仿真。'
-        return '几何：用户指定 HTML 原稿 / 补充示意；形状和系统配色不构成药效证据。'
+            return '几何：BodyParts3D 简化参考网格；子宫为示意层。'
+        if self.selected == 'uterus':
+            return '几何：子宫为示意层；其余为 BodyParts3D 真实参考网格。'
+        return ('几何：BodyParts3D 真实体表 / 器官 / 肌肉参考网格（FMA7163 来源，'
+                '非患者个体或临床验证模型）。')
 
     def render(self):
         context = self.get_context() or {}
