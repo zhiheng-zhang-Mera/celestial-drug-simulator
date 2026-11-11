@@ -232,7 +232,7 @@ async function boot() {
   }
   height = anatomy.height;
   homeTarget = new THREE.Vector3(0, height * 0.515, 0);
-  fitDistance = (height * 1.035) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+  fitDistance = (height * 1.025) / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
 
   setProgress('构建真实体表与器官网格…', 22, 'BodyParts3D · 真实三角网格');
   await nextFrame();

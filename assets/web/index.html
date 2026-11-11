@@ -49,29 +49,24 @@
     border-right: 1px solid var(--line);
     overflow-y: auto;
     overflow-x: hidden;
+    scrollbar-gutter: stable;
     scrollbar-width: thin;
     scrollbar-color: #2A2C30 transparent;
-    padding-bottom: 14px;
+    padding-bottom: 8px;
   }
   .panel::-webkit-scrollbar { width: 7px; }
   .panel::-webkit-scrollbar-thumb { background: #2A2C30; border-radius: 4px; }
 
-  .panel-head { padding: 11px 15px 9px; }
+  .panel-head { padding: 7px 15px 6px; }
   .eyebrow {
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: var(--text-3);
   }
-  .panel-sub {
-    font-size: 11px;
-    color: var(--text-2);
-    margin-top: 3px;
-  }
-  .panel-sub em { font-style: normal; color: var(--text-3); }
   .selection-line {
-    margin-top: 7px;
-    padding-top: 7px;
+    margin-top: 4px;
+    padding-top: 4px;
     border-top: 1px solid var(--line);
     font-size: 12px;
     font-weight: 600;
@@ -81,7 +76,7 @@
   .selection-line span#selection-name { display: block; }
   .selection-line span#selection-meta {
     display: block;
-    margin-top: 2px;
+    margin-top: 1px;
     font-size: 9.5px;
     font-weight: 400;
     color: var(--text-3);
@@ -90,21 +85,23 @@
   .legend-mini {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 5px;
-    font-size: 9.5px;
+    gap: 4px;
+    margin-top: 2px;
+    font-size: 8.5px;
     color: var(--text-3);
-    line-height: 1.3;
+    line-height: 1.2;
+    white-space: nowrap;
   }
-  .legend-mini .sw { width: 6px; height: 6px; }
+  .legend-mini .sw { width: 5px; height: 5px; }
+  .legend-mini .sep { color: var(--line-strong); margin: 0 1px; }
 
-  .block { border-top: 1px solid var(--line); padding: 8px 15px 10px; }
+  .block { border-top: 1px solid var(--line); padding: 5px 15px 7px; }
   .block-head {
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.08em;
     color: var(--text-3);
-    margin-bottom: 6px;
+    margin-bottom: 3px;
   }
 
   .row {
@@ -125,11 +122,6 @@
     flex: none;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07);
   }
-  .sw-none { background: transparent; border: 1px dashed var(--line-strong); }
-  .note { font-size: 9.5px; color: var(--text-3); white-space: nowrap; }
-  .is-note { cursor: default; color: var(--text-3); }
-  .is-note:hover { color: var(--text-3); }
-
   input[type="checkbox"] {
     width: 13px; height: 13px;
     accent-color: var(--accent);
@@ -140,39 +132,46 @@
   .slider {
     display: flex;
     justify-content: space-between;
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--text-2);
-    margin: 6px 0 3px;
+    margin: 3px 0 0;
   }
   .slider .val { color: var(--text-3); font-variant-numeric: tabular-nums; }
   input[type="range"] {
     width: 100%;
-    height: 14px;
+    height: 12px;
+    margin: 0;
+    display: block;
     accent-color: var(--accent);
     cursor: pointer;
   }
 
   .layers {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 0 6px;
+    min-width: 0;
   }
-  .layers .row { min-height: 23px; gap: 5px; }
-  .layers .row-label { font-size: 10.5px; }
+  .layers .row { min-height: 20px; gap: 5px; min-width: 0; }
+  .layers .row-label {
+    font-size: 10.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .layers .sw { width: 6px; height: 6px; }
-  .layers input[type="checkbox"] { width: 12px; height: 12px; }
+  .layers input[type="checkbox"] { width: 12px; height: 12px; flex: none; }
 
   .view-bar {
     position: absolute;
     top: 50%;
-    left: 10px;
+    right: 10px;
     transform: translateY(-50%);
     z-index: 4;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 2px;
-    padding: 3px;
+    gap: 1px;
+    padding: 2px;
     background: rgba(12, 13, 15, 0.78);
     border: 1px solid var(--line);
     border-radius: 6px;
@@ -193,14 +192,22 @@
   .vbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .vbtn[aria-pressed="true"] { color: var(--accent); }
 
-  .field-label { display: block; font-size: 10px; color: var(--text-3); margin: 9px 0 4px; }
+  .repro-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    min-width: 0;
+  }
+  .repro-row .row-label { flex: none; font-size: 10px; color: var(--text-3); }
+  .repro-row select { flex: 1; min-width: 0; width: auto; }
   select {
     width: 100%;
     background: #101113;
     color: var(--text);
     border: 1px solid var(--line-strong);
     border-radius: var(--radius);
-    padding: 5px 7px;
+    padding: 3px 6px;
     font-size: 11px;
     font-family: inherit;
   }
@@ -217,8 +224,6 @@
   }
   .tag-real { color: var(--accent); border-color: rgba(116, 227, 200, 0.28); }
   .tag-schematic { color: var(--warn); border-color: rgba(232, 190, 115, 0.3); }
-
-  .micro { font-size: 9.5px; color: var(--text-3); line-height: 1.5; margin-top: 7px; }
 
   /* ------------------------------------------------------------- stage */
   #canvas-wrap { position: relative; min-width: 0; min-height: 0; background: var(--ink); overflow: hidden; }
@@ -316,6 +321,17 @@
   @media (max-height: 540px) {
     .hint { display: none; }
   }
+  /* Tall stages (1440) can afford the more generous rhythm. The 1200/1024
+     stages use the compact rhythm so the whole panel fits without scrolling. */
+  @media (min-height: 600px) {
+    .panel-head { padding: 10px 15px 8px; }
+    .block { padding: 7px 15px 9px; }
+    .block-head { margin-bottom: 5px; }
+    .legend-mini { font-size: 9.5px; margin-top: 4px; }
+    .slider { margin: 5px 0 2px; }
+    .layers .row { min-height: 23px; }
+    .repro-row { margin-top: 8px; }
+  }
   @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 1ms !important; animation-duration: 1ms !important; }
   }
@@ -325,17 +341,15 @@
 <div id="app">
   <aside class="panel" aria-label="人体模型控制">
     <header class="panel-head">
-      <div class="eyebrow">人体模型</div>
-      <div class="panel-sub">BodyParts3D · 真实网格</div>
+      <div class="eyebrow">人体模型 · BodyParts3D</div>
       <div class="selection-line">
         <span id="selection-name">大脑</span>
         <span id="selection-meta">正在等待区域状态…</span>
       </div>
       <div class="legend-mini">
-        <span class="sw" style="--c:#74E3C8"></span><span id="legend-evidence">亮色 = 文献关联</span>
-      </div>
-      <div class="legend-mini">
-        <span class="sw" style="--c:#C08A9A"></span><span>子宫为示意层 · 骨骼未含</span>
+        <span class="sw" style="--c:#74E3C8"></span><span id="legend-evidence">亮色=文献关联</span>
+        <span class="sep">·</span>
+        <span class="sw" style="--c:#C08A9A"></span><span>子宫示意 · 无骨骼层</span>
       </div>
     </header>
 
@@ -361,19 +375,16 @@
         <label class="row"><span class="sw" style="--c:#A65F55"></span><span class="row-label">肌肉群</span><input type="checkbox" id="layer-mus" checked /></label>
         <label class="row"><span class="sw" style="--c:#C08A9A"></span><span class="row-label">生殖层</span><input type="checkbox" id="layer-rep" checked /></label>
       </div>
-      <div class="row is-note"><span class="sw sw-none"></span><span class="row-label">骨骼</span><span class="note">来源数据未含</span></div>
-      <label class="field-label" for="reproductive">生殖分层</label>
-      <select id="reproductive" aria-label="生殖器官分层">
-        <option value="none" selected>隐藏</option>
-        <option value="testes">睾丸 · 真实网格</option>
-        <option value="uterus">子宫 · 示意层</option>
-        <option value="both">全部（含示意层）</option>
-      </select>
+      <label class="repro-row" for="reproductive">
+        <span class="row-label">生殖分层</span>
+        <select id="reproductive" aria-label="生殖器官分层">
+          <option value="none" selected>隐藏</option>
+          <option value="testes">睾丸 · 真实网格</option>
+          <option value="uterus">子宫 · 示意层</option>
+          <option value="both">全部（含示意层）</option>
+        </select>
+      </label>
       <select id="region-select" aria-label="区域目录" hidden></select>
-    </section>
-
-    <section class="block footnote">
-      <p class="micro">BodyParts3D 单例成年男性参考；形状不代表个体解剖或临床证据。</p>
     </section>
   </aside>
 

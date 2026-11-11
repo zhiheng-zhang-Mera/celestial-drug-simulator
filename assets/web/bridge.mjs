@@ -105,7 +105,7 @@ export function initAnatomyBridge(ctx) {
   function syncAutoRotate() {
     const on = stage.autoRotating;
     ui.autoRotate.setAttribute('aria-pressed', String(on));
-    ui.autoRotate.textContent = on ? '停止旋转' : '自动旋转';
+    ui.autoRotate.textContent = on ? '停止' : '旋转';
   }
 
   window.addEventListener('keydown', event => {
