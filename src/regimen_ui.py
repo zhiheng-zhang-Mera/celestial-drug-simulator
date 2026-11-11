@@ -15,6 +15,7 @@ from tkinter import ttk, filedialog
 import webbrowser
 
 from src.simulation import simulate
+from src import report_model
 from src import ui_theme as ui
 
 PAPER = ui.PAPER
@@ -253,6 +254,7 @@ class RegimenWorkspace(tk.Frame):
             frame.grid(row=0, column=0, sticky='nsew')
         self.report = ui.ScrollArea(self.report_host, bg=PAPER['surface'])
         self.report.pack(fill='both', expand=True, padx=(18, 6), pady=12)
+        self.report.canvas.bind('<Configure>', self._report_canvas_resized, add='+')
         exposure_head = tk.Frame(self.exposure_host, bg=PAPER['surface'], padx=14, pady=10)
         exposure_head.pack(fill='x')
         ui.text(exposure_head, '假设曲线数据', size=9, fg=PAPER['ink2']).pack(side='left')
@@ -286,10 +288,28 @@ class RegimenWorkspace(tk.Frame):
         self.name_combo.configure(values=values or NAME_SUGGESTIONS)
 
     def _report_wrap(self):
-        width = self.report.winfo_width()
+        width = self.report.canvas.winfo_width()
         if width <= 1:
-            width = max(340, self.winfo_width() - 500)
-        return max(260, width - 36)
+            width = self.report.winfo_width()
+        if width <= 1:
+            # The report pane may not be mapped yet when an async result lands.
+            # Derive the reading width from the window geometry (left column +
+            # gutters are fixed) so the first render already wraps correctly.
+            width = self.winfo_width() - 517
+        return max(260, max(340, width) - 44)
+
+    def _apply_report_wrap(self):
+        wrap = self._report_wrap()
+        for label in self._report_labels:
+            try:
+                if label.winfo_exists():
+                    label.configure(wraplength=wrap)
+            except tk.TclError:
+                pass
+
+    def _report_canvas_resized(self, event):
+        if event.widget is self.report.canvas and event.width > 1:
+            self._apply_report_wrap()
 
     def _resized(self, event):
         if event.widget is not self:
@@ -299,12 +319,7 @@ class RegimenWorkspace(tk.Frame):
             self._workspace.columnconfigure(0, minsize=minsize)
         except (AttributeError, tk.TclError):
             pass
-        wrap = self._report_wrap()
-        for label in self._report_labels:
-            try:
-                label.configure(wraplength=wrap)
-            except tk.TclError:
-                pass
+        self._apply_report_wrap()
 
     def _online_changed(self, *_):
         if self.on_data_state:
@@ -455,58 +470,45 @@ class RegimenWorkspace(tk.Frame):
         self.after(100, self.poll)
 
     def display_result(self, result):
-        labels = result['label_analysis']
+        labels = result.get('label_analysis') or {}
         inner = self.report.clear()
         self._report_labels = []
         wrap = self._report_wrap()
-        self._section(inner, '在线说明书摘要')
-        note = ui.text(inner, labels.get('note', ''), size=8, fg=PAPER['ink3'], wraplength=wrap)
-        note.pack(fill='x', pady=(0, 12))
-        self._report_labels.append(note)
-        for record in labels.get('records', []):
-            self._record_block(inner, record, wrap)
-        self._section(inner, '联用机制线索')
-        for index, pair in enumerate(labels.get('pairs', [])):
-            names = result['pairs'][index]['drugs']
-            block = tk.Frame(inner, bg=PAPER['surface'])
-            block.pack(fill='x', pady=(0, 12))
-            row = tk.Frame(block, bg=PAPER['surface'])
-            row.pack(fill='x')
-            ui.text(row, ' + '.join(names), size=10, weight='bold').pack(side='left')
-            ui.status_pill(row, pair['status'], bg=PAPER['surface']).pack(side='left', padx=(10, 0))
-            body = ui.text(block, pair.get('summary', ''), size=9, fg=PAPER['ink2'],
-                           wraplength=wrap)
-            body.pack(fill='x', pady=(4, 0))
-            self._report_labels.append(body)
-            for url in pair.get('sources', []):
-                ui.FlatButton(block, '打开来源 ↗', kind='link',
-                              command=lambda target=url: webbrowser.open(target)).pack(
-                    anchor='w', pady=(2, 0))
-        self._section(inner, '既有研究库')
-        for pair in result['pairs']:
-            block = tk.Frame(inner, bg=PAPER['surface'])
-            block.pack(fill='x', pady=(0, 12))
-            row = tk.Frame(block, bg=PAPER['surface'])
-            row.pack(fill='x')
-            ui.text(row, ' + '.join(pair['drugs']), size=10, weight='bold').pack(side='left')
-            ui.status_pill(row, pair['status'], bg=PAPER['surface']).pack(side='left', padx=(10, 0))
-            if not pair['evidence']:
-                ui.text(block, '本资料库没有足够的组合证据；未检出不等于无相互作用。', size=9,
-                        fg=PAPER['ink3'], wraplength=wrap).pack(fill='x', pady=(4, 0))
-            for evidence in pair['evidence']:
-                self._study_block(block, evidence, wrap)
-        footer = tk.Frame(inner, bg=PAPER['surface'])
-        footer.pack(fill='x', pady=(6, 0))
-        ui.hairline(footer).pack(fill='x', pady=(0, 8))
-        for line in ('未计算个体联用浓度 / 风险倍率；机制线索不等同于临床配伍结论。',
-                     result['context'].get('note', '')):
-            label = ui.text(footer, line, size=8, fg=PAPER['ink3'], wraplength=wrap)
-            label.pack(fill='x')
-            self._report_labels.append(label)
-        ui.mono(footer, '输入 SHA256：' + result['input_sha256'], size=8).pack(
-            fill='x', pady=(6, 0))
+        overview = report_model.overview_view(result, labels)
+        individuals = report_model.individual_view(result, labels)
+        interactions = report_model.interaction_view(result, labels)
+
+        # 1. 方案总览 --------------------------------------------------------
+        self._section(inner, '方案总览', index='01')
+        self._overview_block(inner, overview, wrap)
+
+        # 2. 个体作用（每种物质） -------------------------------------------
+        self._section(inner, '个体作用', index='02',
+                      note=f'{len(individuals)} 种物质')
+        if individuals:
+            for person in individuals:
+                self._individual_block(inner, person, wrap)
+        else:
+            self._place(new=inner, text='当前方案没有可展示的物质记录。', wrap=wrap)
+
+        # 3. 交叉作用（每对物质） -------------------------------------------
+        self._section(inner, '交叉作用', index='03',
+                      note=f'{len(interactions)} 对物质')
+        if interactions:
+            for pair in interactions:
+                self._interaction_block(inner, pair, wrap)
+        else:
+            self._place(new=inner, text='当前只有一种物质，没有可展示的交叉作用。',
+                        wrap=wrap)
+
+        # 4. 证据与边界 ------------------------------------------------------
+        self._section(inner, '证据与边界', index='04')
+        self._boundary_block(inner, result, overview, wrap)
+
         self.status.set(
-            f"已分析 {len(self.rows)} 种 / {len(result['pairs'])} 对；来源状态见上方摘要。")
+            f"已分析 {len(self.rows)} 种 / {len(result['pairs'])} 对；"
+            '个体作用与交叉作用见报告，机制线索不等同于临床配伍结论。')
+        self.after_idle(self._apply_report_wrap)
 
         curves = result['curves']
         columns = ['time'] + [str(i) for i in range(len(curves))]
@@ -518,63 +520,295 @@ class RegimenWorkspace(tk.Frame):
             self.exposure.insert('', 'end', values=[f'{t:.6g}'] + [
                 f"{c['values'][i]:.6g}" for c in curves])
 
-    def _section(self, parent, title):
-        frame = tk.Frame(parent, bg=PAPER['surface'])
-        frame.pack(fill='x', pady=(2, 6))
-        ui.eyebrow(frame, title, bg=PAPER['surface']).pack(side='left')
-        ui.hairline(frame).pack(side='left', fill='x', expand=True, padx=(10, 0))
+    # ------------------------------------------------------- report sections
+    def _place(self, new, text, wrap):
+        label = ui.text(new, text, size=9, fg=PAPER['ink3'], wraplength=wrap)
+        label.pack(fill='x', pady=(0, 8))
+        self._report_labels.append(label)
 
-    def _record_block(self, parent, record, wrap):
-        block = tk.Frame(parent, bg=PAPER['surface'])
-        block.pack(fill='x', pady=(0, 12))
-        row = tk.Frame(block, bg=PAPER['surface'])
-        row.pack(fill='x')
-        ui.text(row, record.get('name') or record.get('compound_id') or '未命名', size=10,
-                weight='bold').pack(side='left')
-        ui.status_pill(row, record.get('status', 'unknown'), bg=PAPER['surface']).pack(
-            side='left', padx=(10, 0))
-        summary = ui.text(block, record.get('summary', ''), size=9, fg=PAPER['ink2'],
-                          wraplength=wrap)
-        summary.pack(fill='x', pady=(4, 0))
-        self._report_labels.append(summary)
-        if record.get('url'):
-            meta = str(record.get('retrieved_at') or '')
-            line = tk.Frame(block, bg=PAPER['surface'])
-            line.pack(fill='x', pady=(2, 0))
-            ui.FlatButton(line, '打开来源原文 ↗', kind='link',
-                          command=lambda url=record['url']: webbrowser.open(url)).pack(side='left')
-            ui.mono(line, '获取 ' + (meta[:10] if meta else '未记录'), size=8).pack(
-                side='left', padx=(8, 0))
-        if record.get('error'):
-            ui.text(block, '在线查询说明：' + str(record['error']), size=8,
-                    fg=PAPER['ink3'], wraplength=wrap).pack(fill='x', pady=(2, 0))
+    def _overview_block(self, parent, overview, wrap):
+        counts = overview['counts']
+        ui.metric_row(parent, [
+            (counts['substances'], '物质数'),
+            (counts['pairs'], '交叉对数'),
+            (counts['mechanism_pairs'], '有机制线索的对数'),
+            (counts['data_gaps'], '数据缺口数'),
+        ], bg=PAPER['surface']).pack(fill='x', pady=(0, 10))
+        note = tk.Frame(parent, bg=PAPER['bgElevated'], padx=12, pady=10)
+        note.pack(fill='x')
+        tk.Frame(note, bg=PAPER['accent'], width=2).pack(side='left', fill='y')
+        body = tk.Frame(note, bg=PAPER['bgElevated'], padx=10)
+        body.pack(side='left', fill='x', expand=True)
+        label = ui.text(body, overview['disclaimer'], size=9, fg=PAPER['ink2'],
+                        bg=PAPER['bgElevated'], wraplength=max(220, wrap - 34))
+        label.pack(fill='x')
+        self._report_labels.append(label)
+        ui.text(body, '数据缺口数 = 所有物质缺口标记之和。', size=8, fg=PAPER['ink3'],
+                bg=PAPER['bgElevated'], wraplength=max(220, wrap - 34)).pack(
+            fill='x', pady=(4, 0))
 
-    def _study_block(self, parent, evidence, wrap):
-        block = tk.Frame(parent, bg=PAPER['surface2'], padx=10, pady=8)
+    def _individual_block(self, parent, person, wrap):
+        base = PAPER['bgElevated']
+        card = ui.card(parent, bg=base)
+        card.outer.pack(fill='x', pady=(0, 10))
+
+        head = tk.Frame(card, bg=base)
+        head.pack(fill='x')
+        ui.text(head, person['name'], size=11, weight='bold', bg=base).pack(side='left')
+        ui.Chip(head, KIND_LABELS.get(person['kind'], person['kind']),
+                bg=PAPER['surface2'], fg=PAPER['ink2']).pack(side='left', padx=(8, 0))
+        ui.status_pill(head, person['status'], bg=base).pack(side='left', padx=(8, 0))
+        ui.status_pill(head, person['record_status'], bg=base).pack(side='right')
+
+        meta = tk.Frame(card, bg=base)
+        meta.pack(fill='x', pady=(3, 0))
+        if person['source_url']:
+            ui.FlatButton(meta, '打开来源原文 ↗', kind='link',
+                          command=lambda url=person['source_url']: webbrowser.open(url)).pack(
+                side='left')
+        retrieved = str(person.get('retrieved_at') or '')
+        if retrieved:
+            ui.mono(meta, '获取 ' + retrieved[:10], size=8).pack(side='left', padx=(8, 0))
+
+        kv = tk.Frame(card, bg=base)
+        kv.pack(fill='x', pady=(8, 0))
+        for label, value in (
+                ('途径', ROUTE_LABELS.get(person['route'], person['route'] or '未填写')),
+                ('剂量', self._number_text(person.get('dose_mg'), 'mg')),
+                ('间隔', self._number_text(person.get('interval_h'), 'h'))):
+            ui.kv_row(kv, label, value, bg=base).pack(side='left', padx=(0, 16))
+        if person.get('category') not in (None, '', 'medicine'):
+            ui.kv_row(card, '类别', CATEGORY_LABELS.get(person['category'], '未填写'),
+                      bg=base).pack(fill='x', pady=(4, 0))
+
+        self._card_heading(card, '个体机制摘要', base)
+        mechanism = person['mechanism']
+        body = ui.text(card, mechanism['text'], size=10, fg=PAPER['ink'], bg=base,
+                       wraplength=max(220, wrap - 32))
+        body.pack(fill='x', pady=(3, 0))
+        self._report_labels.append(body)
+        source_note = {
+            'record_facts': '来源：标签记录中的机制段落摘要',
+            'profile_facts': '来自 profile 的机制事实摘要',
+            'record_summary': '来源：标签记录摘要（非机制段落）',
+        }.get(mechanism['source'])
+        if source_note:
+            ui.mono(card, source_note, size=7).pack(anchor='w', pady=(2, 0))
+
+        self._card_heading(card, '影响部位', base)
+        if person['regions']:
+            for region in person['regions']:
+                chip = ui.Chip(
+                    card,
+                    f"{region['name']} · {ui.CATEGORY.get(region['category'], region['category'] or '证据')}",
+                    command=lambda region=region, view=person: self._open_region(
+                        view['index'], region['id']),
+                    bg=PAPER['accentSoft'], fg=PAPER['accent'])
+                chip.pack(anchor='w', pady=(4, 0))
+                region_text = ui.text(card, region['text'], size=9, fg=PAPER['ink2'],
+                                      bg=base, wraplength=max(220, wrap - 48))
+                region_text.pack(fill='x', pady=(2, 0), padx=(2, 0))
+                self._report_labels.append(region_text)
+        else:
+            ui.text(card, report_model.MISSING_REGIONS, size=9, fg=PAPER['ink3'],
+                    bg=base, wraplength=max(220, wrap - 32)).pack(fill='x', pady=(3, 0))
+
+        self._card_heading(card, '证据缺口', base)
+        if person['gaps']:
+            for gap in person['gaps']:
+                row = tk.Frame(card, bg=base)
+                row.pack(fill='x', pady=(2, 0))
+                ui.text(row, gap['label'], size=9, fg=PAPER['ink2'], bg=base).pack(side='left')
+                ui.mono(row, gap['code'], size=7).pack(side='left', padx=(8, 0))
+        else:
+            ui.text(card, '未记录缺口代码。', size=9, fg=PAPER['ink3'], bg=base).pack(
+                anchor='w', pady=(3, 0))
+
+        if person['record_error']:
+            error = ui.text(card, '在线查询说明：' + person['record_error'], size=8,
+                            fg=PAPER['ink3'], bg=base, wraplength=max(220, wrap - 32))
+            error.pack(fill='x', pady=(6, 0))
+            self._report_labels.append(error)
+
+    def _interaction_block(self, parent, pair, wrap):
+        base = PAPER['bgElevated']
+        card = ui.card(parent, bg=base)
+        card.outer.pack(fill='x', pady=(0, 10))
+
+        head = tk.Frame(card, bg=base)
+        head.pack(fill='x')
+        ui.text(head, ' × '.join(pair['names']), size=11, weight='bold',
+                bg=base).pack(side='left')
+        ui.status_pill(head, pair['status'], bg=base).pack(side='left', padx=(8, 0))
+
+        raw = tk.Frame(card, bg=base)
+        raw.pack(fill='x', pady=(2, 0))
+        ui.mono(raw, '目录状态 ' + (pair['result_status'] or '未记录'), size=7).pack(side='left')
+        ui.mono(raw, '标签状态 ' + (pair['label_status'] or '未记录'), size=7).pack(
+            side='left', padx=(12, 0))
+
+        lines = tk.Frame(card, bg=base)
+        lines.pack(fill='x', pady=(8, 0))
+        ui.eyebrow(lines, '个体作用 · 交叉作用的两端', bg=base).pack(anchor='w')
+        for caption, person in (('A · ' + pair['a']['name'], pair['a']),
+                                ('B · ' + pair['b']['name'], pair['b'])):
+            row = tk.Frame(lines, bg=base)
+            row.pack(fill='x', pady=(4, 0))
+            ui.text(row, caption, size=9, weight='bold', fg=PAPER['ink'], bg=base).pack(anchor='w')
+            line = ui.text(
+                row, f"{person['summary']} · 主要影响部位：{person['region_text']}",
+                size=9, fg=PAPER['ink2'], bg=base, wraplength=max(220, wrap - 40))
+            line.pack(fill='x')
+            self._report_labels.append(line)
+
+        self._card_heading(card, '交叉作用', base)
+        cross = ui.text(card, pair['summary'], size=10, fg=PAPER['ink'], bg=base,
+                        wraplength=max(220, wrap - 32))
+        cross.pack(fill='x', pady=(3, 0))
+        self._report_labels.append(cross)
+
+        if pair['studies']:
+            self._card_heading(card, '研究观察（仅展示，不预测）', base)
+            for study in pair['studies']:
+                self._study_row(card, study, wrap)
+        else:
+            ui.text(card, '本资料库未收录该组合的研究观察。', size=9, fg=PAPER['ink3'],
+                    bg=base, wraplength=max(220, wrap - 32)).pack(fill='x', pady=(3, 0))
+
+        if pair['sources']:
+            sources = tk.Frame(card, bg=base)
+            sources.pack(fill='x', pady=(8, 0))
+            ui.eyebrow(sources, '来源链接', bg=base).pack(side='left')
+            for index, url in enumerate(pair['sources'], 1):
+                ui.FlatButton(sources, f'来源 {index} ↗', kind='link',
+                              command=lambda target=url: webbrowser.open(target)).pack(
+                    side='left', padx=(8, 0))
+        else:
+            ui.text(card, '来源链接：未记录。', size=8, fg=PAPER['ink3'],
+                    bg=base).pack(anchor='w', pady=(8, 0))
+
+    def _study_row(self, parent, study, wrap):
+        base = PAPER['surface2']
+        block = tk.Frame(parent, bg=base, padx=10, pady=8)
         block.pack(fill='x', pady=(6, 0))
-        ui.text(block, str(evidence.get('source_location', '来源章节未记录')), size=9,
-                weight='bold', bg=PAPER['surface2']).pack(fill='x')
-        for line in (evidence.get('context'), evidence.get('uncertainty')):
-            if line:
-                label = ui.text(block, str(line), size=8, fg=PAPER['ink2'],
-                                bg=PAPER['surface2'], wraplength=wrap)
-                label.pack(fill='x', pady=(2, 0))
-                self._report_labels.append(label)
-        applicability = evidence.get('applicability', '')
-        structure = evidence.get('structural_check', '')
-        mapped = tk.Frame(block, bg=PAPER['surface2'])
-        mapped.pack(fill='x', pady=(4, 0))
-        ui.text(mapped, '适用性：' + ui.APPLICABILITY.get(applicability, applicability or '未记录') +
-                ' · ' + ui.STRUCTURAL.get(structure, structure or '未记录'), size=8,
-                fg=PAPER['ink2'], bg=PAPER['surface2']).pack(side='left')
-        ui.mono(mapped, applicability + ' / ' + structure, size=7).pack(side='left', padx=(8, 0))
-        ratio = evidence.get('auc_ratio')
-        ui.text(block, f'研究观察 AUC 比率 {ratio}；当前方案预测：未准入。', size=8,
-                fg=PAPER['ink2'], bg=PAPER['surface2']).pack(fill='x', pady=(2, 0))
-        url = (evidence.get('source') or {}).get('url', '')
-        if url:
+        ui.text(block, study['source_location'], size=9, weight='bold', bg=base).pack(fill='x')
+        conditions = '；'.join(part for part in (study['population'], study['context']) if part)
+        self._study_line(block, '研究人群与条件', conditions or '未记录', wrap)
+        self._study_line(block, '不确定性', study['uncertainty'] or '未记录', wrap)
+        applicability = ui.APPLICABILITY.get(study['applicability'],
+                                             study['applicability'] or '未记录')
+        structure = ui.STRUCTURAL.get(study['structural_check'],
+                                      study['structural_check'] or '未记录')
+        self._study_line(block, '适用性 / 结构校验', f'{applicability} · {structure}', wrap)
+        ui.mono(block, f"{study['applicability'] or '未记录'} / "
+                       f"{study['structural_check'] or '未记录'}", size=7).pack(
+            anchor='w', pady=(1, 0))
+        ratio = study['auc_ratio']
+        observed = ui.text(
+            block, f"研究观察 AUC 比率：{ratio if ratio is not None else '未记录'}；"
+                   f"{study['prediction_text']}", size=8, fg=PAPER['ink2'], bg=base,
+            wraplength=max(220, wrap - 54))
+        observed.pack(fill='x', pady=(3, 0))
+        self._report_labels.append(observed)
+        if study['source_url']:
             ui.FlatButton(block, '打开来源原文 ↗', kind='link',
-                          command=lambda target=url: webbrowser.open(target)).pack(anchor='w')
+                          command=lambda url=study['source_url']: webbrowser.open(url)).pack(
+                anchor='w')
+
+    def _study_line(self, parent, label, value, wrap):
+        base = PAPER['surface2']
+        row = tk.Frame(parent, bg=base)
+        row.pack(fill='x', pady=(2, 0))
+        ui.text(row, label, size=8, fg=PAPER['ink3'], bg=base).pack(side='left', anchor='n')
+        text = ui.text(row, value if value else '未记录', size=8, fg=PAPER['ink2'],
+                       bg=base, wraplength=max(180, wrap - 90))
+        text.pack(side='left', fill='x', expand=True, padx=(8, 0))
+        self._report_labels.append(text)
+
+    def _boundary_block(self, parent, result, overview, wrap):
+        base = PAPER['surface']
+        definitions = (
+            ('标签事实', '来自官方标签记录与来源 profile 的可核对段落；保留在线 / 缓存 / 种子状态。'),
+            ('机制推断', '由两条个体机制线索组合出的定性提示，不是该组合的临床试验结论。'),
+            ('研究观察', '目录研究库收录的外部研究结果；仅展示，不进入本方案预测。'),
+            ('边界', '不相乘、不生成数值风险、不输出个体暴露或效应预测。'),
+        )
+        block = tk.Frame(parent, bg=PAPER['bgElevated'], padx=12, pady=10)
+        block.pack(fill='x', pady=(0, 10))
+        for label, value in definitions:
+            row = tk.Frame(block, bg=PAPER['bgElevated'])
+            row.pack(fill='x', pady=(2, 0))
+            ui.text(row, label, size=9, weight='bold', fg=PAPER['ink'],
+                    bg=PAPER['bgElevated'], width=7).pack(side='left', anchor='n')
+            text = ui.text(row, value, size=9, fg=PAPER['ink2'], bg=PAPER['bgElevated'],
+                           wraplength=max(220, wrap - 90))
+            text.pack(side='left', fill='x', expand=True, padx=(8, 0))
+            self._report_labels.append(text)
+
+        for line in (result.get('explanation', ''), overview['label_note'],
+                     result['context'].get('note', '')):
+            if not line:
+                continue
+            label = ui.text(parent, str(line), size=8, fg=PAPER['ink3'], wraplength=wrap)
+            label.pack(fill='x', pady=(0, 2))
+            self._report_labels.append(label)
+
+        sampling = result.get('sampling') or {}
+        if sampling.get('note'):
+            label = ui.text(
+                parent,
+                f"采样：显示 {sampling.get('displayed_points', 0)} / "
+                f"{sampling.get('original_points', 0)} 点；{sampling['note']}",
+                size=8, fg=PAPER['ink3'], wraplength=wrap)
+            label.pack(fill='x', pady=(0, 2))
+            self._report_labels.append(label)
+
+        label = ui.text(parent, overview['export_note'], size=8, fg=PAPER['ink3'],
+                        wraplength=wrap)
+        label.pack(fill='x', pady=(0, 2))
+        self._report_labels.append(label)
+        ui.mono(parent, '输入 SHA256：' + (overview['input_sha256'] or '未记录'),
+                size=8).pack(fill='x', pady=(6, 0))
+        if overview['snapshot_id']:
+            ui.mono(parent, '来源快照：' + overview['snapshot_id'], size=8).pack(
+                fill='x', pady=(1, 0))
+
+    def _number_text(self, value, unit):
+        if value is None or value == '':
+            return '未填写'
+        try:
+            return f'{value:g} {unit}'
+        except (TypeError, ValueError):
+            return f'{value} {unit}'
+
+    def _card_heading(self, parent, title, bg):
+        ui.eyebrow(parent, title, bg=bg).pack(anchor='w', pady=(10, 0))
+
+    def _open_region(self, index, region):
+        """Select the region on the anatomy stage; never invents an effect."""
+        if not self.body:
+            return
+        entries = (self.result or {}).get('entries') or []
+        if not 0 <= index < len(entries):
+            return
+        self.body.drug = entries[index]
+        self.body.select_region(region)
+        if self.tabs:
+            self.tabs.select('body')
+
+    # ------------------------------------------------------------ result view
+    def _section(self, parent, title, index=None, note=None):
+        frame = tk.Frame(parent, bg=PAPER['surface'])
+        frame.pack(fill='x', pady=(12, 6))
+        row = tk.Frame(frame, bg=PAPER['surface'])
+        row.pack(fill='x')
+        if index:
+            ui.mono(row, index, size=8, fg=PAPER['accent']).pack(side='left', padx=(0, 8))
+        tk.Label(row, text=title, font=(ui.FONT, 12, 'bold'), fg=PAPER['ink'],
+                 bg=PAPER['surface']).pack(side='left')
+        if note:
+            ui.text(row, note, size=8, fg=PAPER['ink3']).pack(side='right')
+        ui.hairline(frame).pack(fill='x', pady=(7, 0))
 
     def export(self):
         if self.result is None:

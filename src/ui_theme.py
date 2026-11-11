@@ -35,6 +35,7 @@ STATUS = {
     'HOLD_FOR_REVIEW': ('待人工审核', 'warn'),
     'MECHANISM_INFERENCE': ('机制推断', 'info'),
     'PENDING_REVIEW': ('待人工审核', 'warn'),
+    'SYNTHETIC_ONLY': ('合成模型 · 仅假设', 'warn'),
     'online': ('在线官方标签', 'gain'),
     'cache': ('本地缓存 · 已校验', 'info'),
     'seed': ('随程序提供的来源事实', 'muted'),
@@ -182,6 +183,59 @@ def checkbox(parent, value, variable, command=None, bg=None, fg=None):
 def hairline(parent, colour=None, bg=None):
     return tk.Frame(parent, height=1, bg=colour or PAPER['line'],
                     bd=0, highlightthickness=0)
+
+
+def card(parent, bg=None, padx=14, pady=12):
+    """One-job surface inside a reading pane.
+
+    Returns the padded body frame; the bordered outer frame is available as
+    ``body.outer`` for callers that need to place it themselves.
+    """
+    base = bg if bg is not None else PAPER['bgElevated']
+    outer = tk.Frame(parent, bg=base, highlightthickness=1,
+                     highlightbackground=PAPER['line'])
+    body = tk.Frame(outer, bg=base, padx=padx, pady=pady)
+    body.pack(fill='both', expand=True)
+    body.outer = outer
+    return body
+
+
+def metric_row(parent, metrics, bg=None):
+    """Quiet metric line: a large number with a small label, never a KPI card.
+
+    ``metrics`` is an iterable of ``(value, label)`` pairs or dicts with
+    ``value``/``label`` keys.
+    """
+    base = bg if bg is not None else bg_of(parent)
+    row = tk.Frame(parent, bg=base)
+    for metric in metrics:
+        if isinstance(metric, dict):
+            value, label = metric.get('value'), metric.get('label', '')
+        else:
+            value, label = metric
+        cell = tk.Frame(row, bg=base)
+        cell.pack(side='left', padx=(0, 32))
+        tk.Label(cell, text=str(value), font=(FONT, 20, 'bold'), fg=PAPER['ink'],
+                 bg=base, anchor='w').pack(anchor='w')
+        tk.Label(cell, text=str(label), font=(FONT, 9), fg=PAPER['ink3'],
+                 bg=base, anchor='w').pack(anchor='w')
+    return row
+
+
+def kv_row(parent, label, value, bg=None, mono=False, value_fg=None):
+    """Compact label/value line used by report cards."""
+    base = bg if bg is not None else bg_of(parent)
+    row = tk.Frame(parent, bg=base)
+    tk.Label(row, text=str(label), font=(FONT, 9), fg=PAPER['ink3'],
+             bg=base, anchor='w').pack(side='left')
+    if mono:
+        field = tk.Label(row, text=str(value), font=(MONO, 9),
+                         fg=value_fg or PAPER['ink3'], bg=base, anchor='w')
+    else:
+        field = tk.Label(row, text=str(value), font=(FONT, 9),
+                         fg=value_fg or PAPER['ink'], bg=base, anchor='w')
+    field.pack(side='left', padx=(8, 0))
+    return row
 
 
 class FlatButton(tk.Button):
