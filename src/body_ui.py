@@ -3,6 +3,7 @@
 Data still comes from ``src.anatomy`` unchanged; this module only decides how
 regions, status codes and provenance are presented to the reader.
 """
+import threading
 import tkinter as tk
 from tkinter import ttk
 from urllib.parse import urlparse
@@ -10,6 +11,7 @@ import webbrowser
 
 from src.anatomy import REGIONS, region_details
 from src.web_body import WebBody
+from src import pharmacopoeia
 from src import ui_theme as ui
 
 PAPER = ui.PAPER
@@ -52,11 +54,9 @@ class AnatomyWorkspace(tk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self._catalog = catalog
-        self._substances = list(SUPPORTED_SUBSTANCES)
-        for identity, record in catalog.get('compounds', {}).items():
-            if identity == 'atomoxetine':
-                continue
-            self._substances.append((identity, (record or {}).get('name') or identity))
+        self._pharma_entries = pharmacopoeia.load_entries()
+        self._combo_entries = {}
+        self._substances = [(entry['identity'], entry['display']) for entry in self._pharma_entries]
         self._labels = [label for _identity, label in self._substances]
         self._build_toolbar(get_selected, open_context, open_pgx, open_regimen)
         self._build_split()
@@ -73,12 +73,11 @@ class AnatomyWorkspace(tk.Frame):
         self.choice = tk.StringVar(value='未选择物质')
         self._query = tk.StringVar(value='未选择物质')
         self.combo = ttk.Combobox(bar, textvariable=self._query, values=self._labels,
-                                  style='Paper.TCombobox', width=28)
+                                  style='Paper.TCombobox', width=30)
         self.combo.pack(side='left', padx=(0, 8))
         self.combo.bind('<KeyRelease>', self._filter_substances)
         self.combo.bind('<<ComboboxSelected>>', self._choose_substance)
         self.combo.bind('<Return>', self._choose_substance)
-        self.combo.bind('<FocusOut>', self._restore_substance)
 
         def use_regimen():
             item = get_selected()
@@ -99,33 +98,93 @@ class AnatomyWorkspace(tk.Frame):
                  bg=PAPER['surface']).pack(side='left')
         ui.text(legend, '亮色 = 文献关联，非个人反应', size=9,
                 fg=PAPER['ink3']).pack(side='left', padx=(4, 0))
+
+        status_row = tk.Frame(toolbar, bg=PAPER['surface'], padx=24)
+        status_row.pack(fill='x', pady=(0, 10))
+        self.pharm_status = tk.StringVar(value='本地药典就绪 · 可输入中文 / 英文名检索')
+        tk.Label(status_row, textvariable=self.pharm_status, font=(ui.FONT, 8),
+                 fg=PAPER['ink3'], bg=PAPER['surface'], anchor='w').pack(side='left')
+        self.mayo_button = ui.FlatButton(status_row, 'Mayo 更新', kind='quiet',
+                                         command=self.update_from_mayo)
+        self.mayo_button.pack(side='right', padx=(8, 0))
+        ui.FlatButton(status_row, '打开 Mayo 搜索', kind='quiet',
+                      command=self.open_mayo).pack(side='right')
         ui.hairline(toolbar).pack(fill='x')
 
     def _filter_substances(self, event):
         if event.keysym in ('Left', 'Right', 'Up', 'Down', 'Return', 'Escape', 'Tab'):
             return
-        typed = self._query.get().strip().casefold()
-        values = self._labels if not typed else [
-            label for label in self._labels if typed in label.casefold()]
-        self.combo.configure(values=values or self._labels)
+        typed = self._query.get().strip()
+        entries = pharmacopoeia.search(typed) if typed else self._pharma_entries
+        self._combo_entries = {entry['display']: entry for entry in entries}
+        self.combo.configure(values=[entry['display'] for entry in entries])
 
     def _choose_substance(self, _event=None):
         typed = self._query.get().strip()
-        exact = [pair for pair in self._substances if pair[1] == typed]
-        matches = exact or [pair for pair in self._substances if typed.casefold() in pair[1].casefold()]
-        if len(matches) == 1:
-            identity, label = matches[0]
-            self.drug = {'kind': 'catalog', 'compound_id': identity, 'name': label}
-            self.choice.set(label)
-            self._query.set(label)
+        entry = self._combo_entries.get(typed)
+        if entry is None:
+            matches = pharmacopoeia.search(typed)
+            entry = matches[0] if len(matches) == 1 else None
+        if entry is not None:
+            self._apply_entry(entry)
         else:
             self._query.set(self.choice.get())
-        self.combo.configure(values=self._labels)
+            self.pharm_status.set('本地药典没有唯一匹配；可继续输入，或尝试「Mayo 更新」。')
+        self.combo.configure(values=[item['display'] for item in self._pharma_entries])
         self.render()
+
+    def _apply_entry(self, entry):
+        self.drug = {'kind': 'catalog', 'compound_id': entry['identity'],
+                     'name': entry['display']}
+        self.choice.set(entry['display'])
+        self._query.set(entry['display'])
+        note = entry.get('note') or ''
+        self.pharm_status.set(pharmacopoeia.source_label(entry) + ((' · ' + note) if note else ''))
 
     def _restore_substance(self, _event=None):
         self._query.set(self.choice.get())
-        self.combo.configure(values=self._labels)
+        self.combo.configure(values=[item['display'] for item in self._pharma_entries])
+
+    # ------------------------------------------------------------ Mayo update
+    def update_from_mayo(self):
+        query = self._query.get().strip()
+        if not query or query == '未选择物质':
+            self.pharm_status.set('请先输入要查询的药物名称，再尝试 Mayo 更新。')
+            return
+        self.mayo_button.configure(state='disabled')
+        self.pharm_status.set('正在从 Mayo 查询（仅发送药物名称）…')
+
+        def work():
+            try:
+                record = pharmacopoeia.MayoClient().update(query)
+            except pharmacopoeia.PharmacopoeiaError as error:
+                self.after(0, lambda failure=error: self._mayo_finished(None, failure))
+            except Exception as error:  # the worker must always answer the UI
+                wrapped = pharmacopoeia.PharmacopoeiaError('MAYO_UNKNOWN', str(error))
+                self.after(0, lambda failure=wrapped: self._mayo_finished(None, failure))
+            else:
+                self.after(0, lambda saved=record: self._mayo_finished(saved, None))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _mayo_finished(self, record, error):
+        self.mayo_button.configure(state='normal')
+        if error is not None:
+            self.pharm_status.set(
+                f"Mayo 更新失败（{error.code}）：{error} 本地药典仍可用，可点「打开 Mayo 搜索」人工核对。")
+            return
+        self._pharma_entries = pharmacopoeia.load_entries()
+        self._combo_entries = {entry['display']: entry for entry in self._pharma_entries}
+        self.combo.configure(values=[entry['display'] for entry in self._pharma_entries])
+        stamp = str(record.get('retrieved_at', ''))[:19].replace('T', ' ')
+        self.pharm_status.set(
+            f"已写入本地缓存：{record.get('title', '')} · {stamp}（Mayo 摘要，未做临床校验）")
+
+    def open_mayo(self):
+        query = self._query.get().strip()
+        if not query or query == '未选择物质':
+            query = 'drug'
+        webbrowser.open(pharmacopoeia.search_url(query))
 
     # -------------------------------------------------------------------- split
     def _build_split(self):

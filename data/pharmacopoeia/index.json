@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "license_note": "Local index over Celestial-curated drug profiles, interaction catalog and cached public labels. Display names/aliases are editorial; source links point to DailyMed/openFDA/Mayo pages. Not a pharmacopoeia substitute and not clinical validation.",
+  "entries": [
+    {
+      "identity": "atomoxetine",
+      "display": "阿托莫西汀 / atomoxetine",
+      "names": [
+        "阿托莫西汀",
+        "托莫西汀",
+        "atomoxetine"
+      ],
+      "source": "local_evidence",
+      "status": "evidence_only",
+      "has_profile": false,
+      "has_label_cache": false,
+      "catalog_present": false,
+      "note": "仅有本地文献关联（人体区域证据），没有口服标签缓存。",
+      "label_url": ""
+    },
+    {
+      "identity": "bicalutamide",
+      "display": "比卡鲁胺 / bicalutamide",
+      "names": [
+        "比卡鲁胺",
+        "bicalutamide",
+        "比卡鲁胺 / bicalutamide"
+      ],
+      "source": "local_profile",
+      "status": "profile",
+      "has_profile": true,
+      "has_label_cache": true,
+      "catalog_present": false,
+      "note": "非甾体抗雄激素；标签机制与药代资料来自本地档案。",
+      "label_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7a08d88b-051a-4c16-9560-12685c500c58"
+    },
+    {
+      "identity": "estradiol",
+      "display": "雌二醇 / estradiol",
+      "names": [
+        "雌二醇",
+        "戊酸雌二醇",
+        "estradiol",
+        "estradiol valerate",
+        "17β-雌二醇",
+        "17β-estradiol",
+        "雌二醇 / estradiol"
+      ],
+      "source": "local_profile",
+      "status": "profile",
+      "has_profile": true,
+      "has_label_cache": true,
+      "catalog_present": false,
+      "note": "戊酸雌二醇按雌二醇身份检索；酯类的药代参数未单独建模。",
+      "label_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bfc1beb9-1ade-446e-97dd-55b41c2fa851"
+    },
+    {
+      "identity": "fluconazole",
+      "display": "氟康唑 / fluconazole",
+      "names": [
+        "氟康唑",
+        "fluconazole",
+        "氟康唑 / fluconazole"
+      ],
+      "source": "local_profile",
+      "status": "profile",
+      "has_profile": true,
+      "has_label_cache": false,
+      "catalog_present": true,
+      "note": "",
+      "label_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204"
+    },
+    {
+      "identity": "midazolam",
+      "display": "咪达唑仑 / midazolam",
+      "names": [
+        "咪达唑仑",
+        "midazolam",
+        "咪达唑仑 / midazolam"
+      ],
+      "source": "local_profile",
+      "status": "profile",
+      "has_profile": true,
+      "has_label_cache": false,
+      "catalog_present": true,
+      "note": "",
+      "label_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204"
+    },
+    {
+      "identity": "tofacitinib",
+      "display": "托法替布 / tofacitinib",
+      "names": [
+        "托法替布",
+        "tofacitinib",
+        "托法替布 / tofacitinib"
+      ],
+      "source": "local_profile",
+      "status": "profile",
+      "has_profile": true,
+      "has_label_cache": false,
+      "catalog_present": true,
+      "note": "",
+      "label_url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204"
+    }
+  ]
+}
