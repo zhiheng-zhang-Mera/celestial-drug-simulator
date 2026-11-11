@@ -6,6 +6,7 @@ from pathlib import Path
 
 from src import report_model
 from src.drug_library import analyze_labels
+from src.regimen_ui import editor_item
 from src.simulation import simulate
 
 
@@ -66,7 +67,8 @@ class ReportModelTests(unittest.TestCase):
         self.assertIn('CYP3A4', pair['b']['summary'])
         self.assertEqual(pair['a']['region_text'], report_model.MISSING_REGIONS)
         self.assertIn('CYP3A4', pair['summary'])
-        self.assertEqual(len(pair['sources']), 2)
+        self.assertIn('同时促进女性化并降低男性特征', pair['summary'])
+        self.assertGreaterEqual(len(pair['sources']), 2)
         self.assertEqual(pair['studies'], [])
         overview = report_model.overview_view(result, labels)
         self.assertEqual(overview['counts']['pairs'], 1)
@@ -135,7 +137,9 @@ class ReportModelTests(unittest.TestCase):
         pair = report_model.interaction_view(result, labels)[0]
         self.assertEqual(pair['status'], 'HOLD_FOR_REVIEW')
         self.assertTrue(pair['has_catalog_observations'])
-        self.assertIn('目录研究库', pair['summary'])
+        self.assertTrue(pair['has_review'])
+        self.assertIn('说明书研究观察', pair['summary'])
+        self.assertEqual(pair['evidence_grade'], 'label_ddi_study')
         self.assertEqual(len(pair['studies']), 1)
         study = pair['studies'][0]
         self.assertEqual(study['auc_ratio'], 3.59)
@@ -143,6 +147,7 @@ class ReportModelTests(unittest.TestCase):
         self.assertIn('未准入', study['prediction_text'])
         self.assertTrue(study['source_url'].startswith('https://dailymed.nlm.nih.gov/'))
         self.assertIn(study['source_url'], pair['sources'])
+        self.assertTrue(any('f694c617' in source for source in pair['sources']))
 
     def test_regions_come_from_the_curated_anatomy_table(self):
         # atomoxetine is not in the curated profile library, so it cannot pass
@@ -191,6 +196,117 @@ class ReportModelTests(unittest.TestCase):
         report_model.interaction_view(result, labels)
         self.assertEqual(result, result_before)
         self.assertEqual(labels, labels_before)
+
+
+    def test_curated_alias_resolves_without_guessing(self):
+        self.assertEqual(report_model.resolve_identity('戊酸雌二醇'), 'estradiol')
+        self.assertEqual(report_model.resolve_identity('戊酸雌二醇片'), 'estradiol')
+        self.assertEqual(report_model.resolve_identity(' estradiol valerate '), 'estradiol')
+        self.assertEqual(report_model.resolve_identity('比卡鲁胺'), 'bicalutamide')
+        for name in ('雌二醇注射剂', 'estradiol + bicalutamide', '未知物质', '', None):
+            self.assertIsNone(report_model.resolve_identity(name))
+
+    def test_valerate_editor_item_keeps_display_name_but_uses_canonical_identity(self):
+        item = editor_item({'name': '戊酸雌二醇', 'dose_mg': '', 'interval_h': ''}, 'oral')
+        self.assertEqual(item['name'], '戊酸雌二醇')
+        self.assertEqual(item['kind'], 'catalog')
+        self.assertEqual(item['compound_id'], 'estradiol')
+        result, labels = self.build([item, entry('比卡鲁胺', 'catalog', 'bicalutamide')])
+        individual = report_model.individual_view(result, labels)[0]
+        self.assertEqual(individual['canonical_id'], 'estradiol')
+        self.assertEqual(individual['name'], '戊酸雌二醇')
+        self.assertIn('雌激素受体激动', individual['pd']['summary'])
+        self.assertIn('酯类前药', individual['pd']['alias_note'])
+        self.assertTrue(individual['pd']['sources'][0]['url'].startswith(
+            'https://dailymed.nlm.nih.gov/'))
+
+    def test_golden_estradiol_bicalutamide_review_is_complete(self):
+        result, labels = self.build([entry('戊酸雌二醇', 'catalog', 'estradiol'),
+                                     entry('比卡鲁胺', 'catalog', 'bicalutamide')])
+        individuals = report_model.individual_view(result, labels)
+        self.assertIn('增强雌激素信号', individuals[0]['pd']['summary'])
+        self.assertIn('女性化表达', individuals[0]['pd']['summary'])
+        self.assertIn('降低雄激素信号', individuals[1]['pd']['summary'])
+        self.assertIn('男性化表达', individuals[1]['pd']['summary'])
+
+        pair = report_model.interaction_view(result, labels)[0]
+        self.assertEqual(pair['names'], ['戊酸雌二醇', '比卡鲁胺'])
+        self.assertTrue(pair['has_review'])
+        self.assertEqual(pair['status'], 'MECHANISM_INFERENCE')
+        self.assertEqual(pair['evidence_grade'], 'mechanism_inference_no_direct_ddi_trial')
+        self.assertIn('同时促进女性化并降低男性特征', pair['summary'])
+        self.assertIn('增强雌激素信号', pair['pd_individual_a']['summary'])
+        self.assertIn('降低雄激素信号', pair['pd_individual_b']['summary'])
+        self.assertEqual(pair['combined_effect']['headline'],
+                         '同时促进女性化并降低男性特征')
+        self.assertGreaterEqual(len(pair['combined_effect']['items']), 2)
+        self.assertTrue(pair['not_computed'])
+
+        sections = pair['disclosure_sections']
+        self.assertEqual([section['title'] for section in sections],
+                         ['作用机制', '合用后可能效应', '临床考虑', '需要监测项',
+                          '证据等级与来源', '不确定性与未计算声明'])
+        for section in sections:
+            self.assertTrue(section['id'])
+            self.assertTrue(section['body'])
+            self.assertGreaterEqual(len(section['items']), 1)
+            self.assertTrue(all(item['text'] for item in section['items']))
+        self.assertTrue(any('同时促进女性化' in section['body']
+                            for section in sections if section['id'] == 'combined_effect'))
+        self.assertTrue(any('肝功能' in item['text']
+                            for section in sections for item in section['items']))
+        self.assertTrue(any('监测' in section['title'] for section in sections))
+
+        urls = set(pair['sources'])
+        self.assertTrue(any('bfc1beb9' in url for url in urls))
+        self.assertTrue(any('7a08d88b' in url for url in urls))
+        self.assertTrue(any('mayoclinic.org' in url for url in urls))
+        self.assertGreaterEqual(len(urls), 4)
+        self.assertEqual(pair['studies'], [])
+
+    def test_review_fallback_preserves_previous_behaviour(self):
+        result, labels = self.build([entry('雌二醇', 'catalog', 'estradiol'),
+                                     entry('比卡鲁胺', 'catalog', 'bicalutamide')])
+        individual = report_model.individual_view(result, labels, reviews={})[0]
+        self.assertIsNone(individual['pd'])
+        self.assertIn('CYP3A4', individual['mechanism']['text'])
+        pair = report_model.interaction_view(result, labels, reviews={})[0]
+        self.assertFalse(pair['has_review'])
+        self.assertIsNone(pair['combined_effect'])
+        self.assertIsNone(pair['pd_individual_a'])
+        self.assertEqual(pair['disclosure_sections'], [])
+        self.assertEqual(pair['evidence_grade'], '')
+        self.assertIn('CYP3A4', pair['summary'])
+        self.assertEqual(len(pair['sources']), 2)
+        self.assertEqual(pair['status'], 'MECHANISM_INFERENCE')
+        overview = report_model.overview_view(result, labels, reviews={})
+        self.assertEqual(overview['counts']['mechanism_pairs'], 1)
+
+    def test_fluconazole_midazolam_review_merges_with_catalog_study(self):
+        result, labels = self.build([entry('氟康唑', 'catalog', 'fluconazole'),
+                                     entry('咪达唑仑', 'catalog', 'midazolam')])
+        pair = report_model.interaction_view(result, labels)[0]
+        self.assertTrue(pair['has_review'])
+        self.assertEqual(pair['evidence_grade'], 'label_ddi_study')
+        self.assertIn('咪达唑仑暴露可能升高', pair['combined_effect']['headline'])
+        self.assertEqual(len(pair['disclosure_sections']), 6)
+        self.assertEqual(len(pair['studies']), 1)
+        self.assertTrue(any('f694c617' in url for url in pair['sources']))
+        self.assertTrue(any('CYP3A4' in section['body']
+                            for section in pair['disclosure_sections']))
+
+    def test_view_assembly_does_not_write_views_into_export_result(self):
+        result, labels = self.build([entry('戊酸雌二醇', 'catalog', 'estradiol'),
+                                     entry('比卡鲁胺', 'catalog', 'bicalutamide')])
+        before_keys = set(result)
+        report_model.overview_view(result, labels)
+        report_model.individual_view(result, labels)
+        report_model.interaction_view(result, labels)
+        self.assertEqual(set(result), before_keys)
+        for key in ('pd_individual_a', 'combined_effect', 'disclosure_sections',
+                    'individual_view', 'interaction_view', 'sections'):
+            self.assertNotIn(key, result)
+            self.assertNotIn(key, result['pairs'][0])
 
 
 if __name__ == '__main__':

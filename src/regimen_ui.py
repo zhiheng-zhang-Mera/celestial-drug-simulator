@@ -26,7 +26,8 @@ CATEGORY_LABELS = {'medicine': '药品', 'supplement': '补充剂', 'botanical':
                    'food_beverage': '食品 / 饮料', 'other': '其他'}
 CATEGORY_VALUES = {label: code for code, label in CATEGORY_LABELS.items()}
 KIND_LABELS = {'catalog': '来源库', 'custom': '自定义', 'synthetic': '合成模型'}
-NAME_SUGGESTIONS = ('雌二醇', '比卡鲁胺', '氟康唑', '咪达唑仑', '托法替布', 'atomoxetine')
+NAME_SUGGESTIONS = ('戊酸雌二醇', '雌二醇', '比卡鲁胺', '氟康唑', '咪达唑仑', '托法替布',
+                    'atomoxetine')
 
 
 def study_lines(evidence):
@@ -40,6 +41,12 @@ def editor_item(values, route, custom=False, advanced=False, category='medicine'
     from src.drug_library import resolve_name, profile_for
     name = values.get('name', '').strip()
     identity = resolve_name(name) if not custom and not advanced else None
+    if identity is None and not custom and not advanced:
+        # Curated aliases (e.g. 戊酸雌二醇 → estradiol) resolve to the canonical
+        # identity for label/profile lookup; the display name stays user input.
+        candidate = report_model.resolve_identity(name)
+        if candidate and profile_for(candidate, route):
+            identity = candidate
     profile = profile_for(identity, route) if identity else None
 
     def number(key, integer=False):
@@ -296,7 +303,7 @@ class RegimenWorkspace(tk.Frame):
             # Derive the reading width from the window geometry (left column +
             # gutters are fixed) so the first render already wraps correctly.
             width = self.winfo_width() - 517
-        return max(260, max(340, width) - 44)
+        return max(260, max(340, width) - 50)
 
     def _apply_report_wrap(self):
         wrap = self._report_wrap()
@@ -595,6 +602,54 @@ class RegimenWorkspace(tk.Frame):
         if source_note:
             ui.mono(card, source_note, size=7).pack(anchor='w', pady=(2, 0))
 
+        pd = person.get('pd')
+        if pd:
+            self._card_heading(card, '性激素表达作用（PD）', base)
+            summary = ui.text(card, pd['summary'], size=10, fg=PAPER['ink'], bg=base,
+                              wraplength=max(220, wrap - 32))
+            summary.pack(fill='x', pady=(3, 0))
+            self._report_labels.append(summary)
+            target = ' · '.join(part for part in (
+                '靶点：' + pd['target'] if pd.get('target') else '',
+                '类别：' + pd['drug_class'] if pd.get('drug_class') else '') if part)
+            if target:
+                ui.text(card, target, size=8, fg=PAPER['ink3'], bg=base).pack(
+                    fill='x', pady=(2, 0))
+            for effect in (pd.get('effects') or [])[:3]:
+                bullet = ui.text(card, '· ' + effect, size=9, fg=PAPER['ink2'], bg=base,
+                                 wraplength=max(220, wrap - 40))
+                bullet.pack(fill='x', pady=(2, 0))
+                self._report_labels.append(bullet)
+            grade = f"证据等级：{pd.get('evidence_grade_label') or pd.get('evidence_grade') or '未记录'}"
+            ui.text(card, grade, size=8, fg=PAPER['ink3'], bg=base).pack(anchor='w', pady=(4, 0))
+            if pd.get('evidence_grade'):
+                ui.mono(card, pd['evidence_grade'], size=7).pack(anchor='w', pady=(1, 0))
+            if pd.get('alias_note'):
+                alias = ui.text(card, pd['alias_note'], size=8, fg=PAPER['ink3'], bg=base,
+                                wraplength=max(220, wrap - 32))
+                alias.pack(fill='x', pady=(2, 0))
+                self._report_labels.append(alias)
+            if pd.get('uncertainty'):
+                uncertainty = ui.text(card, '不确定性：' + pd['uncertainty'], size=8,
+                                      fg=PAPER['ink3'], bg=base,
+                                      wraplength=max(220, wrap - 32))
+                uncertainty.pack(fill='x', pady=(2, 0))
+                self._report_labels.append(uncertainty)
+            if pd.get('sources'):
+                links = tk.Frame(card, bg=base)
+                links.pack(fill='x', pady=(3, 0))
+                ui.eyebrow(links, 'PD 来源', bg=base).pack(anchor='w')
+                for source_index, source in enumerate(pd['sources'], 1):
+                    if source.get('url'):
+                        label = source.get('label') or f'来源 {source_index}'
+                        ui.FlatButton(links, f'{label} ↗', kind='link',
+                                      command=lambda url=source['url']: webbrowser.open(url)).pack(
+                            anchor='w', pady=(1, 0))
+                    elif source.get('label'):
+                        ui.text(links, source['label'], size=8, fg=PAPER['ink3'],
+                                bg=base, wraplength=max(220, wrap - 32)).pack(
+                            anchor='w', pady=(1, 0))
+
         self._card_heading(card, '影响部位', base)
         if person['regions']:
             for region in person['regions']:
@@ -646,17 +701,30 @@ class RegimenWorkspace(tk.Frame):
         ui.mono(raw, '目录状态 ' + (pair['result_status'] or '未记录'), size=7).pack(side='left')
         ui.mono(raw, '标签状态 ' + (pair['label_status'] or '未记录'), size=7).pack(
             side='left', padx=(12, 0))
+        if pair.get('evidence_grade_label') or pair.get('evidence_grade'):
+            grade = tk.Frame(card, bg=base)
+            grade.pack(fill='x', pady=(2, 0))
+            ui.text(grade, '证据等级：' + (pair.get('evidence_grade_label') or '未记录'),
+                    size=8, fg=PAPER['ink2'], bg=base).pack(anchor='w')
+            if pair.get('evidence_grade'):
+                ui.mono(grade, pair['evidence_grade'], size=7).pack(anchor='w', pady=(1, 0))
 
         lines = tk.Frame(card, bg=base)
         lines.pack(fill='x', pady=(8, 0))
         ui.eyebrow(lines, '个体作用 · 交叉作用的两端', bg=base).pack(anchor='w')
-        for caption, person in (('A · ' + pair['a']['name'], pair['a']),
-                                ('B · ' + pair['b']['name'], pair['b'])):
+        for caption, person, pd in (
+                ('A · ' + pair['a']['name'], pair['a'], pair.get('pd_individual_a')),
+                ('B · ' + pair['b']['name'], pair['b'], pair.get('pd_individual_b'))):
             row = tk.Frame(lines, bg=base)
             row.pack(fill='x', pady=(4, 0))
             ui.text(row, caption, size=9, weight='bold', fg=PAPER['ink'], bg=base).pack(anchor='w')
+            if pd:
+                pd_line = ui.text(row, 'PD：' + pd['summary'], size=9, fg=PAPER['ink'],
+                                  bg=base, wraplength=max(220, wrap - 40))
+                pd_line.pack(fill='x')
+                self._report_labels.append(pd_line)
             line = ui.text(
-                row, f"{person['summary']} · 主要影响部位：{person['region_text']}",
+                row, f"机制线索：{person['summary']} · 主要影响部位：{person['region_text']}",
                 size=9, fg=PAPER['ink2'], bg=base, wraplength=max(220, wrap - 40))
             line.pack(fill='x')
             self._report_labels.append(line)
@@ -667,6 +735,32 @@ class RegimenWorkspace(tk.Frame):
         cross.pack(fill='x', pady=(3, 0))
         self._report_labels.append(cross)
 
+        combined = pair.get('combined_effect')
+        if combined:
+            self._card_heading(card, '综合作用', base)
+            if combined.get('headline'):
+                headline = ui.text(card, combined['headline'], size=11, weight='bold',
+                                   fg=PAPER['ink'], bg=base,
+                                   wraplength=max(220, wrap - 32))
+                headline.pack(fill='x', pady=(2, 0))
+                self._report_labels.append(headline)
+            for item in combined.get('items') or []:
+                bullet = ui.text(card, '· ' + item, size=9, fg=PAPER['ink2'], bg=base,
+                                 wraplength=max(220, wrap - 40))
+                bullet.pack(fill='x', pady=(2, 0))
+                self._report_labels.append(bullet)
+            if combined.get('note'):
+                note = ui.text(card, combined['note'], size=8, fg=PAPER['ink3'], bg=base,
+                               wraplength=max(220, wrap - 32))
+                note.pack(fill='x', pady=(3, 0))
+                self._report_labels.append(note)
+
+        if pair.get('not_computed'):
+            boundary = ui.text(card, pair['not_computed'], size=8, fg=PAPER['ink3'],
+                               bg=base, wraplength=max(220, wrap - 32))
+            boundary.pack(fill='x', pady=(3, 0))
+            self._report_labels.append(boundary)
+
         if pair['studies']:
             self._card_heading(card, '研究观察（仅展示，不预测）', base)
             for study in pair['studies']:
@@ -675,14 +769,45 @@ class RegimenWorkspace(tk.Frame):
             ui.text(card, '本资料库未收录该组合的研究观察。', size=9, fg=PAPER['ink3'],
                     bg=base, wraplength=max(220, wrap - 32)).pack(fill='x', pady=(3, 0))
 
+        sections = [section for section in (pair.get('disclosure_sections') or [])
+                    if section.get('id') != 'combined_effect']
+        if sections:
+            self._card_heading(card, '详细披露（可展开）', base)
+            for section in sections:
+                disclosure = ui.Disclosure(card, section['title'], bg=base)
+                disclosure.pack(fill='x', pady=(2, 0))
+                body = disclosure.body
+                if section.get('body'):
+                    label = ui.text(body, section['body'], size=9, fg=PAPER['ink2'],
+                                    bg=base, wraplength=max(210, wrap - 56))
+                    label.pack(fill='x', pady=(2, 0))
+                    self._report_labels.append(label)
+                for item in section.get('items') or []:
+                    line = tk.Frame(body, bg=base)
+                    line.pack(fill='x', pady=(2, 0))
+                    text = ui.text(line, '· ' + item['text'], size=9, fg=PAPER['ink2'],
+                                   bg=base, wraplength=max(200, wrap - 70))
+                    text.pack(fill='x')
+                    self._report_labels.append(text)
+                    source = str(item.get('source') or '')
+                    if source.startswith('http'):
+                        ui.FlatButton(line, '打开来源 ↗', kind='link',
+                                      command=lambda url=source: webbrowser.open(url)).pack(
+                            anchor='w')
+                    elif source:
+                        source_label = ui.mono(line, '来源：' + source, size=7,
+                                               wraplength=max(200, wrap - 70))
+                        source_label.pack(anchor='w')
+                        self._report_labels.append(source_label)
+
         if pair['sources']:
             sources = tk.Frame(card, bg=base)
             sources.pack(fill='x', pady=(8, 0))
-            ui.eyebrow(sources, '来源链接', bg=base).pack(side='left')
+            ui.eyebrow(sources, '来源链接', bg=base).pack(anchor='w')
             for index, url in enumerate(pair['sources'], 1):
                 ui.FlatButton(sources, f'来源 {index} ↗', kind='link',
                               command=lambda target=url: webbrowser.open(target)).pack(
-                    side='left', padx=(8, 0))
+                    anchor='w', pady=(1, 0))
         else:
             ui.text(card, '来源链接：未记录。', size=8, fg=PAPER['ink3'],
                     bg=base).pack(anchor='w', pady=(8, 0))
@@ -739,9 +864,9 @@ class RegimenWorkspace(tk.Frame):
             row = tk.Frame(block, bg=PAPER['bgElevated'])
             row.pack(fill='x', pady=(2, 0))
             ui.text(row, label, size=9, weight='bold', fg=PAPER['ink'],
-                    bg=PAPER['bgElevated'], width=7).pack(side='left', anchor='n')
+                    bg=PAPER['bgElevated'], width=4).pack(side='left', anchor='n')
             text = ui.text(row, value, size=9, fg=PAPER['ink2'], bg=PAPER['bgElevated'],
-                           wraplength=max(220, wrap - 90))
+                           wraplength=max(180, wrap - 130))
             text.pack(side='left', fill='x', expand=True, padx=(8, 0))
             self._report_labels.append(text)
 

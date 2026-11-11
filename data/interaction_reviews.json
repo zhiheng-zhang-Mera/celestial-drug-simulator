@@ -1,0 +1,400 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-11-12",
+  "scope": "Curated label-level PD, mechanism and interaction disclosure notes for selected compounds. Label facts and mechanism inference only; not patient-specific advice and not a prediction of exposure, effect or risk.",
+  "drugs": {
+    "estradiol": {
+      "canonical_name": "雌二醇 / estradiol",
+      "aliases": [
+        "雌二醇",
+        "estradiol",
+        "17β-estradiol",
+        "戊酸雌二醇",
+        "戊酸雌二醇片",
+        "estradiol valerate"
+      ],
+      "alias_notes": {
+        "戊酸雌二醇": "戊酸雌二醇为雌二醇的酯类前药；本报告按 estradiol 归属检索标签与机制资料，不推断酯类特有的暴露或效应差异。",
+        "戊酸雌二醇片": "戊酸雌二醇为雌二醇的酯类前药；本报告按 estradiol 归属检索标签与机制资料，不推断酯类特有的暴露或效应差异。",
+        "estradiol valerate": "Estradiol valerate is an ester prodrug of estradiol; this report maps it to estradiol for label and mechanism lookup and does not infer ester-specific exposure or effect differences."
+      },
+      "drug_class": "estrogen",
+      "pd_target": "雌激素受体（ERα / ERβ）激动",
+      "pd_summary": "雌激素受体激动，增强雌激素信号与女性化表达。",
+      "pd_effects": [
+        "促进雌激素反应基因转录，影响乳腺、脂肪分布、皮肤及性器官等组织。",
+        "抑制破骨细胞活性、减少骨吸收，长期影响骨密度。",
+        "对下丘脑-垂体-性腺轴产生负反馈，可降低促性腺激素分泌。"
+      ],
+      "mechanism": "雌二醇与雌激素受体结合并激活受体，形成受体-配体复合物后调控雌激素反应基因；口服制剂经肝首过代谢，部分由 CYP3A4 代谢。",
+      "evidence_grade": "label_mechanism",
+      "evidence_grade_label": "说明书机制（未检索到本组合直接研究）",
+      "uncertainty": "口服雌二醇首过效应明显；戊酸雌二醇为酯类前药，按 estradiol 归属但不推断酯类特有差异；不同剂型与给药途径的暴露不可直接换算。",
+      "sources": [
+        {
+          "label": "DailyMed estradiol label",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bfc1beb9-1ade-446e-97dd-55b41c2fa851",
+          "section": "CLINICAL PHARMACOLOGY / Pharmacodynamics; Drug Interactions"
+        },
+        {
+          "label": "Mayo Clinic drug interactions (reference)",
+          "url": "https://www.mayoclinic.org/drugs-supplements/drug-interactions/art-20048005",
+          "section": "Drug interactions overview"
+        }
+      ]
+    },
+    "bicalutamide": {
+      "canonical_name": "比卡鲁胺 / bicalutamide",
+      "aliases": ["比卡鲁胺", "bicalutamide"],
+      "alias_notes": {},
+      "drug_class": "non-steroidal antiandrogen",
+      "pd_target": "雄激素受体（AR）拮抗",
+      "pd_summary": "雄激素受体拮抗，降低雄激素信号与男性化表达。",
+      "pd_effects": [
+        "竞争性阻断雄激素与 AR 结合，减少雄激素依赖基因转录。",
+        "可升高睾酮与促黄体生成素水平，部分患者出现男性乳房发育或乳房压痛。",
+        "对前列腺组织雄激素信号具有抑制作用。"
+      ],
+      "mechanism": "比卡鲁胺为手性非甾体抗雄激素，活性 R-对映体竞争性拮抗雄激素受体；在体外可抑制 CYP3A4。",
+      "evidence_grade": "label_mechanism",
+      "evidence_grade_label": "说明书机制（未检索到本组合直接研究）",
+      "uncertainty": "主要活性形式为 R-对映体；半衰期个体差异较大，肝功能可影响暴露；标签研究人群主要为前列腺癌男性，不能外推到所有人群或所有用途。",
+      "sources": [
+        {
+          "label": "DailyMed bicalutamide label",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7a08d88b-051a-4c16-9560-12685c500c58",
+          "section": "12.1 Mechanism of Action; 7 DRUG INTERACTIONS; 12.3 Pharmacokinetics"
+        },
+        {
+          "label": "Mayo Clinic bicalutamide (oral route)",
+          "url": "https://www.mayoclinic.org/drugs-supplements/bicalutamide-oral-route/description/drg-20072486",
+          "section": "Description and brand names; before using"
+        }
+      ]
+    }
+  },
+  "pairs": {
+    "estradiol+bicalutamide": {
+      "compounds": ["estradiol", "bicalutamide"],
+      "status": "mechanism_inference",
+      "evidence_grade": "mechanism_inference_no_direct_ddi_trial",
+      "evidence_grade_label": "机制推断 · 无该组合直接对照试验",
+      "summary": "机制推断：戊酸雌二醇（estradiol）增强雌激素受体信号，比卡鲁胺阻断雄激素受体信号；两者在性激素表达上方向相加，可能同时促进女性化并降低男性特征。雌二醇部分经 CYP3A4 代谢，而比卡鲁胺在体外抑制 CYP3A4，可能进一步影响雌二醇暴露。未检索到该组合的直接对照试验，不量化效应，也不作个体预测。",
+      "combined_effect": {
+        "headline": "同时促进女性化并降低男性特征",
+        "items": [
+          "雌激素受体激动：可能促进乳腺发育、脂肪分布改变等女性化表现。",
+          "雄激素受体拮抗：可能减少体毛、肌肉量、性欲及前列腺雄激素信号等男性化表现。",
+          "两药方向相加属于机制层面的预期；出现时间、幅度和可逆性未在本资料中量化。"
+        ],
+        "note": "以上为机制推断，不是对任何个体的疗效或不良反应预测，也不构成用药建议。"
+      },
+      "disclosure_sections": [
+        {
+          "id": "mechanism",
+          "title": "作用机制",
+          "body": "两种药物分别作用于雌激素受体和雄激素受体，方向相反地调节性激素表达；此外存在可能的 CYP3A4 相关药代相互作用。",
+          "items": [
+            {
+              "text": "雌二醇与 ERα/ERβ 结合并激活雌激素反应基因，增强雌激素信号。",
+              "source": "DailyMed estradiol label · CLINICAL PHARMACOLOGY"
+            },
+            {
+              "text": "比卡鲁胺的活性 R-对映体竞争性拮抗雄激素受体，降低雄激素信号。",
+              "source": "DailyMed bicalutamide label · 12.1 Mechanism of Action"
+            },
+            {
+              "text": "雌二醇部分经 CYP3A4 代谢；比卡鲁胺在体外抑制 CYP3A4，可能影响雌二醇暴露。",
+              "source": "DailyMed estradiol label · Drug Interactions；DailyMed bicalutamide label · 7 DRUG INTERACTIONS"
+            }
+          ]
+        },
+        {
+          "id": "combined_effect",
+          "title": "合用后可能效应",
+          "body": "机制层面，雌激素受体激动与雄激素受体拮抗的作用方向相加，可能同时促进女性化表达并降低男性特征。",
+          "items": [
+            {
+              "text": "女性化表达：乳腺、脂肪分布、皮肤及性器官等雌激素敏感组织可能发生变化。",
+              "source": "机制推断，基于两种药物标签机制"
+            },
+            {
+              "text": "男性特征减弱：体毛、肌肉量、性欲及前列腺雄激素信号等雄激素依赖表现可能减弱。",
+              "source": "机制推断，基于两种药物标签机制"
+            },
+            {
+              "text": "上述变化的时间进程、幅度和可逆性未量化，且存在明显个体差异。",
+              "source": "机制推断 · 不确定性"
+            }
+          ]
+        },
+        {
+          "id": "clinical_considerations",
+          "title": "临床考虑",
+          "body": "以下为标签警告与一般性监测要点，供阅读来源事实时参考；是否适用及如何处理须由具备资质的医生结合具体情境判断。",
+          "items": [
+            {
+              "text": "比卡鲁胺说明书适应症为前列腺癌，未批准用于女性；若用于性别肯定治疗，属于说明书外使用。",
+              "source": "DailyMed bicalutamide label · INDICATIONS AND USAGE / WARNINGS"
+            },
+            {
+              "text": "肝功能：比卡鲁胺可发生肝毒性甚至肝衰竭；雌二醇经肝代谢。合用时应关注肝功能。",
+              "source": "DailyMed bicalutamide label · WARNINGS；DailyMed estradiol label · CLINICAL PHARMACOLOGY"
+            },
+            {
+              "text": "血栓与心血管：雌激素治疗与静脉血栓栓塞、卒中及心血管事件风险相关，存在危险因素时风险更高。",
+              "source": "DailyMed estradiol label · BOXED WARNING / WARNINGS"
+            },
+            {
+              "text": "骨密度：雄激素剥夺与雌激素治疗均可能影响骨代谢；长期使用需评估骨健康。",
+              "source": "一般性监测建议（非说明书结论）"
+            },
+            {
+              "text": "性激素与血液学：比卡鲁胺可升高睾酮和 LH；雌激素可影响血红蛋白/血细胞比容。",
+              "source": "DailyMed bicalutamide label · CLINICAL PHARMACOLOGY；DailyMed estradiol label · WARNINGS"
+            },
+            {
+              "text": "乳腺与前列腺：比卡鲁胺可致男性乳房发育/压痛；雌激素可致乳房胀痛；前列腺癌患者应按说明书监测 PSA。",
+              "source": "DailyMed bicalutamide label · ADVERSE REACTIONS / INDICATIONS；DailyMed estradiol label · WARNINGS"
+            },
+            {
+              "text": "药物相互作用：比卡鲁胺抑制 CYP3A4，可能增加经 CYP3A4 代谢的雌二醇暴露。",
+              "source": "DailyMed bicalutamide label · 7 DRUG INTERACTIONS"
+            }
+          ]
+        },
+        {
+          "id": "monitoring",
+          "title": "需要监测项",
+          "body": "监测频率与项目应由具备资质的医生根据年龄、合并用药、肝功能和心血管风险决定。",
+          "items": [
+            {
+              "text": "肝功能：ALT、AST、胆红素。",
+              "source": "比卡鲁胺标签肝毒性警告"
+            },
+            {
+              "text": "血红蛋白 / 血细胞比容。",
+              "source": "雌激素标签警告；一般性监测建议"
+            },
+            {
+              "text": "睾酮、雌二醇、LH（如临床需要）。",
+              "source": "机制与标签药代/药效信息"
+            },
+            {
+              "text": "骨密度与骨折风险。",
+              "source": "一般性监测建议（非说明书结论）"
+            },
+            {
+              "text": "血栓与心血管风险因素、血压。",
+              "source": "雌激素标签警告；一般性监测建议"
+            },
+            {
+              "text": "乳腺/前列腺相关症状；前列腺癌患者按说明书监测 PSA。",
+              "source": "两种药物标签"
+            },
+            {
+              "text": "给药途径、剂量与依从性；不同雌二醇剂型不可直接换算。",
+              "source": "制剂与标签信息"
+            }
+          ]
+        },
+        {
+          "id": "evidence_sources",
+          "title": "证据等级与来源",
+          "body": "个体 PD：说明书机制。组合：机制推断，无该组合直接对照试验。药代相互作用：基于两种药物标签的 CYP3A4 机制信息，未在本组合中量化。",
+          "items": [
+            {
+              "text": "DailyMed estradiol label（CLINICAL PHARMACOLOGY / Drug Interactions）",
+              "source": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bfc1beb9-1ade-446e-97dd-55b41c2fa851"
+            },
+            {
+              "text": "DailyMed bicalutamide label（12.1 Mechanism of Action / 7 DRUG INTERACTIONS）",
+              "source": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7a08d88b-051a-4c16-9560-12685c500c58"
+            },
+            {
+              "text": "Mayo Clinic bicalutamide（oral route）",
+              "source": "https://www.mayoclinic.org/drugs-supplements/bicalutamide-oral-route/description/drg-20072486"
+            },
+            {
+              "text": "Mayo Clinic 药物相互作用总览（阅读参考）",
+              "source": "https://www.mayoclinic.org/drugs-supplements/drug-interactions/art-20048005"
+            }
+          ]
+        },
+        {
+          "id": "uncertainty",
+          "title": "不确定性与未计算声明",
+          "body": "本组合没有直接对照试验；PD 方向来自两种药物各自的标签机制，不能据此推断个体疗效、不良反应概率或停药/换药方案。CYP3A4 抑制对雌二醇暴露的影响未在本组合中量化。不同雌二醇剂型、剂量、给药途径及个体肝功能均可能改变暴露与效应。",
+          "items": [
+            {
+              "text": "未计算：个体暴露、效应大小、联合风险倍率、相互作用 AUC 倍率。",
+              "source": "本报告边界"
+            },
+            {
+              "text": "不构成：个体化处方、剂量调整、监测频率或超说明书用药建议。",
+              "source": "本报告边界"
+            }
+          ]
+        }
+      ],
+      "not_computed": "本组合为机制推断，无直接对照试验；未计算个体暴露、效应大小、联合风险倍率，也不提供剂量或监测频率建议。",
+      "uncertainty": "无该组合直接对照试验；PD 方向来自标签机制；幅度、时间进程和可逆性未知；未计算个体暴露、效应或风险。",
+      "sources": [
+        {
+          "label": "DailyMed estradiol label",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=bfc1beb9-1ade-446e-97dd-55b41c2fa851",
+          "section": "CLINICAL PHARMACOLOGY / Drug Interactions"
+        },
+        {
+          "label": "DailyMed bicalutamide label",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=7a08d88b-051a-4c16-9560-12685c500c58",
+          "section": "12.1 Mechanism of Action; 7 DRUG INTERACTIONS"
+        },
+        {
+          "label": "Mayo Clinic bicalutamide (oral route)",
+          "url": "https://www.mayoclinic.org/drugs-supplements/bicalutamide-oral-route/description/drg-20072486",
+          "section": "Description / before using"
+        },
+        {
+          "label": "Mayo Clinic drug interactions",
+          "url": "https://www.mayoclinic.org/drugs-supplements/drug-interactions/art-20048005",
+          "section": "Drug interactions overview"
+        }
+      ]
+    },
+    "fluconazole+midazolam": {
+      "compounds": ["fluconazole", "midazolam"],
+      "status": "label_ddi_study",
+      "evidence_grade": "label_ddi_study",
+      "evidence_grade_label": "说明书引用的健康受试者 DDI 研究",
+      "summary": "说明书研究观察：氟康唑抑制 CYP3A4，合用可使口服咪达唑仑暴露升高（研究观察 AUC 比率 3.59）。该数值是研究观察，不是当前方案预测；需关注镇静与呼吸抑制等临床考虑。",
+      "combined_effect": {
+        "headline": "咪达唑仑暴露可能升高",
+        "items": [
+          "氟康唑抑制 CYP3A4，可能减少咪达唑仑代谢。",
+          "说明书引用的研究观察到咪达唑仑 AUC 比率约为 3.59。",
+          "研究观察不代表当前方案或任何个体的预测值。"
+        ],
+        "note": "研究观察仅作外部参考；不量化当前方案，也不提供剂量建议。"
+      },
+      "disclosure_sections": [
+        {
+          "id": "mechanism",
+          "title": "作用机制",
+          "body": "氟康唑为 CYP3A4 抑制剂；咪达唑仑为 CYP3A4 底物，合用可能降低咪达唑仑清除。",
+          "items": [
+            {
+              "text": "氟康唑抑制 CYP3A4，可能减少经该酶代谢的咪达唑仑清除。",
+              "source": "DailyMed DIFLUCAN label · CLINICAL PHARMACOLOGY / Drug Interaction Studies"
+            },
+            {
+              "text": "说明书引用的研究观察：咪达唑仑 AUC 比率约 3.59（12 名志愿者，随机交叉）。",
+              "source": "DailyMed DIFLUCAN label · Drug Interaction Studies / Midazolam"
+            }
+          ]
+        },
+        {
+          "id": "combined_effect",
+          "title": "合用后可能效应",
+          "body": "机制层面，咪达唑仑暴露可能升高；临床可表现为镇静加深或呼吸抑制风险增加，但本资料未对当前方案作个体预测。",
+          "items": [
+            {
+              "text": "镇静/嗜睡可能增强。",
+              "source": "机制推断，基于 CYP3A4 抑制"
+            },
+            {
+              "text": "呼吸抑制风险可能随暴露升高而增加。",
+              "source": "机制推断；具体风险需结合剂量与临床情境"
+            }
+          ]
+        },
+        {
+          "id": "clinical_considerations",
+          "title": "临床考虑",
+          "body": "以下为说明书研究与一般性监测要点；具体处理须由具备资质的医生结合剂量、给药途径与患者状态判断。",
+          "items": [
+            {
+              "text": "说明书研究为单次口服咪达唑仑 7.5 mg 与氟康唑 400 mg 第 1 天、随后 200 mg/日的设计，不能直接外推到其他剂量或途径。",
+              "source": "DailyMed DIFLUCAN label · Drug Interaction Studies / Midazolam"
+            },
+            {
+              "text": "合用可能增强镇静与呼吸抑制；需评估气道、意识状态及合并使用其他中枢抑制剂的情况。",
+              "source": "机制推断；一般性监测建议"
+            },
+            {
+              "text": "氟康唑经肾排泄，肾功能不全时暴露可能改变；具体调整由医生根据说明书与临床情况决定。",
+              "source": "DailyMed DIFLUCAN label · CLINICAL PHARMACOLOGY"
+            },
+            {
+              "text": "氟康唑与其他 CYP3A4 底物或延长 QT 的药物合用时需另行评估。",
+              "source": "DailyMed DIFLUCAN label · DRUG INTERACTIONS / WARNINGS"
+            }
+          ]
+        },
+        {
+          "id": "monitoring",
+          "title": "需要监测项",
+          "body": "监测项目与频率应由具备资质的医生根据给药场景决定。",
+          "items": [
+            {
+              "text": "意识状态、镇静程度与呼吸频率/血氧。",
+              "source": "机制推断；一般性监测建议"
+            },
+            {
+              "text": "合并使用的中枢抑制剂、阿片类或其他镇静药物。",
+              "source": "一般性监测建议"
+            },
+            {
+              "text": "肾功能与氟康唑相关不良反应。",
+              "source": "DailyMed DIFLUCAN label"
+            }
+          ]
+        },
+        {
+          "id": "evidence_sources",
+          "title": "证据等级与来源",
+          "body": "该组合在目录中有说明书引用的健康受试者 DDI 研究观察；AUC 比率仅作为研究观察展示，不进入本方案预测。",
+          "items": [
+            {
+              "text": "DailyMed DIFLUCAN label（CLINICAL PHARMACOLOGY / Drug Interaction Studies / Midazolam）",
+              "source": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204"
+            },
+            {
+              "text": "Mayo Clinic drug interactions（阅读参考）",
+              "source": "https://www.mayoclinic.org/drugs-supplements/drug-interactions/art-20048005"
+            }
+          ]
+        },
+        {
+          "id": "uncertainty",
+          "title": "不确定性与未计算声明",
+          "body": "研究观察来自特定剂量、途径与人群，不能外推到所有情境；未计算当前方案的暴露、效应或风险倍率，也不提供剂量调整建议。",
+          "items": [
+            {
+              "text": "未计算：当前方案暴露、效应大小、联合风险倍率。",
+              "source": "本报告边界"
+            },
+            {
+              "text": "不构成：个体化处方、剂量调整或监测频率建议。",
+              "source": "本报告边界"
+            }
+          ]
+        }
+      ],
+      "not_computed": "研究观察不是当前方案预测；未计算个体暴露、效应大小或联合风险倍率。",
+      "uncertainty": "研究观察来自特定剂量、途径与人群；不能外推到其他情境；未计算当前方案暴露、效应或风险。",
+      "sources": [
+        {
+          "label": "DailyMed DIFLUCAN label",
+          "url": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=f694c617-3383-416c-91b6-b94fda371204",
+          "section": "CLINICAL PHARMACOLOGY / Drug Interaction Studies / Midazolam"
+        },
+        {
+          "label": "Mayo Clinic drug interactions",
+          "url": "https://www.mayoclinic.org/drugs-supplements/drug-interactions/art-20048005",
+          "section": "Drug interactions overview"
+        }
+      ]
+    }
+  }
+}
