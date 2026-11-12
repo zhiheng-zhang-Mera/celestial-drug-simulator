@@ -2,6 +2,8 @@
 
 Implementation update (2026-11-05): the feature branch contains a local multi-drug research UI, custom parameter scenarios, source-linked candidate records and fail-closed pair reporting. See [running and limitations](docs/RUNNING.md). The design below remains the broader target; real combination prediction and independent scientific validation are not complete.
 
+Packaging update (2026-11-12): the repository now ships its own complete per-user installer and host-wide single-instance guard. `./installer/Install.ps1 -CheckOnly` checks Python 3.12+/Tk and pip; `./installer/Install.ps1` installs to `%LOCALAPPDATA%\Celestial\Programs\Celestial-Drug-Simulator`, creates desktop/Start-menu shortcuts that target the installed `.venv\Scripts\pythonw.exe -m src.app` (never cmd/bat), and writes a dependency report. `-Uninstall` removes shortcuts and the install directory while keeping user data. A second launch focuses the existing window and exits with `CELESTIAL_ALREADY_RUNNING` (code 3); double-process evidence is produced by `./scripts/Test-SingleInstance.ps1`. See [installer/README.md](installer/README.md) and [installer/EVIDENCE.md](installer/EVIDENCE.md).
+
 > **循证治理的多药药代动力学 / 药效动力学机制模拟器**  
 > **Evidence-Governed Mechanistic Simulator for Multi-Drug Pharmacokinetic and Pharmacodynamic Interactions**
 

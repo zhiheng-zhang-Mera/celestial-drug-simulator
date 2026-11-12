@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "productId": "celestial-drug-simulator",
+  "displayName": "Celestial Drug Simulator",
+  "publisher": "Celestial",
+  "version": "1.0.0",
+  "entryPoint": ".venv\\Scripts\\pythonw.exe",
+  "entryArguments": "-m src.app",
+  "payloadRoot": ".",
+  "payloadIncludes": [
+    "src",
+    "assets",
+    "data",
+    "docs",
+    "README.md",
+    "celestial_single_instance.py"
+  ],
+  "payloadExcludes": [
+    "__pycache__",
+    "*.pyc",
+    "*.pyo",
+    "data/cache",
+    "data/reports",
+    "*.test.mjs"
+  ],
+  "installDirName": "Celestial-Drug-Simulator",
+  "python": {
+    "minVersion": "3.12",
+    "requiresTk": true,
+    "wingetId": "Python.Python.3.12",
+    "downloadUrl": "https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe"
+  },
+  "pipRequirements": "requirements.txt",
+  "requires": [
+    {
+      "kind": "python",
+      "minVersion": "3.12",
+      "requiresTk": true
+    },
+    {
+      "kind": "pip-requirements",
+      "note": "核心 Tk 工作流无必需第三方包；PySide6/numpy 为可选增强"
+    }
+  ],
+  "optionalChecks": [
+    {
+      "kind": "python-module",
+      "module": "PySide6",
+      "reason": "原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图"
+    },
+    {
+      "kind": "python-module",
+      "module": "numpy",
+      "reason": "tools/build_web_anatomy.py 构建期依赖；运行时不导入"
+    }
+  ],
+  "shortcut": {
+    "desktop": true,
+    "startMenu": true,
+    "name": "Celestial Drug Simulator",
+    "icon": ".venv\\Scripts\\pythonw.exe",
+    "workingDirectory": "."
+  },
+  "instanceTest": {
+    "launcher": "",
+    "module": "src.app",
+    "windowTitle": "Celestial Drug Simulator · 人体作用与证据",
+    "stateEnvVar": "",
+    "timeoutSeconds": 60
+  },
+  "entryCheck": {
+    "kind": "module",
+    "path": "src/app.py"
+  }
+}

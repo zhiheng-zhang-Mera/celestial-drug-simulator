@@ -1,0 +1,5 @@
+# Celestial Drug Simulator 核心 Tk 工作流无必需第三方 Python 包。
+# 运行时要求：Python 3.12+ 且包含 Tk（安装器负责检查/安装）。
+# 可选增强（不随默认安装下载，见 installer/README.md）：
+#   PySide6==6.12.0   # src/webview_host.py 原生嵌入解剖视图；缺失时回退简化视图
+#   numpy>=2.0        # tools/build_web_anatomy.py 构建期依赖

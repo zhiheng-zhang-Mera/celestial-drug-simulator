@@ -14,7 +14,7 @@ The JSON report includes entered parameters, gaps, all pairs, source records, sn
 
 The integration branch adds 药物模拟器 to both sidebar and galaxy through the shared navigation collection. The twelve existing destinations are preserved. The integration opens an independent local Python window; it is not an embedded or packaged Python runtime.
 
-Provide absolute paths in the Throne panel, or initialize them using `CELESTIAL_DRUG_PYTHON` and `CELESTIAL_DRUG_ROOT`. The launcher uses an argument list without a shell and Python isolated mode. No regimen or private data is sent to Throne, network services or an external model. The module remains open if Throne closes. No installer or executable distribution is included.
+Provide absolute paths in the Throne panel, or initialize them using `CELESTIAL_DRUG_PYTHON` and `CELESTIAL_DRUG_ROOT`. The launcher uses an argument list without a shell and Python isolated mode. No regimen or private data is sent to Throne, network services or an external model. The module remains open if Throne closes. A per-repository installer/executable distribution is now included: see `installer/README.md` (`Install.ps1 -CheckOnly`, install, `-Uninstall`) and `scripts/Test-SingleInstance.ps1`. The host-wide single instance guard is `celestial_single_instance.py`; a second launch focuses the existing window and exits with `CELESTIAL_ALREADY_RUNNING` (code 3).
 
 For local developer verification, existing `CELESTIAL_FINANCE_OFFLINE=1` now also allows this local module destination. It still suppresses runtime/device services; the UI retains its legacy finance-mode wording. A normal startup retains the original twelve enabled destinations plus the new one.
 

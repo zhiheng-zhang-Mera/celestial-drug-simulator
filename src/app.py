@@ -1,8 +1,17 @@
 """Celestial Drug Simulator desktop workspace with a clinical reading shell."""
 import os
+import sys
 import tkinter as tk
+from pathlib import Path
+
+try:
+    from celestial_single_instance import enforce_single_instance
+except ModuleNotFoundError:  # direct `python src/app.py` from the repository root
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from celestial_single_instance import enforce_single_instance
 
 DEFAULT_TITLE = 'Celestial Drug Simulator · 人体作用与证据'
+_INSTANCE_GUARD = None
 
 
 def window_title():
@@ -115,6 +124,10 @@ def build(window):
 
 
 def main():
+    global _INSTANCE_GUARD
+    # Host-wide single instance: the guard must be held for the whole UI lifetime.
+    _INSTANCE_GUARD = enforce_single_instance(
+        'celestial-drug-simulator', 'simulator', window_title())
     window = tk.Tk()
     build(window)
     window.mainloop()

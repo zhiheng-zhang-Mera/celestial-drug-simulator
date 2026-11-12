@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "productId": "celestial-drug-simulator",
+  "testedAt": "2026-11-12T12:26:51.4733304Z",
+  "scope": "global (production default, no --instance-scope)",
+  "programDataLock": "C:\\ProgramData\\Celestial\\locks\\celestial-drug-simulator.lock",
+  "first": {
+    "pid": 7264,
+    "windowReady": true,
+    "windowHandle": "0x290DC4",
+    "programDataLockExists": false
+  },
+  "second": {
+    "exitCode": 3,
+    "output": "CELESTIAL_ALREADY_RUNNING: celestial-drug-simulator is already running; the existing window was focused and this second launch exited.",
+    "containsMarker": true,
+    "firstStillAlive": true
+  },
+  "pass": true
+}

@@ -1,0 +1,619 @@
+{
+  "schemaVersion": 1,
+  "productId": "celestial-drug-simulator",
+  "verifiedAt": "2026-11-12T12:25:41.2400055Z",
+  "repository": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+  "python": "C:\\Python314\\python.exe",
+  "pythonVersion": "3.14.3",
+  "temporaryRoot": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+  "tests": {
+    "command": "C:\\Python314\\python.exe -B -m unittest discover -s tests",
+    "exitCode": 0,
+    "summary": "Ran 109 tests in 1.041s | OK"
+  },
+  "checkBeforeInstall": {
+    "command": "pwsh -NoProfile -File D:\\Celestrial-Throne\\repos\\drug-simulator\\installer\\Install.ps1 -CheckOnly -Root C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+    "exitCode": 0,
+    "outputTail": "[INFO] 可选检查 python-module: MISSING (venv 尚未创建；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图)\n[INFO] 可选检查 python-module: MISSING (venv 尚未创建；tools/build_web_anatomy.py 构建期依赖；运行时不导入)\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json\n[INFO] python             OK         C:\\Python314\\python.exe\n[INFO] python-tk          OK         tkinter 可导入\n[INFO] pip                OK         python -m pip 可用\n[INFO] venv               MISSING    安装时将创建 venv\n[INFO] pip-requirements   MISSING    安装时将创建 venv 并执行 pip install\n[INFO] payload            OK         D:\\Celestrial-Throne\\repos\\drug-simulator\n[INFO] 依赖检查通过；运行 Install.ps1 执行安装/修复",
+    "reportPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json",
+    "report": {
+      "schemaVersion": 1,
+      "productId": "celestial-drug-simulator",
+      "displayName": "Celestial Drug Simulator",
+      "version": "1.0.0",
+      "mode": "check",
+      "result": "OK",
+      "generatedAt": "2026-11-12T12:25:45.9431068Z",
+      "host": "MEGA-REP",
+      "root": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+      "installDir": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator",
+      "entryPoint": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "dependencies": [
+        {
+          "kind": "python",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "C:\\Python314\\python.exe",
+          "required": true
+        },
+        {
+          "kind": "python-tk",
+          "status": "OK",
+          "version": "Tk 3.14.3",
+          "detail": "tkinter 可导入",
+          "required": true
+        },
+        {
+          "kind": "pip",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "python -m pip 可用",
+          "required": true
+        },
+        {
+          "kind": "venv",
+          "status": "MISSING",
+          "version": "",
+          "detail": "安装时将创建 venv",
+          "required": true
+        },
+        {
+          "kind": "pip-requirements",
+          "status": "MISSING",
+          "version": "",
+          "detail": "安装时将创建 venv 并执行 pip install",
+          "required": true
+        },
+        {
+          "kind": "payload",
+          "status": "OK",
+          "version": "",
+          "detail": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+          "required": true
+        }
+      ],
+      "optionalChecks": [
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 尚未创建；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图",
+          "required": false
+        },
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 尚未创建；tools/build_web_anatomy.py 构建期依赖；运行时不导入",
+          "required": false
+        }
+      ],
+      "shortcuts": [],
+      "warnings": [],
+      "errors": []
+    }
+  },
+  "install": {
+    "command": "pwsh -NoProfile -File D:\\Celestrial-Throne\\repos\\drug-simulator\\installer\\Install.ps1 -Root C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4 -Force",
+    "exitCode": 0,
+    "outputTail": "[INFO] 安装 Celestial Drug Simulator 1.0.0 -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\n[INFO] payload 已复制（54 个文件）到 C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\n[INFO] 创建 venv: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\n[INFO] requirements 文件无第三方包；跳过 pip install（venv 已就绪）\n[INFO] 可选检查 python-module: MISSING (venv 内缺少 PySide6；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图)\n[INFO] 可选检查 python-module: MISSING (venv 内缺少 numpy；tools/build_web_anatomy.py 构建期依赖；运行时不导入)\n[INFO] 桌面快捷方式: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 开始菜单快捷方式: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json\n[INFO] 安装完成：C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\n[INFO] 快捷方式 desktop: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 快捷方式 startMenu: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app",
+    "installDir": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator",
+    "installDirExists": true,
+    "venvPythonExists": true,
+    "venvPythonwExists": true,
+    "entryPoint": ".venv\\Scripts\\pythonw.exe",
+    "entryArguments": "-m src.app",
+    "payloadFileCount": 55,
+    "receipt": {
+      "schemaVersion": 1,
+      "productId": "celestial-drug-simulator",
+      "version": "1.0.0",
+      "generatedAt": "2026-11-12T12:25:50.388005Z",
+      "files": [
+        {
+          "path": "assets\\anatomy\\ATTRIBUTION.md",
+          "sha256": "7e09f157ce87d5afa491c1e29b0e56c8ce227cb1c8a9cd7c6135e90aa519170b",
+          "bytes": 2651
+        },
+        {
+          "path": "assets\\anatomy\\bodyparts3d.json",
+          "sha256": "32a6dff285793571bc4f48a9d823086c265e33af33bf84d1b84b30efb05e6cfc",
+          "bytes": 690957
+        },
+        {
+          "path": "assets\\anatomy\\LICENSE-BodyParts3D.txt",
+          "sha256": "0e26340c8fadac4a0478d23dd12f4cb20b4043c436d0ab95eacb062391a7ec84",
+          "bytes": 715
+        },
+        {
+          "path": "assets\\reference\\doubao_html_20261105_155000.html",
+          "sha256": "b3a4aabd2a43cb255c745d9934115b2933041c6bdc432d93a4eb2ebcd409a03f",
+          "bytes": 24143
+        },
+        {
+          "path": "assets\\web\\ATTRIBUTION.md",
+          "sha256": "dda76c967a00dce5a369fa47f9c1e4fc14b11ff6d59bf513e2c84164a4e5632e",
+          "bytes": 4849
+        },
+        {
+          "path": "assets\\web\\bridge.mjs",
+          "sha256": "72c708bea2bd7e0ef0ef7ae1f29b58a449971726b7cc4407b929f5fe0682918d",
+          "bytes": 15233
+        },
+        {
+          "path": "assets\\web\\data\\bodyparts3d.json",
+          "sha256": "32a6dff285793571bc4f48a9d823086c265e33af33bf84d1b84b30efb05e6cfc",
+          "bytes": 690957
+        },
+        {
+          "path": "assets\\web\\data\\bodyparts3d.mjs",
+          "sha256": "937d797a99c4d56ea100180d93538aa903d39ef483d96977a283ed585e9c8c9b",
+          "bytes": 2500279
+        },
+        {
+          "path": "assets\\web\\index.html",
+          "sha256": "a9d2773522a95f0960be1924529826fd76057da74fc108919ded5c4c76ea2661",
+          "bytes": 18915
+        },
+        {
+          "path": "assets\\web\\interaction.mjs",
+          "sha256": "2b7b3c3043f6919e14a6bcf9d1a1c534e919954e5cb1896572df3029035bc15f",
+          "bytes": 1646
+        },
+        {
+          "path": "assets\\web\\scene.mjs",
+          "sha256": "b6418770ecf7ed48d28f035f59d59e5b771352f5a15a31bf64b79ce86f989204",
+          "bytes": 29421
+        },
+        {
+          "path": "assets\\web\\vendor\\OrbitControls.js",
+          "sha256": "61b1f6c8a13552b8ec666b5723bea1951bd110f3ed3767a37d041304389992b2",
+          "bytes": 32268
+        },
+        {
+          "path": "assets\\web\\vendor\\THREE-LICENSE.txt",
+          "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454",
+          "bytes": 1081
+        },
+        {
+          "path": "assets\\web\\vendor\\three.module.min.js",
+          "sha256": "6c2bfdf07626404916f34aef8cf57992926d849526bc6eb4556da96a3ba4e78c",
+          "bytes": 674422
+        },
+        {
+          "path": "celestial_single_instance.py",
+          "sha256": "708a86552e121cb84568755f9c835bf30414f8b2d9b37e8abccbd875db2b2b62",
+          "bytes": 12428
+        },
+        {
+          "path": "data\\catalog.json",
+          "sha256": "9b9b1ce2770550d20c1051299764ff4df384147a99f18a4e152f70556ddcfb9d",
+          "bytes": 3533
+        },
+        {
+          "path": "data\\drug_profiles.json",
+          "sha256": "c1088b583b7dd506d94b340ee8ba33c259c4e0556ca53423cfcf5b5976e8faab",
+          "bytes": 4406
+        },
+        {
+          "path": "data\\interaction_reviews.json",
+          "sha256": "a7df6e28cb08bf93576703865a3e791f77647cc68c26fdc124a141e3df1a5f9e",
+          "bytes": 21443
+        },
+        {
+          "path": "data\\pharmacopoeia\\index.json",
+          "sha256": "3ba033f471a61ee01d6d978c7f5639bf03ca3eac1656dd0ac561aaa4e9baa88c",
+          "bytes": 3542
+        },
+        {
+          "path": "docs\\BODY_UI_FIGMA.md",
+          "sha256": "1d78110c8fc424240e68f3438abefbd773494ad2b95af76fe5459bcb1e3dd2f4",
+          "bytes": 7924
+        },
+        {
+          "path": "docs\\CONTEXT_EXTENSION.md",
+          "sha256": "3c2469d351dca941cfd71c68d1b31430570e16ee82b08fa2b6158cbf53dc7dd4",
+          "bytes": 3327
+        },
+        {
+          "path": "docs\\DRUG_LIBRARY.md",
+          "sha256": "58430d793e092ac5c557107028595cc32c0415d79eac0eef1e2c8b5d1eb9b44d",
+          "bytes": 7053
+        },
+        {
+          "path": "docs\\HTML_EMBEDDING.md",
+          "sha256": "7a3f2a81c2f24cc19233842756c419f2cc8450fe5afc3297e6dd122d7385fac7",
+          "bytes": 6251
+        },
+        {
+          "path": "docs\\LIVE_PGX.md",
+          "sha256": "dce4046a83a95e5f8bca30c5c3fab3998062514e25da02c6217167b3879ac6cb",
+          "bytes": 3140
+        },
+        {
+          "path": "docs\\RUNNING.md",
+          "sha256": "045d9b12a5343b60e88d6d9513df7b783d05018c5ef0455aa69d3d7fe01cb596",
+          "bytes": 4776
+        },
+        {
+          "path": "docs\\superpowers\\plans\\2026-11-05-body-ui.md",
+          "sha256": "df8d224ce1740a645b423d05c73e1880bf222db6e81c32638e667905f152e56b",
+          "bytes": 1877
+        },
+        {
+          "path": "docs\\superpowers\\plans\\2026-11-05-html-anatomy.md",
+          "sha256": "883d447fa2b987672c4d3d38632d49c84f19266b06a2e79602d08b3e43bd4217",
+          "bytes": 2892
+        },
+        {
+          "path": "docs\\superpowers\\plans\\2026-11-05-live-pgx.md",
+          "sha256": "748f8b31dfafef34a1873ae0ae284290399481690f090ad38eef1ad8453cb668",
+          "bytes": 2399
+        },
+        {
+          "path": "docs\\superpowers\\plans\\2026-11-05-multi-drug.md",
+          "sha256": "684ca1b2b898e9ab1479a351a4f6c840f2cee2af65c40db62b7aa2556521e200",
+          "bytes": 2366
+        },
+        {
+          "path": "docs\\superpowers\\plans\\2026-11-05-open-anatomy.md",
+          "sha256": "400bd68ed688ab32aeb3d2b6660e14180c85402731bd6a83b6a44b8f3373714f",
+          "bytes": 2037
+        },
+        {
+          "path": "docs\\superpowers\\plans\\2026-11-05-regimen-defaults.md",
+          "sha256": "5320c936865d43745be65c34cfc3ac0e55dfe210008a0911bdac0ceed3b10fb4",
+          "bytes": 2223
+        },
+        {
+          "path": "README.md",
+          "sha256": "f758bf0fc56682693e79f111f20338a2a770f0759113fccb41ab9af6e230af5e",
+          "bytes": 44011
+        },
+        {
+          "path": "src\\anatomy_atlas.py",
+          "sha256": "6a0f826dc30dd2eef6b2c4106560bef98655b5dfc0a0222d0b5f5bf750fcef20",
+          "bytes": 2918
+        },
+        {
+          "path": "src\\anatomy_mesh.py",
+          "sha256": "758cd1a2be4c2404c897db62349831e1e7e34fc890c42fbe88757069e5c75ff4",
+          "bytes": 2539
+        },
+        {
+          "path": "src\\anatomy.py",
+          "sha256": "15db74cecb7f6bc0214814b25ca2bc73ef9e447adf78f87cbcdab1543e3a5cb9",
+          "bytes": 4382
+        },
+        {
+          "path": "src\\app.py",
+          "sha256": "1b4e521ef4e731117ada93ea5c9e5e3a55a0d63b17264418349ac1ec9c9d7152",
+          "bytes": 6151
+        },
+        {
+          "path": "src\\body_canvas.py",
+          "sha256": "05b4cd47e91473eda6e11137757abaea0a23d357a1452296e54608693ffd63b0",
+          "bytes": 5004
+        },
+        {
+          "path": "src\\body_ui.py",
+          "sha256": "63f373e2c4eb18d0701a726f7908b531ed10907d1f6bebadfde3a383fb3e4e13",
+          "bytes": 19541
+        },
+        {
+          "path": "src\\context_dialog.py",
+          "sha256": "e4d3cc9ecaf5efc1315e13d57b9954f6cc3e3b43953219a5ee5a201661846587",
+          "bytes": 8649
+        },
+        {
+          "path": "src\\context.py",
+          "sha256": "762a079f25a4e24a19ee30f574ab7561cb7321c1a1904a64db75f00aebb32a3f",
+          "bytes": 3405
+        },
+        {
+          "path": "src\\drug_library.py",
+          "sha256": "85d11bc443a5a9b05f4bcc8db804a80c48aa2df3e7b16a7e9cbe7f6d154e7933",
+          "bytes": 16573
+        },
+        {
+          "path": "src\\exposure.py",
+          "sha256": "83062c1d7365f263a38f4b2332f10d11ad05d8b2a9b8886df11bfdf2cc2946bf",
+          "bytes": 1921
+        },
+        {
+          "path": "src\\navigation.py",
+          "sha256": "5112231d481c4b3a8b43742a118b36511b727429e280def40753d2010e9af1e9",
+          "bytes": 2339
+        },
+        {
+          "path": "src\\pgx_dialog.py",
+          "sha256": "844ec41c8b17f8d59c273eb6848fd151e9089e835be48582c24c36d6139fd155",
+          "bytes": 6620
+        },
+        {
+          "path": "src\\pgx.py",
+          "sha256": "739d3f0c9fdc4c12a006a5ecfdd7e5f83fd5efc8d8ca2f4dd31b26d31b5e7c43",
+          "bytes": 3942
+        },
+        {
+          "path": "src\\pharmacopoeia.py",
+          "sha256": "dfce3a7d89eae715828bb2bb58f3ab5465b97a2cf0e0c2886896021ca16c95b6",
+          "bytes": 12212
+        },
+        {
+          "path": "src\\regimen_ui.py",
+          "sha256": "47ef707d9b18b8d1fcf52d64b6b7d40ace5c2a457c103c9da597b00f2bb1d7a5",
+          "bytes": 49681
+        },
+        {
+          "path": "src\\report_model.py",
+          "sha256": "c62a44a484ff288c5f777a37fdccd2b6ab50872756197a15276f407910f17138",
+          "bytes": 21826
+        },
+        {
+          "path": "src\\simulation.py",
+          "sha256": "eb2f185da634cd35a73b9f2c71c6d9c5a12f90d6b6c297b911ff09da3abafc01",
+          "bytes": 7259
+        },
+        {
+          "path": "src\\sources.py",
+          "sha256": "533e30d074f08ed4cc301aeaed52382300f62102f7817d0cfb96f334224bdfbc",
+          "bytes": 5895
+        },
+        {
+          "path": "src\\ui_theme.py",
+          "sha256": "2055f19238cdcd443843499058445a6ad735242f20cdc16247a68c38aaf8652f",
+          "bytes": 17855
+        },
+        {
+          "path": "src\\web_anatomy.py",
+          "sha256": "cf3407d2575f39f015094aa0985b4119fcd5c18355ca0a0e66981bb414deb9fc",
+          "bytes": 1703
+        },
+        {
+          "path": "src\\web_body.py",
+          "sha256": "af45e52900da9bb1bc82fd9aac42116c40c9d27ad301846666d2007b6f87c596",
+          "bytes": 5771
+        },
+        {
+          "path": "src\\webview_host.py",
+          "sha256": "95f6b872540cbb6aec6b52fdd70d0a64e96682e3364c36f3d1ed933f47866fa7",
+          "bytes": 6422
+        }
+      ]
+    },
+    "dependencyReportPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json",
+    "dependencyReport": {
+      "schemaVersion": 1,
+      "productId": "celestial-drug-simulator",
+      "displayName": "Celestial Drug Simulator",
+      "version": "1.0.0",
+      "mode": "install",
+      "result": "OK",
+      "generatedAt": "2026-11-12T12:26:12.0878872Z",
+      "host": "MEGA-REP",
+      "root": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+      "installDir": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator",
+      "entryPoint": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "dependencies": [
+        {
+          "kind": "payload",
+          "status": "OK",
+          "version": "",
+          "detail": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+          "required": true
+        },
+        {
+          "kind": "python",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "C:\\Python314\\python.exe",
+          "required": true
+        },
+        {
+          "kind": "python-tk",
+          "status": "OK",
+          "version": "",
+          "detail": "Tk 3.14.3",
+          "required": true
+        },
+        {
+          "kind": "pip",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "python -m pip",
+          "required": true
+        },
+        {
+          "kind": "venv",
+          "status": "INSTALLED",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv",
+          "required": true
+        },
+        {
+          "kind": "pip-requirements",
+          "status": "INSTALLED",
+          "version": "",
+          "detail": "pip check 通过",
+          "required": true
+        }
+      ],
+      "optionalChecks": [
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 内缺少 PySide6；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图",
+          "required": false
+        },
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 内缺少 numpy；tools/build_web_anatomy.py 构建期依赖；运行时不导入",
+          "required": false
+        }
+      ],
+      "shortcuts": [
+        {
+          "path": "D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk",
+          "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+          "arguments": "-m src.app",
+          "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.",
+          "iconLocation": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe,0",
+          "scope": "desktop"
+        },
+        {
+          "path": "C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk",
+          "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+          "arguments": "-m src.app",
+          "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.",
+          "iconLocation": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe,0",
+          "scope": "startMenu"
+        }
+      ],
+      "warnings": [],
+      "errors": []
+    },
+    "desktopShortcut": {
+      "path": "D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk",
+      "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "arguments": "-m src.app",
+      "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.",
+      "targetExists": true,
+      "targetIsExe": true,
+      "pointsAtCmdOrBat": false
+    },
+    "startMenuShortcut": {
+      "path": "C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk",
+      "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "arguments": "-m src.app",
+      "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.",
+      "targetExists": true,
+      "targetIsExe": true,
+      "pointsAtCmdOrBat": false
+    }
+  },
+  "checkAfterInstall": {
+    "exitCode": 0,
+    "outputTail": "[INFO] 可选检查 python-module: MISSING (venv 内缺少 PySide6；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图)\n[INFO] 可选检查 python-module: MISSING (venv 内缺少 numpy；tools/build_web_anatomy.py 构建期依赖；运行时不导入)\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json\n[INFO] python             OK         C:\\Python314\\python.exe\n[INFO] python-tk          OK         tkinter 可导入\n[INFO] pip                OK         python -m pip 可用\n[INFO] venv               OK         C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\n[INFO] pip-requirements   OK         C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\python.exe\n[INFO] payload            OK         D:\\Celestrial-Throne\\repos\\drug-simulator\n[INFO] 依赖检查通过；运行 Install.ps1 执行安装/修复",
+    "report": {
+      "schemaVersion": 1,
+      "productId": "celestial-drug-simulator",
+      "displayName": "Celestial Drug Simulator",
+      "version": "1.0.0",
+      "mode": "check",
+      "result": "OK",
+      "generatedAt": "2026-11-12T12:26:27.0469821Z",
+      "host": "MEGA-REP",
+      "root": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+      "installDir": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator",
+      "entryPoint": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "dependencies": [
+        {
+          "kind": "python",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "C:\\Python314\\python.exe",
+          "required": true
+        },
+        {
+          "kind": "python-tk",
+          "status": "OK",
+          "version": "Tk 3.14.3",
+          "detail": "tkinter 可导入",
+          "required": true
+        },
+        {
+          "kind": "pip",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "python -m pip 可用",
+          "required": true
+        },
+        {
+          "kind": "venv",
+          "status": "OK",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv",
+          "required": true
+        },
+        {
+          "kind": "pip-requirements",
+          "status": "OK",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\python.exe",
+          "required": true
+        },
+        {
+          "kind": "payload",
+          "status": "OK",
+          "version": "",
+          "detail": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+          "required": true
+        }
+      ],
+      "optionalChecks": [
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 内缺少 PySide6；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图",
+          "required": false
+        },
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 内缺少 numpy；tools/build_web_anatomy.py 构建期依赖；运行时不导入",
+          "required": false
+        }
+      ],
+      "shortcuts": [
+        {
+          "scope": "desktop",
+          "path": "D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk",
+          "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+          "arguments": "-m src.app",
+          "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\."
+        },
+        {
+          "scope": "startMenu",
+          "path": "C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk",
+          "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+          "arguments": "-m src.app",
+          "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\."
+        }
+      ],
+      "warnings": [],
+      "errors": []
+    }
+  },
+  "idempotentReinstall": {
+    "command": "pwsh -NoProfile -File D:\\Celestrial-Throne\\repos\\drug-simulator\\installer\\Install.ps1 -Root C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+    "exitCode": 0,
+    "targetPathUnchanged": true,
+    "argumentsUnchanged": true,
+    "outputTail": "[INFO] 桌面快捷方式: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 开始菜单快捷方式: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json\n[INFO] 安装完成：C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\n[INFO] 快捷方式 desktop: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 快捷方式 startMenu: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app"
+  },
+  "installedLaunch": {
+    "target": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+    "arguments": "-m src.app",
+    "pid": 33620,
+    "windowHandle": "0x2B0DC0",
+    "windowFound": true,
+    "processAlive": true
+  },
+  "uninstall": {
+    "command": "pwsh -NoProfile -File D:\\Celestrial-Throne\\repos\\drug-simulator\\installer\\Install.ps1 -Uninstall -Root C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4",
+    "exitCode": 0,
+    "desktopShortcutRemoved": true,
+    "startMenuShortcutRemoved": true,
+    "installDirRemoved": true,
+    "outputTail": "[INFO] 已删除快捷方式: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk\n[INFO] 已删除快捷方式: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk\n[INFO] 已删除安装目录: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\Programs\\Celestial-Drug-Simulator（用户数据目录保留）\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-celestial-drug-simulator-0b932d935aea4a188aa049b0df2a9fd4\\installers\\celestial-drug-simulator.json"
+  },
+  "failurePath": {
+    "command": "pwsh -NoProfile -File C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-broken-ad504eecb02d4bea8087778d35846368\\installer\\Install.ps1 -Root C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-broken-root-163b5fe455de412586c4d719f28a9395 -Force",
+    "removedPayloadItem": "src\\app.py",
+    "exitCode": 2,
+    "desktopShortcutCreated": false,
+    "startMenuShortcutCreated": false,
+    "reportResult": "FAILED",
+    "outputTail": "[INFO] 安装 Celestial Drug Simulator 1.0.0 -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-broken-root-163b5fe455de412586c4d719f28a9395\\Programs\\Celestial-Drug-Simulator\n[FAILED] payload 缺失: src/app.py；请确认仓库 checkout 完整\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-verify-broken-root-163b5fe455de412586c4d719f28a9395\\installers\\celestial-drug-simulator.json"
+  }
+}
