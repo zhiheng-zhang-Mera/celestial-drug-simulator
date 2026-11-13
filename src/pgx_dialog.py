@@ -7,8 +7,24 @@ import webbrowser
 
 from src import ui_theme as ui
 
+try:
+    from celestial_help import attach_help
+except ModuleNotFoundError:  # direct `python src/...` execution from the repository root
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from celestial_help import attach_help
+
 PAPER = ui.PAPER
 DIPLOTYPES = ('*1/*1', '*1/*4', '*4/*4')
+HELP_TEXTS = {
+    'pgx': (
+        '这里展示来源快照与 CYP2D6 条件化研究估计：输入体重、年龄、单次剂量与基因双倍型，'
+        '全部在本机计算，不读取主方案、不上传。结果为群体参数下的研究估计，不是个人实测、'
+        '剂量推荐或临床结论；「更新来源」会联网抓取公开资料，只用于本机缓存。'
+    ),
+}
 
 
 def open_pgx(parent):
@@ -24,8 +40,12 @@ def open_pgx(parent):
     body.pack(fill='both', expand=True)
 
     ui.eyebrow(body, '独立研究场景').pack(anchor='w')
-    ui.text(body, '阿托莫西汀 · CYP2D6 · 条件化研究估计', size=15, weight='bold').pack(
-        anchor='w', pady=(4, 2))
+    title_row = tk.Frame(body, bg=PAPER['bg'])
+    title_row.pack(fill='x', pady=(4, 0))
+    ui.text(title_row, '阿托莫西汀 · CYP2D6 · 条件化研究估计', size=15, weight='bold').pack(
+        side='left')
+    attach_help(title_row, 'pgx', HELP_TEXTS['pgx'],
+                title='来源与基因估计').pack(side='left', padx=(8, 0))
     ui.text(body, '不读取主方案；群体参数不是个人实测，不提供用药建议。', size=9,
             fg=PAPER['ink3']).pack(anchor='w')
 

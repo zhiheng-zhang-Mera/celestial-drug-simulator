@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "productId": "celestial-drug-simulator",
+  "displayName": "Celestial Drug Simulator",
+  "lockMode": "mutex",
+  "testedAt": "2026-11-13T05:08:47.9694269Z",
+  "repository": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+  "python": "C:\\Python314\\python.exe",
+  "pythonVersion": "3.14.3",
+  "instanceScope": "state",
+  "stateRoot": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-instance-41b7d76f7a5146d0ac653057cee67f01",
+  "windowTitle": "Celestial Drug Simulator · 人体作用与证据",
+  "first": {
+    "pid": 38996,
+    "windowHandle": "0x1250C12",
+    "windowReady": true,
+    "aliveAfterSecond": true
+  },
+  "second": {
+    "command": "C:\\Python314\\python.exe -B -m src.app --instance-scope=state",
+    "exitCode": 3,
+    "elapsedSeconds": 0.49,
+    "output": "CELESTIAL_ALREADY_RUNNING: celestial-drug-simulator is already running; the existing window was focused and this second launch exited.",
+    "containsAlreadyRunningMarker": true
+  },
+  "third": {
+    "pid": 41304,
+    "windowHandle": "0x790022",
+    "windowReady": true
+  },
+  "checks": {
+    "firstReady": true,
+    "secondExitCodeIsThree": true,
+    "secondPrintsAlreadyRunning": true,
+    "firstStillAlive": true,
+    "lockReleasedAfterExit": true
+  },
+  "pass": true,
+  "notes": []
+}

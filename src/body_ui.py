@@ -14,11 +14,41 @@ from src.web_body import WebBody
 from src import pharmacopoeia
 from src import ui_theme as ui
 
+try:
+    from celestial_help import attach_help
+except ModuleNotFoundError:  # direct `python src/...` execution from the repository root
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from celestial_help import attach_help
+
 PAPER = ui.PAPER
 INK = ui.INK
 SUPPORTED_SUBSTANCES = (('atomoxetine', '阿托莫西汀 / atomoxetine'),)
 SOURCE_NAMES = {'mayoclinic.org': 'Mayo Clinic', 'dailymed.nlm.nih.gov': 'DailyMed / NLM',
                 'api.fda.gov': 'openFDA', 'cpicpgx.org': 'CPIC'}
+HELP_TEXTS = {
+    'search': (
+        '在这里输入或选择要查看的药物物质。默认只在本机药典与来源缓存中匹配，不联网；'
+        '输入中文或英文名均可。选中后「人体作用」页会显示该物质的证据关联，右侧阅读区同步更新。'
+        '只有点击「Mayo 更新」时才会把药物名称发送到 mayoclinic.org。'
+    ),
+    'body': (
+        '这是本机渲染的人体示意图与器官/肌肉网格，用于定位证据关联，不是诊断或影像。'
+        '点击器官、系统或肌肉切换右侧证据；所有渲染资源都在本机，不加载 CDN 或外部模型。'
+        '没有真实网格的部位会明确标注为示意图或不含骨骼。'
+    ),
+    'evidence': (
+        '这里显示所选区域的证据阅读结果：来源、机制/代谢/排泄关联、置信与缺口。'
+        '证据来自随程序提供的来源事实与本地缓存，不代表临床结论；缺失证据会明确显示为未知，'
+        '不会自动推断「无相互作用」。'
+    ),
+    'mayo': (
+        '「Mayo 更新」会打开外部网站查询并只发送药物名称；「打开 Mayo 搜索」只启动本机浏览器。'
+        '结果写入本机 data/cache，供后续离线使用；不会上传方案、生理或基因数据，也不自动下载模型。'
+    ),
+}
 
 
 def apply_theme(root):
@@ -78,6 +108,8 @@ class AnatomyWorkspace(tk.Frame):
         self.combo.bind('<KeyRelease>', self._filter_substances)
         self.combo.bind('<<ComboboxSelected>>', self._choose_substance)
         self.combo.bind('<Return>', self._choose_substance)
+        attach_help(bar, 'search', HELP_TEXTS['search'],
+                    title='物质检索').pack(side='left', padx=(0, 10))
 
         def use_regimen():
             item = get_selected()
@@ -102,6 +134,8 @@ class AnatomyWorkspace(tk.Frame):
         self.mayo_button.pack(side='right', padx=(8, 0))
         ui.FlatButton(status_row, '打开 Mayo 搜索', kind='quiet',
                       command=self.open_mayo).pack(side='right')
+        attach_help(status_row, 'mayo', HELP_TEXTS['mayo'],
+                    title='Mayo 查询边界').pack(side='right', padx=(0, 8))
         ui.hairline(toolbar).pack(fill='x')
 
     def _filter_substances(self, event):
@@ -196,6 +230,8 @@ class AnatomyWorkspace(tk.Frame):
         self.stage_title = tk.StringVar()
         tk.Label(header, textvariable=self.stage_title, font=(ui.FONT, 9, 'bold'),
                  fg=INK['ink2'], bg=INK['bg']).pack(side='left')
+        attach_help(header, 'body', HELP_TEXTS['body'],
+                    title='人体作用视图').pack(side='left', padx=(8, 0))
         ui.text(header, '点击器官或系统切换证据', size=9, fg=INK['ink3'],
                 bg=INK['bg']).pack(side='right')
         ui.hairline(stage, colour=INK['line']).grid(row=2, column=0, sticky='ew')
@@ -227,6 +263,8 @@ class AnatomyWorkspace(tk.Frame):
                                       state='readonly', style='Paper.TCombobox')
         self.directory.grid(row=0, column=1, sticky='e')
         self.directory.bind('<<ComboboxSelected>>', self._directory_chosen)
+        attach_help(top, 'evidence', HELP_TEXTS['evidence'],
+                    title='证据阅读').grid(row=0, column=2, sticky='e', padx=(6, 0))
         self.heading = tk.StringVar()
         tk.Label(top, textvariable=self.heading, font=(ui.FONT, 19, 'bold'),
                  fg=PAPER['ink'], bg=PAPER['surface'], anchor='w').grid(

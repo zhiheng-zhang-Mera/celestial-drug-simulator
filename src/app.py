@@ -6,12 +6,28 @@ from pathlib import Path
 
 try:
     from celestial_single_instance import enforce_single_instance
+    from celestial_branding import apply_window_icon
+    from celestial_help import attach_help
 except ModuleNotFoundError:  # direct `python src/app.py` from the repository root
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     from celestial_single_instance import enforce_single_instance
+    from celestial_branding import apply_window_icon
+    from celestial_help import attach_help
 
 DEFAULT_TITLE = 'Celestial Drug Simulator · 人体作用与证据'
 _INSTANCE_GUARD = None
+
+HELP_TEXTS = {
+    'data-status': (
+        '这里显示本地资料与在线查询的当前状态。默认使用随程序提供的本地药典与来源事实；'
+        '只有你点击「Mayo 更新」时，药物名称才会发送到 mayoclinic.org（外部网站），不会发送'
+        '方案、生理或基因数据。状态文字只反映本机缓存/在线结果，不代表临床结论。'
+    ),
+    'nav': (
+        '两个页面分别是「人体作用」与「多药方案 / 联用机制」。切换只改变本机界面，不联网、'
+        '不提交数据；选中物质或方案会在两个页面间共享，但不会上传到任何服务。'
+    ),
+}
 
 
 def window_title():
@@ -27,6 +43,7 @@ def build(window):
     from src.navigation import SegmentedNav
     from src.simulation import load_catalog
 
+    window._celestial_branding = apply_window_icon(window, 'celestial-drug-simulator')
     window.title(window_title())
     window.geometry('1440x900')
     window.minsize(1024, 720)
@@ -61,6 +78,8 @@ def build(window):
              bg=palette['bgElevated']).pack(side='left')
     tk.Label(right, textvariable=data_var, font=(ui.FONT, 9), fg=palette['ink2'],
              bg=palette['bgElevated']).pack(side='left', padx=(4, 0))
+    attach_help(right, 'data-status', HELP_TEXTS['data-status'],
+                title='资料与在线状态').pack(side='left', padx=(8, 0))
     ui.hairline(window).pack(fill='x')
 
     # ------------------------------------------------------------ navigation
@@ -70,6 +89,8 @@ def build(window):
     nav.pack(side='left')
     nav.add('body', '人体作用')
     nav.add('regimen', '多药方案 / 联用机制')
+    attach_help(nav_row, 'nav', HELP_TEXTS['nav'],
+                title='页面切换').pack(side='left', padx=(8, 0))
     ui.text(nav_row, '本机数据 · 研究记录，不构成医学建议', size=8,
             fg=palette['ink3']).pack(side='right', pady=6)
 

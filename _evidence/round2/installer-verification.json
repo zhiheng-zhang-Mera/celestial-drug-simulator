@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "productId": "celestial-drug-simulator",
+  "verifiedAt": "2026-11-13T05:07:25.9207256Z",
+  "repository": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+  "temporaryRoot": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41",
+  "checks": {
+    "checkOnlyExit0": true,
+    "installExit0": true,
+    "iconCopied": true,
+    "registrationExists": true,
+    "receiptExists": true,
+    "registrationFields": true,
+    "desktopShortcutExists": true,
+    "startMenuShortcutExists": true,
+    "shortcutTargetIsExe": true,
+    "shortcutIconIsBrandingIco": true,
+    "installedLaunchWindow": true,
+    "reinstallExit0": true,
+    "shortcutStable": true,
+    "checkAfterExit0": true,
+    "afterIconOk": true,
+    "afterRegistrationOk": true,
+    "uninstallExit0": true,
+    "desktopShortcutRemoved": true,
+    "startMenuShortcutRemoved": true,
+    "installDirRemoved": true
+  },
+  "checkOnly": {
+    "exitCode": 0,
+    "outputTail": "[INFO] python             OK         C:\\Python314\\python.exe\n[INFO] python-tk          OK         tkinter 可导入\n[INFO] pip                OK         python -m pip 可用\n[INFO] venv               MISSING    安装时将创建 venv\n[INFO] pip-requirements   MISSING    安装时将创建 venv 并执行 pip install\n[INFO] payload            OK         D:\\Celestrial-Throne\\repos\\drug-simulator\n[INFO] 依赖检查通过；运行 Install.ps1 执行安装/修复\n"
+  },
+  "install": {
+    "exitCode": 0,
+    "outputTail": "[INFO] 桌面快捷方式: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 开始菜单快捷方式: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 产品注册信息: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\celestial-product.json\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\installers\\celestial-drug-simulator.json\n[INFO] 安装完成：C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\n[INFO] 快捷方式 desktop: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 快捷方式 startMenu: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n",
+    "installedIcon": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\assets\\branding\\celestial-drug-simulator.ico",
+    "iconExists": true,
+    "registrationPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\celestial-product.json",
+    "registrationExists": true,
+    "receiptExists": true
+  },
+  "launch": {
+    "pid": 38740,
+    "windowHandle": "0x240D9E",
+    "windowFound": true,
+    "target": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+    "arguments": "-m src.app"
+  },
+  "idempotent": {
+    "exitCode": 0,
+    "outputTail": "[INFO] 桌面快捷方式: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 开始菜单快捷方式: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 产品注册信息: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\celestial-product.json\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\installers\\celestial-drug-simulator.json\n[INFO] 安装完成：C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\n[INFO] 快捷方式 desktop: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n[INFO] 快捷方式 startMenu: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk -> C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe -m src.app\n"
+  },
+  "checkAfter": {
+    "exitCode": 0,
+    "outputTail": "[INFO] pip                OK         python -m pip 可用\n[INFO] venv               OK         C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\n[INFO] pip-requirements   OK         C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\python.exe\n[INFO] payload            OK         D:\\Celestrial-Throne\\repos\\drug-simulator\n[INFO] icon               OK         C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\assets\\branding\\celestial-drug-simulator.ico\n[INFO] registration       OK         C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\celestial-product.json\n[INFO] 依赖检查通过；运行 Install.ps1 执行安装/修复\n",
+    "report": {
+      "schemaVersion": 1,
+      "productId": "celestial-drug-simulator",
+      "displayName": "Celestial Drug Simulator",
+      "version": "1.0.0",
+      "mode": "check",
+      "result": "OK",
+      "generatedAt": "2026-11-13T05:08:11.7564002Z",
+      "host": "MEGA-REP",
+      "root": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41",
+      "installDir": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator",
+      "entryPoint": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "registrationPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\celestial-product.json",
+      "registrationExists": true,
+      "payloadReceiptPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\install-receipt.json",
+      "dependencies": [
+        {
+          "kind": "python",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "C:\\Python314\\python.exe",
+          "required": true
+        },
+        {
+          "kind": "python-tk",
+          "status": "OK",
+          "version": "Tk 3.14.3",
+          "detail": "tkinter 可导入",
+          "required": true
+        },
+        {
+          "kind": "pip",
+          "status": "OK",
+          "version": "3.14.3",
+          "detail": "python -m pip 可用",
+          "required": true
+        },
+        {
+          "kind": "venv",
+          "status": "OK",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv",
+          "required": true
+        },
+        {
+          "kind": "pip-requirements",
+          "status": "OK",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\python.exe",
+          "required": true
+        },
+        {
+          "kind": "payload",
+          "status": "OK",
+          "version": "",
+          "detail": "D:\\Celestrial-Throne\\repos\\drug-simulator",
+          "required": true
+        },
+        {
+          "kind": "icon",
+          "status": "OK",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\assets\\branding\\celestial-drug-simulator.ico",
+          "required": true
+        },
+        {
+          "kind": "registration",
+          "status": "OK",
+          "version": "",
+          "detail": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\celestial-product.json",
+          "required": true
+        }
+      ],
+      "optionalChecks": [
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 内缺少 PySide6；原生嵌入解剖视图需要 PySide6/QtWebEngine 6.12；缺失时产品自动回退简化视图",
+          "required": false
+        },
+        {
+          "kind": "python-module",
+          "status": "MISSING",
+          "detail": "venv 内缺少 numpy；tools/build_web_anatomy.py 构建期依赖；运行时不导入",
+          "required": false
+        }
+      ],
+      "shortcuts": [
+        {
+          "scope": "desktop",
+          "path": "D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk",
+          "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+          "arguments": "-m src.app",
+          "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\."
+        },
+        {
+          "scope": "startMenu",
+          "path": "C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk",
+          "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+          "arguments": "-m src.app",
+          "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\."
+        }
+      ],
+      "warnings": [],
+      "errors": []
+    }
+  },
+  "uninstall": {
+    "exitCode": 0,
+    "outputTail": "[INFO] 已删除快捷方式: D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk\n[INFO] 已删除快捷方式: C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk\n[INFO] 已删除安装目录: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator（用户数据目录保留）\n[INFO] 依赖报告: C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\installers\\celestial-drug-simulator.json\n"
+  },
+  "pass": true,
+  "registration": {
+    "productId": "celestial-drug-simulator",
+    "entryPoint": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+    "entryArguments": "-m src.app",
+    "iconPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\assets\\branding\\celestial-drug-simulator.ico",
+    "iconExists": true,
+    "entryExists": true,
+    "registryHint": "scan %LOCALAPPDATA%\\Celestial\\Programs\\*\\celestial-product.json"
+  },
+  "shortcuts": [
+    {
+      "path": "D:\\UserData\\Desktop\\Celestial Drug Simulator.lnk",
+      "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "arguments": "-m src.app",
+      "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.",
+      "iconLocation": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\assets\\branding\\celestial-drug-simulator.ico,0",
+      "iconFileExists": true,
+      "targetExists": true,
+      "targetIsExe": true,
+      "pointsAtCmdOrBat": false
+    },
+    {
+      "path": "C:\\Users\\15601\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Celestial\\Celestial Drug Simulator.lnk",
+      "targetPath": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.venv\\Scripts\\pythonw.exe",
+      "arguments": "-m src.app",
+      "workingDirectory": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\.",
+      "iconLocation": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-r2-celestial-drug-simulator-ef032783e15747bea59ccb5143d6cb41\\Programs\\Celestial-Drug-Simulator\\assets\\branding\\celestial-drug-simulator.ico,0",
+      "iconFileExists": true,
+      "targetExists": true,
+      "targetIsExe": true,
+      "pointsAtCmdOrBat": false
+    }
+  ]
+}

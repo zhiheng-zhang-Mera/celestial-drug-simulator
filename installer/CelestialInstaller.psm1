@@ -318,6 +318,7 @@ function Copy-CelestialPayload {
     }
     New-Item -ItemType Directory -Force -Path $Layout.InstallDir | Out-Null
     $copied = 0
+    $sourceHashes = @{}
     foreach ($item in @($Manifest.payloadIncludes)) {
         $relativeItem = [string]$item
         $source = Join-Path $SourceRoot $relativeItem
@@ -334,15 +335,31 @@ function Copy-CelestialPayload {
                 $destination = Join-Path $target $relativeFile
                 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
                 Copy-Item -LiteralPath $file.FullName -Destination $destination -Force
+                $sourceHashes[$repoRelative.Replace('\', '/')] = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
                 $copied++
             }
         } else {
             New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
             Copy-Item -LiteralPath $source -Destination $target -Force
+            $sourceHashes[$relativeItem.Replace('\', '/')] = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
             $copied++
         }
     }
-    Write-CelestialLog "payload 已复制（$copied 个文件）到 $($Layout.InstallDir)"
+    # Copy integrity: every installed payload file must match its source SHA-256.
+    $mismatches = New-Object System.Collections.ArrayList
+    foreach ($relative in $sourceHashes.Keys) {
+        $destination = Join-Path $Layout.InstallDir $relative
+        if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) {
+            $null = $mismatches.Add("missing:$relative")
+            continue
+        }
+        $actual = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+        if ($actual -ne $sourceHashes[$relative]) { $null = $mismatches.Add("hash:$relative") }
+    }
+    if ($mismatches.Count -gt 0) {
+        throw ("payload 复制校验失败: " + (@($mismatches) -join ', '))
+    }
+    Write-CelestialLog "payload 已复制并逐文件 SHA-256 校验（$copied 个文件）到 $($Layout.InstallDir)"
 
     $hashes = @(Get-CelestialPayloadHashes -Manifest $Manifest -Layout $Layout | ForEach-Object {
         [pscustomobject][ordered]@{
@@ -400,6 +417,12 @@ function New-CelestialShortcut {
     $icon = $target
     if ($shortcutSpec -and $shortcutSpec.PSObject.Properties['icon'] -and $shortcutSpec.icon) {
         $icon = Join-Path $Layout.InstallDir ([string]$shortcutSpec.icon)
+        if (-not (Test-Path -LiteralPath $icon -PathType Leaf)) {
+            throw "快捷方式图标不存在（应为安装目录内的产品 .ico）: $icon"
+        }
+        if ([IO.Path]::GetExtension($icon).ToLowerInvariant() -ne '.ico') {
+            throw "快捷方式图标必须是 .ico: $icon"
+        }
     }
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path) | Out-Null
     $shell = New-Object -ComObject WScript.Shell
@@ -421,6 +444,7 @@ function New-CelestialShortcut {
             arguments = $saved.Arguments
             workingDirectory = $saved.WorkingDirectory
             iconLocation = $saved.IconLocation
+            iconExists = (Test-Path -LiteralPath $icon -PathType Leaf)
         }
     } finally {
         if ($shell) { [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shell) }
@@ -499,6 +523,43 @@ function Test-CelestialOptionalChecks {
     }
 }
 
+function Write-CelestialRegistration {
+    param($Manifest, $Layout)
+    $shortcutSpec = $Manifest.shortcut
+    $entry = Join-Path $Layout.InstallDir ([string]$Manifest.entryPoint)
+    $arguments = ''
+    if ($Manifest.PSObject.Properties['entryArguments'] -and $Manifest.entryArguments) {
+        $arguments = ([string]$Manifest.entryArguments).Replace('{installDir}', $Layout.InstallDir)
+    }
+    $workingDirectory = $Layout.InstallDir
+    $icon = $entry
+    if ($shortcutSpec -and $shortcutSpec.PSObject.Properties['icon'] -and $shortcutSpec.icon) {
+        $icon = Join-Path $Layout.InstallDir ([string]$shortcutSpec.icon)
+    }
+    $registration = [ordered]@{
+        schemaVersion = 1
+        productId = [string]$Manifest.productId
+        displayName = [string]$Manifest.displayName
+        publisher = [string]$Manifest.publisher
+        version = [string]$Manifest.version
+        installDir = $Layout.InstallDir
+        entryPoint = $entry
+        entryArguments = $arguments
+        workingDirectory = $workingDirectory
+        iconPath = $icon
+        iconExists = (Test-Path -LiteralPath $icon -PathType Leaf)
+        registryHint = 'scan %LOCALAPPDATA%\Celestial\Programs\*\celestial-product.json'
+        installedAt = (Get-Date).ToUniversalTime().ToString('o')
+        shortcuts = @($script:CelestialState.Shortcuts | ForEach-Object {
+            [ordered]@{ scope = $_.scope; path = $_.path; iconLocation = $_.iconLocation }
+        })
+    }
+    $registrationPath = Join-Path $Layout.InstallDir 'celestial-product.json'
+    $registration | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $registrationPath -Encoding UTF8
+    Write-CelestialLog "产品注册信息: $registrationPath"
+    return $registrationPath
+}
+
 function Write-CelestialReport {
     param($Manifest, $Layout, [string]$Mode, [string]$Result, [string[]]$Errors = @())
     $payload = [ordered]@{
@@ -513,6 +574,9 @@ function Write-CelestialReport {
         root = $Layout.Root
         installDir = $Layout.InstallDir
         entryPoint = (Join-Path $Layout.InstallDir ([string]$Manifest.entryPoint))
+        registrationPath = (Join-Path $Layout.InstallDir 'celestial-product.json')
+        registrationExists = (Test-Path -LiteralPath (Join-Path $Layout.InstallDir 'celestial-product.json') -PathType Leaf)
+        payloadReceiptPath = (Join-Path $Layout.InstallDir 'install-receipt.json')
         dependencies = @($script:CelestialState.Dependencies)
         optionalChecks = @($script:CelestialState.Optional)
         shortcuts = @($script:CelestialState.Shortcuts)
@@ -577,6 +641,14 @@ function Invoke-CelestialCheck {
     # Verify an existing installation's shortcuts without modifying it.
     $shortcut = $Manifest.shortcut
     if (Test-Path -LiteralPath $Layout.InstallDir) {
+        $installedIcon = if ($shortcut -and $shortcut.PSObject.Properties['icon'] -and $shortcut.icon) {
+            Join-Path $Layout.InstallDir ([string]$shortcut.icon)
+        } else { '' }
+        $iconStatus = if (-not $installedIcon) { 'NOT_APPLICABLE' } elseif (Test-Path -LiteralPath $installedIcon -PathType Leaf) { 'OK' } else { 'MISSING' }
+        Add-CelestialDependency -Kind 'icon' -Status $iconStatus -Detail $installedIcon
+        $registration = Join-Path $Layout.InstallDir 'celestial-product.json'
+        $registrationStatus = if (Test-Path -LiteralPath $registration -PathType Leaf) { 'OK' } else { 'MISSING' }
+        Add-CelestialDependency -Kind 'registration' -Status $registrationStatus -Detail $registration
         foreach ($scope in @('desktop', 'startMenu')) {
             if (-not $shortcut -or -not $shortcut.$scope) { continue }
             $path = if ($scope -eq 'desktop') {
@@ -649,6 +721,8 @@ function Install-Celestial {
         $entry = Join-Path $Layout.InstallDir ([string]$Manifest.entryPoint)
         if (-not (Test-Path -LiteralPath $entry -PathType Leaf)) { throw "安装后缺少入口可执行文件: $entry" }
         $null = New-CelestialShortcuts -Manifest $Manifest -Layout $Layout
+        $registrationPath = Write-CelestialRegistration -Manifest $Manifest -Layout $Layout
+        Add-CelestialDependency -Kind 'registration' -Status 'OK' -Detail $registrationPath
         $report = Write-CelestialReport -Manifest $Manifest -Layout $Layout -Mode 'install' -Result 'OK'
         Write-CelestialLog ("安装完成：{0}" -f $Layout.InstallDir)
         foreach ($shortcut in $report.shortcuts) {
@@ -699,4 +773,4 @@ Export-ModuleMember -Function `
     Read-CelestialManifest, Get-CelestialLayout, Invoke-CelestialCheck, Install-Celestial, `
     Uninstall-Celestial, Write-CelestialReport, Test-CelestialExcluded, Find-CelestialPython, `
     Install-CelestialPython, New-CelestialShortcut, New-CelestialShortcuts, Copy-CelestialPayload, `
-    Write-CelestialLog
+    Write-CelestialRegistration, Write-CelestialLog

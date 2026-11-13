@@ -53,12 +53,16 @@
   installers\celestial-drug-simulator.json  # 依赖报告（每次运行刷新）
 ```
 
-- payload：`src/`、`assets/`、`data/`（不含运行时 `data/cache`、`data/reports`）、
-  `docs/`、`README.md`、`celestial_single_instance.py`。
+- payload：`src/`、`assets/`（含 `assets/branding/`）、`data/`（不含运行时 `data/cache`、
+  `data/reports`）、`docs/`、`README.md`、`celestial_single_instance.py`、`celestial_help.py`、
+  `celestial_branding.py`。
 - venv：`.venv\Scripts\python.exe`（运行）与 `.venv\Scripts\pythonw.exe`（快捷方式目标）。
 - 入口：`pythonw.exe -m src.app`，工作目录为安装目录（`-m` 依赖该 cwd 解析 `src` 包）。
-- 每次复制 payload 后生成 `install-receipt.json`（逐文件 SHA-256）；如清单提供
-  `payloadSha256` 固定哈希则强制校验。
+- 每次复制 payload 时逐文件比较源与安装目录的 SHA-256，不一致即失败；随后生成
+  `install-receipt.json`（逐文件 SHA-256）。如清单提供 `payloadSha256` 固定哈希则额外强制校验。
+- 安装后写 `celestial-product.json`（productId、displayName、entryPoint、entryArguments、
+  workingDirectory、iconPath、shortcuts、registryHint），供 Throne 子项目扫描发现：
+  `%LOCALAPPDATA%\Celestial\Programs\*\celestial-product.json`。
 - 安装幂等：重复运行覆盖 payload、保留 `state/` 与用户数据；`-Force` 额外重建 venv。
 
 ## 依赖处理
@@ -69,22 +73,23 @@
 2. 缺失时优先 `winget install Python.Python.3.12 --scope user --silent`；
    winget 不可用或失败则下载 python.org 官方安装器并
    `/quiet InstallAllUsers=0 Include_tcltk=1 Include_pip=1 TargetDir=...`。
+   该自动安装分支在本轮**未触发**（验收机已有 Python 3.14.3），标记 NOT_RUN。
 3. 创建 venv 后执行 `pip install -r requirements.txt`（本产品为空清单）与 `pip check`；
    `optionalChecks` 在依赖报告中报告 PySide6 / numpy 是否可用（仅报告，不自动下载）。
 4. 必需依赖失败：退出码 2，不创建桌面/开始菜单快捷方式。
 
-依赖报告字段：`python / python-tk / pip / venv / pip-requirements / payload` 的
-`OK | INSTALLED | MISSING | FAILED` 与实际版本；`optionalChecks` 记录可选增强状态。
+依赖报告字段：`python / python-tk / pip / venv / pip-requirements / payload / icon /
+registration` 的 `OK | INSTALLED | MISSING | FAILED` 与实际版本；`optionalChecks` 记录可选增强状态。
 
 ## 快捷方式
 
 - 桌面：`[Desktop]\Celestial Drug Simulator.lnk`
 - 开始菜单：`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Celestial\Celestial Drug Simulator.lnk`
-- 目标：`<安装目录>\.venv\Scripts\pythonw.exe`，参数 `-m src.app`，工作目录为安装目录，
-  图标取 `pythonw.exe`。**不是** `.cmd`/`.bat`/`powershell.exe`。
-  这是契约对 Python 产品的适配：入口仍为真实 `.exe`（pythonw），窗口程序无控制台。
-
-安装器创建后会用 WScript.Shell 回读 `.lnk` 并校验 `TargetPath` 与安装出的 exe 一致。
+- 目标：`<安装目录>\.venv\Scripts\pythonw.exe`，参数 `-m src.app`，工作目录为安装目录。
+  **不是** `.cmd`/`.bat`/`powershell.exe`。这是契约对 Python 产品的适配：入口仍为真实
+  `.exe`（pythonw），窗口程序无控制台。
+- 图标：`IconLocation = <安装目录>\assets\branding\celestial-drug-simulator.ico,0`（安装器复制
+  并在创建前检查文件存在，创建后用 WScript.Shell 回读 `TargetPath` 与 `IconLocation` 校验）。
 
 ## 单实例
 

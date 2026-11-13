@@ -13,7 +13,9 @@
     "data",
     "docs",
     "README.md",
-    "celestial_single_instance.py"
+    "celestial_single_instance.py",
+    "celestial_help.py",
+    "celestial_branding.py"
   ],
   "payloadExcludes": [
     "__pycache__",
@@ -58,7 +60,7 @@
     "desktop": true,
     "startMenu": true,
     "name": "Celestial Drug Simulator",
-    "icon": ".venv\\Scripts\\pythonw.exe",
+    "icon": "assets\\branding\\celestial-drug-simulator.ico",
     "workingDirectory": "."
   },
   "instanceTest": {

@@ -3,16 +3,16 @@
   "productId": "celestial-drug-simulator",
   "displayName": "Celestial Drug Simulator",
   "lockMode": "file",
-  "testedAt": "2026-11-12T12:26:43.1794368Z",
+  "testedAt": "2026-11-13T05:08:57.7620274Z",
   "repository": "D:\\Celestrial-Throne\\repos\\drug-simulator",
   "python": "C:\\Python314\\python.exe",
   "pythonVersion": "3.14.3",
   "instanceScope": "state",
-  "stateRoot": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-instance-452b88f081e3473189ee8102d0e75957",
+  "stateRoot": "C:\\Users\\15601\\AppData\\Local\\Temp\\celestial-instance-438df43a4bf14b73aa9e3ad799c40416",
   "windowTitle": "Celestial Drug Simulator · 人体作用与证据",
   "first": {
-    "pid": 28472,
-    "windowHandle": "0x7C0BD6",
+    "pid": 35356,
+    "windowHandle": "0x3B0E3C",
     "windowReady": true,
     "aliveAfterSecond": true
   },
@@ -24,8 +24,8 @@
     "containsAlreadyRunningMarker": true
   },
   "third": {
-    "pid": 32424,
-    "windowHandle": "0x260D1E",
+    "pid": 15280,
+    "windowHandle": "0x3D0D84",
     "windowReady": true
   },
   "checks": {

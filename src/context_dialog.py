@@ -5,9 +5,25 @@ from tkinter import ttk
 from src.context import normalize_context
 from src import ui_theme as ui
 
+try:
+    from celestial_help import attach_help
+except ModuleNotFoundError:  # direct `python src/...` execution from the repository root
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from celestial_help import attach_help
+
 PAPER = ui.PAPER
 SEX_CHOICES = (('unknown', '未填写 / 未知'), ('female', '女性'), ('male', '男性'),
                ('intersex', '间性'))
+HELP_TEXTS = {
+    'context': (
+        '这里填写可选的生理基线与基因记录，用于报告上下文，不用于自动诊断或剂量推荐。'
+        '数据只保存在本机内存与本机报告文件，不上传；留空保持未知，不会推断。保存后旧报告失效，'
+        '需要重新分析才能包含新上下文。'
+    ),
+}
 
 
 def edit_context(parent, current, on_save):
@@ -22,7 +38,11 @@ def edit_context(parent, current, on_save):
     body = tk.Frame(dialog, bg=PAPER['bg'], padx=24, pady=18)
     body.pack(fill='both', expand=True)
 
-    ui.text(body, '生理基线与基因', size=15, weight='bold').pack(anchor='w')
+    head = tk.Frame(body, bg=PAPER['bg'])
+    head.pack(fill='x')
+    ui.text(head, '生理基线与基因', size=15, weight='bold').pack(side='left')
+    attach_help(head, 'context', HELP_TEXTS['context'],
+                title='生理与基因').pack(side='left', padx=(8, 0))
     ui.text(body, '可留空；保存后旧报告失效。数据只保存在本机，不上传。', size=9,
             fg=PAPER['ink3']).pack(anchor='w', pady=(2, 14))
 

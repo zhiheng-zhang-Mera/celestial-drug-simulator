@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "productId": "celestial-drug-simulator",
+  "testedAt": "2026-11-13T05:11:40.096278+00:00",
+  "pythonVersion": "3.14.3",
+  "tkVersion": 8.6,
+  "checks": {
+    "manager": true,
+    "bubbleCount": 12,
+    "uniqueKeys": true,
+    "minimumBubbles": true,
+    "allTextsPresent": true,
+    "sentenceCounts2to8": true,
+    "toggleOpens": true,
+    "toggleCloses": true,
+    "tabFocusable": true,
+    "keyboardEnterOpens": true,
+    "escapeCloses": true,
+    "keyboardSpaceOpens": true,
+    "escapeClosesAfterSpace": true,
+    "clickAwayCloses": true,
+    "brandingIcoExists": true,
+    "brandingPngExists": true,
+    "windowIconApplied": true
+  },
+  "bubbles": [
+    {
+      "key": "data-status",
+      "title": "资料与在线状态",
+      "chars": 126,
+      "sentences": 3,
+      "text": "这里显示本地资料与在线查询的当前状态。默认使用随程序提供的本地药典与来源事实；只有你点击「Mayo 更新」时，药物名称才会发送到 mayoclinic.org（外部网站），不会发送方案、生理或基因数据。状态文字只反映本机缓存/在线结果，不代表临床结论。"
+    },
+    {
+      "key": "nav",
+      "title": "页面切换",
+      "chars": 76,
+      "sentences": 2,
+      "text": "两个页面分别是「人体作用」与「多药方案 / 联用机制」。切换只改变本机界面，不联网、不提交数据；选中物质或方案会在两个页面间共享，但不会上传到任何服务。"
+    },
+    {
+      "key": "overview",
+      "title": "多药方案说明",
+      "chars": 131,
+      "sentences": 3,
+      "text": "这里输入药物与给药方案，生成「联用机制与证据」只读报告。分析在本机 Python 进程内完成，不联网、不上传；默认使用随程序提供的本地参数与证据，缺失时明确标注为缺口或待复核。输出包含每个药对的证据、通路与状态，无法给出真实组合预测时会 fail-closed。"
+    },
+    {
+      "key": "input",
+      "title": "药物输入",
+      "chars": 99,
+      "sentences": 4,
+      "text": "输入药物名称即可分析；剂量、间隔与次数选填，默认按药物与途径匹配。名称只与本机药典/缓存比对，离线也能工作；自定义或合成参数会标记为假设，不代表真实药物暴露。添加后进入左侧方案列表，可再更新或删除。"
+    },
+    {
+      "key": "options",
+      "title": "更多选项",
+      "chars": 106,
+      "sentences": 3,
+      "text": "更多选项控制给药途径、次数、物质类别与在线查询。勾选「优先在线查询」只影响 Mayo/公开标签查询，且只发送药物名称；取消勾选则完全使用本地资料。合成 IV 参数只生成明确标注的假设曲线，不替代真实 PK/PD。"
+    },
+    {
+      "key": "plan",
+      "title": "方案列表",
+      "chars": 67,
+      "sentences": 3,
+      "text": "左侧列出已添加的药物与身份来源。选中一行可更新或删除；列表只保存在本次本机会话，不写入云端。删除或修改会使既有报告失效，需要重新分析。"
+    },
+    {
+      "key": "report",
+      "title": "报告输出",
+      "chars": 86,
+      "sentences": 2,
+      "text": "右侧显示联用机制与证据报告，可切换「假设曲线数据」。报告包含输入、缺口、所有药对、来源记录与哈希，可导出为本地 JSON；这是工程/研究输出，不构成医学建议或真实组合预测。"
+    },
+    {
+      "key": "exposure",
+      "title": "假设曲线数据",
+      "chars": 72,
+      "sentences": 2,
+      "text": "这里只在高级「合成 IV 假设曲线」模式下显示浓度-时间数据。数值来自你填写的假设参数，不是真实药物暴露或患者预测；导出仅写入你选择的本地文件。"
+    },
+    {
+      "key": "search",
+      "title": "物质检索",
+      "chars": 121,
+      "sentences": 4,
+      "text": "在这里输入或选择要查看的药物物质。默认只在本机药典与来源缓存中匹配，不联网；输入中文或英文名均可。选中后「人体作用」页会显示该物质的证据关联，右侧阅读区同步更新。只有点击「Mayo 更新」时才会把药物名称发送到 mayoclinic.org。"
+    },
+    {
+      "key": "mayo",
+      "title": "Mayo 查询边界",
+      "chars": 98,
+      "sentences": 3,
+      "text": "「Mayo 更新」会打开外部网站查询并只发送药物名称；「打开 Mayo 搜索」只启动本机浏览器。结果写入本机 data/cache，供后续离线使用；不会上传方案、生理或基因数据，也不自动下载模型。"
+    },
+    {
+      "key": "body",
+      "title": "人体作用视图",
+      "chars": 104,
+      "sentences": 3,
+      "text": "这是本机渲染的人体示意图与器官/肌肉网格，用于定位证据关联，不是诊断或影像。点击器官、系统或肌肉切换右侧证据；所有渲染资源都在本机，不加载 CDN 或外部模型。没有真实网格的部位会明确标注为示意图或不含骨骼。"
+    },
+    {
+      "key": "evidence",
+      "title": "证据阅读",
+      "chars": 91,
+      "sentences": 2,
+      "text": "这里显示所选区域的证据阅读结果：来源、机制/代谢/排泄关联、置信与缺口。证据来自随程序提供的来源事实与本地缓存，不代表临床结论；缺失证据会明确显示为未知，不会自动推断「无相互作用」。"
+    }
+  ],
+  "icon": {
+    "icoPath": "D:\\Celestrial-Throne\\repos\\drug-simulator\\assets\\branding\\celestial-drug-simulator.ico",
+    "pngPath": "D:\\Celestrial-Throne\\repos\\drug-simulator\\assets\\branding\\celestial-drug-simulator.png",
+    "icoExists": true,
+    "pngExists": true,
+    "applied": [
+      "iconbitmap",
+      "iconphoto"
+    ],
+    "errors": [],
+    "windowIconBitmap": ""
+  },
+  "screenshots": [
+    {
+      "path": "D:\\Celestrial-Throne\\repos\\drug-simulator\\_evidence\\round2\\help-bubble-collapsed-celestial-drug-simulator.png",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "path": "D:\\Celestrial-Throne\\repos\\drug-simulator\\_evidence\\round2\\help-bubble-expanded-celestial-drug-simulator.png",
+      "width": 1440,
+      "height": 900
+    }
+  ],
+  "pass": true,
+  "window": {
+    "title": "Celestial Drug Simulator · 人体作用与证据",
+    "geometry": "1440x900+30+30"
+  }
+}

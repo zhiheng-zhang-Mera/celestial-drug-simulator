@@ -18,7 +18,45 @@ from src.simulation import simulate
 from src import report_model
 from src import ui_theme as ui
 
+try:
+    from celestial_help import attach_help
+except ModuleNotFoundError:  # direct `python src/...` execution from the repository root
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    from celestial_help import attach_help
+
 PAPER = ui.PAPER
+HELP_TEXTS = {
+    'overview': (
+        '这里输入药物与给药方案，生成「联用机制与证据」只读报告。分析在本机 Python 进程内完成，'
+        '不联网、不上传；默认使用随程序提供的本地参数与证据，缺失时明确标注为缺口或待复核。'
+        '输出包含每个药对的证据、通路与状态，无法给出真实组合预测时会 fail-closed。'
+    ),
+    'input': (
+        '输入药物名称即可分析；剂量、间隔与次数选填，默认按药物与途径匹配。名称只与本机药典/'
+        '缓存比对，离线也能工作；自定义或合成参数会标记为假设，不代表真实药物暴露。'
+        '添加后进入左侧方案列表，可再更新或删除。'
+    ),
+    'options': (
+        '更多选项控制给药途径、次数、物质类别与在线查询。勾选「优先在线查询」只影响 Mayo/公开'
+        '标签查询，且只发送药物名称；取消勾选则完全使用本地资料。合成 IV 参数只生成明确标注的'
+        '假设曲线，不替代真实 PK/PD。'
+    ),
+    'plan': (
+        '左侧列出已添加的药物与身份来源。选中一行可更新或删除；列表只保存在本次本机会话，'
+        '不写入云端。删除或修改会使既有报告失效，需要重新分析。'
+    ),
+    'report': (
+        '右侧显示联用机制与证据报告，可切换「假设曲线数据」。报告包含输入、缺口、所有药对、'
+        '来源记录与哈希，可导出为本地 JSON；这是工程/研究输出，不构成医学建议或真实组合预测。'
+    ),
+    'exposure': (
+        '这里只在高级「合成 IV 假设曲线」模式下显示浓度-时间数据。数值来自你填写的假设参数，'
+        '不是真实药物暴露或患者预测；导出仅写入你选择的本地文件。'
+    ),
+}
 ROUTES = {'口服 / 片剂': 'oral', '经皮': 'transdermal', '舌下': 'sublingual', '注射': 'injection',
           '其他': 'other', '静脉推注 · 假设模型': 'iv_bolus', '输注': 'infusion'}
 ROUTE_LABELS = {value: label for label, value in ROUTES.items()}
@@ -101,6 +139,8 @@ class RegimenWorkspace(tk.Frame):
             side='left', padx=(0, 10))
         ui.FlatButton(actions, '分析联用机制', kind='primary', command=self.calculate).pack(
             side='left')
+        attach_help(header, 'overview', HELP_TEXTS['overview'],
+                    title='多药方案说明').pack(side='right', padx=(8, 0))
 
         # editor ------------------------------------------------------------
         card = tk.Frame(self, bg=PAPER['surface'], highlightthickness=1,
@@ -108,6 +148,12 @@ class RegimenWorkspace(tk.Frame):
         card.grid(row=1, column=0, sticky='ew', padx=24)
         inner = tk.Frame(card, bg=PAPER['surface'], padx=16, pady=14)
         inner.pack(fill='x')
+        editor_head = tk.Frame(inner, bg=PAPER['surface'])
+        editor_head.pack(fill='x')
+        ui.text(editor_head, '药物与剂量输入', size=9, weight='bold',
+                bg=PAPER['surface']).pack(side='left')
+        attach_help(editor_head, 'input', HELP_TEXTS['input'],
+                    title='药物输入').pack(side='left', padx=(6, 0))
         fields = tk.Frame(inner, bg=PAPER['surface'])
         fields.pack(fill='x')
         self.variables = {key: tk.StringVar() for key in
@@ -176,6 +222,8 @@ class RegimenWorkspace(tk.Frame):
             side='left', padx=(18, 0))
         ui.checkbox(switches, '高级：合成 IV 假设曲线', self.advanced,
                     command=self.toggle_advanced).pack(side='left', padx=(18, 0))
+        attach_help(switches, 'options', HELP_TEXTS['options'],
+                    title='更多选项').pack(side='left', padx=(12, 0))
 
         self.advanced_box = tk.Frame(more, bg=PAPER['surface2'], padx=12, pady=10)
         ui.text(self.advanced_box, '合成模型参数 · 仅用于假设曲线，不代表所填药物的真实暴露。',
@@ -213,6 +261,8 @@ class RegimenWorkspace(tk.Frame):
         ui.FlatButton(buttons, '更新选中', kind='quiet',
                       command=lambda: self.add(True)).pack(side='left', padx=(0, 6))
         ui.FlatButton(buttons, '删除选中', kind='quiet', command=self.remove).pack(side='left')
+        attach_help(plan_head, 'plan', HELP_TEXTS['plan'],
+                    title='方案列表').pack(side='right', padx=(0, 8))
 
         listing_frame = tk.Frame(left, bg=PAPER['surface'], highlightthickness=1,
                                  highlightbackground=PAPER['line'])
@@ -248,6 +298,8 @@ class RegimenWorkspace(tk.Frame):
         self.results.pack(side='left')
         self.results.add('report', '联用机制与证据')
         self.results.add('exposure', '假设曲线数据')
+        attach_help(results_head, 'report', HELP_TEXTS['report'],
+                    title='报告输出').pack(side='left', padx=(10, 0))
 
         stack = tk.Frame(right, bg=PAPER['bg'])
         stack.grid(row=1, column=0, sticky='nsew')
@@ -267,6 +319,8 @@ class RegimenWorkspace(tk.Frame):
         ui.text(exposure_head, '假设曲线数据', size=9, fg=PAPER['ink2']).pack(side='left')
         ui.text(exposure_head, '仅在高级合成模式下生成，不代表真实暴露。', size=8,
                 fg=PAPER['ink3']).pack(side='left', padx=(10, 0))
+        attach_help(exposure_head, 'exposure', HELP_TEXTS['exposure'],
+                    title='假设曲线数据').pack(side='left', padx=(10, 0))
         self.exposure = ttk.Treeview(self.exposure_host, show='headings', style='Paper.Treeview')
         self.exposure.pack(fill='both', expand=True, padx=14, pady=(0, 12))
         self._show_result('report')

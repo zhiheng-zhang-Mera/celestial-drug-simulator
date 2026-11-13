@@ -4,6 +4,53 @@ Implementation update (2026-11-05): the feature branch contains a local multi-dr
 
 Packaging update (2026-11-12): the repository now ships its own complete per-user installer and host-wide single-instance guard. `./installer/Install.ps1 -CheckOnly` checks Python 3.12+/Tk and pip; `./installer/Install.ps1` installs to `%LOCALAPPDATA%\Celestial\Programs\Celestial-Drug-Simulator`, creates desktop/Start-menu shortcuts that target the installed `.venv\Scripts\pythonw.exe -m src.app` (never cmd/bat), and writes a dependency report. `-Uninstall` removes shortcuts and the install directory while keeping user data. A second launch focuses the existing window and exits with `CELESTIAL_ALREADY_RUNNING` (code 3); double-process evidence is produced by `./scripts/Test-SingleInstance.ps1`. See [installer/README.md](installer/README.md) and [installer/EVIDENCE.md](installer/EVIDENCE.md).
 
+## 当前能力复检（2026-11-13）
+
+### 能做（本机真实入口）
+
+- Tk 桌面窗口：`人体作用` 与 `多药方案 / 联用机制` 两页；本地药典/来源事实、方案编辑、
+  联用机制与证据报告导出（本地 JSON）。核心 Tk 工作流不依赖第三方包。
+- **帮助浮标**：12 个 `?` 覆盖资料/在线状态、页面切换、方案总览、药物输入、更多选项、
+  方案列表、报告输出、假设曲线、物质检索、Mayo 边界、人体视图与证据阅读，以及生理/基因与
+  PGx 两个对话框。默认收起，点击或 Enter/Space 展开，再次点击、点击空白或 Esc 收起；
+  文本为同模块静态说明，不调用模型、不发网络。
+- **品牌图标**：`assets/branding/celestial-drug-simulator.ico`（+ 256px `.png`）。Tk 标题栏用
+  `iconbitmap`/`iconphoto` 设置（兼容 `pythonw.exe`）；安装器复制到安装目录，桌面/开始菜单
+  `.lnk` 的 `IconLocation` 指向安装目录内的 `.ico`。
+- **完整安装器**：Python 3.12+/Tk/pip 检查（缺失时 winget → python.org 静默 per-user 安装）、
+  venv、payload 逐文件 SHA-256 复制校验、幂等重装、`-CheckOnly/-Uninstall/-Force/-Root`；
+  安装目录写 `celestial-product.json` 供 Throne 子项目发现。
+- **同主机单实例**：`Global\Celestial.celestial-drug-simulator.simulator` 互斥体（回退
+  `%ProgramData%\Celestial\locks` 文件锁）；第二实例聚焦窗口并 exit 3 + `CELESTIAL_ALREADY_RUNNING`。
+
+### 做不到 / 未验收
+
+- 不做真实组合预测，不提供诊断/剂量建议；缺失证据保持 `INSUFFICIENT_EVIDENCE` /
+  `MECHANISTIC_INFERENCE_ONLY` 等 fail-closed 状态。在线 Mayo 查询只在显式点击时发送药物名称。
+- **原生 PySide6/QtWebEngine 解剖视图未在安装 venv 中实测（NOT_RUN）**：默认可选包不安装，
+  缺失时回退简化视图；本机系统 Python 有 PySide6 6.12.0，但安装 venv 是隔离的。
+- **纯新主机自动安装 Python 未实测（NOT_RUN）**：本机已有 Python 3.14.3 + Tk。
+- **Throne 子项目入口实际启动本模块未在本仓验收（NOT_RUN）**：本仓只提供
+  `celestial-product.json` 注册信息；Throne 侧发现/启动在 Celestial-Throne 仓验收。
+- `node --test tests/web_anatomy.test.mjs` 未运行；未录制 GUI 视频；未做 Android/移动端验收。
+
+### 能做到什么程度
+
+本机单用户的研究/工程模拟器：真实窗口、真实本机计算与本地报告导出、可重复安装卸载。
+不是临床验证产品，真实组合预测与独立科学验证仍未完成。
+
+### 验证命令与最近结果（2026-11-13）
+
+| 命令 | 结果 |
+|---|---|
+| `python -B -m unittest discover -s tests` | 109 tests OK |
+| `python -B scripts/verify_round2_ui.py` | PASS：12 浮标、开关/键盘/Esc/点击空白、图标回读 |
+| `./installer/Install.ps1 -CheckOnly` | exit 0（pwsh 7 与 Windows PowerShell 5.1） |
+| `./installer/Install.ps1 -Root <temp> -Force` + 重装 + `-CheckOnly` + `-Uninstall` | 全 exit 0；快捷方式 IconLocation = 安装目录 `.ico`；目标 `pythonw.exe -m src.app`；安装后窗口可启动 |
+| `./scripts/Test-SingleInstance.ps1` / `-LockMode file` | PASS / PASS |
+
+证据：`_evidence/round2/`（帮助浮标截图、图标与快捷方式回读、安装器退出码、单实例 JSON）。
+
 > **循证治理的多药药代动力学 / 药效动力学机制模拟器**  
 > **Evidence-Governed Mechanistic Simulator for Multi-Drug Pharmacokinetic and Pharmacodynamic Interactions**
 
